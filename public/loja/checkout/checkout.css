@@ -1,0 +1,289 @@
+/* ==========================================================================
+   PÁGINA DE CHECKOUT
+   ========================================================================== */
+
+.checkout-header {
+    background: var(--oxblood-deep);
+    padding: 1.5rem 0;
+    text-align: center;
+    border-bottom: 1px solid var(--hair);
+}
+
+.checkout-header .brand-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    color: var(--parchment);
+    text-decoration: none;
+}
+
+.checkout-section {
+    background: var(--parchment-dim);
+    padding: 3rem 1.5rem 5rem;
+    min-height: calc(100vh - 200px);
+}
+
+.checkout-title-wrap {
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+}
+
+@media (min-width: 900px) {
+    .checkout-grid {
+        grid-template-columns: 1.4fr 1fr;
+    }
+}
+
+/* Form Styles */
+.form-block {
+    background: var(--parchment);
+    border: 1px solid var(--hair);
+    padding: 2rem;
+    margin-bottom: 1.8rem;
+}
+
+.form-block h3 {
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--hair);
+    padding-bottom: 0.6rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-bottom: 0.4rem;
+}
+
+.form-group input {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--hair);
+    color: var(--ink);
+    padding: 0.8rem 1rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.05rem;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--ember);
+    background: #fff;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-row .form-group {
+    flex: 1;
+    min-width: 140px;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+.flex-3 { flex: 3; }
+
+/* Payment Options */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--hair);
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.payment-option:hover {
+    background: var(--parchment);
+    border-color: var(--gold);
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--ember);
+    border-radius: 50%;
+    margin-right: 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-option input[type="radio"]:checked + .radio-custom::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: var(--ember);
+    border-radius: 50%;
+}
+
+.payment-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-info strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+}
+
+.payment-info span {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.btn-checkout {
+    width: 100%;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--oxblood-deep);
+    border: none;
+    padding: 1.2rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-checkout:hover {
+    background: var(--gold-bright);
+    transform: translateY(-2px);
+}
+
+/* Summary Card */
+.summary-card {
+    background: var(--oxblood-deep);
+    color: var(--parchment);
+    padding: 2.2rem;
+    position: sticky;
+    top: 2rem;
+    border: 1px solid var(--hair);
+}
+
+.summary-card h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold-bright);
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.item-details h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    margin: 0;
+    color: var(--parchment);
+}
+
+.item-details p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(244, 238, 223, 0.7);
+}
+
+.item-qty {
+    font-size: 0.8rem;
+    color: var(--gold);
+}
+
+.item-price {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--gold-bright);
+}
+
+.summary-divider {
+    height: 1px;
+    background: var(--hair);
+    margin: 1.5rem 0;
+    opacity: 0.5;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: rgba(244, 238, 223, 0.8);
+}
+
+.summary-line.discount {
+    color: var(--gold-bright);
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+}
+
+.summary-total strong {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: var(--gold-bright);
+}
+
+.guarantee-box {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--hair);
+    text-align: center;
+}
+
+.guarantee-box .cross-icon {
+    color: var(--gold);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.guarantee-box p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    margin: 0;
+    color: rgba(244, 238, 223, 0.7);
+}

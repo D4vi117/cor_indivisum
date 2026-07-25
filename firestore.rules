@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Bloqueia todo o acesso público por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Coleção de pedidos: NENHUM cliente acessa diretamente via web.
+    // Apenas a Cloud Function (Admin SDK) pode ler e criar pedidos.
+    match /orders/{orderId} {
+      allow read, write: if false;
+    }
+
+    // Exemplo: Se você tiver produtos ou conteúdos públicos que qualquer um pode ler:
+    // match /produtos/{produtoId} {
+    //   allow read: if true;
+    //   allow write: if false;
+    // }
+  }
+}
