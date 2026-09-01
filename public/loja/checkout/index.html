@@ -11,8 +11,13 @@
 		rel="stylesheet">
 	<link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="checkout.css">
-	<link rel="icon" href="favicon.png" type="image/png">
-
+    <link rel="stylesheet" href="/src/styles/gsi-buttons.css">
+	<link rel="icon" href="/favicon.png" type="image/png">
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+	
 </head>
 
 <body>
@@ -43,60 +48,80 @@
 							<h3>1. Dados Pessoais</h3>
 							<div class="form-group">
 								<label for="nome">Nome Completo</label>
-								<input type="text" id="nome" placeholder="Seu nome completo" required>
+								<input type="text" id="nome" name="nome" autocomplete="name" placeholder="Seu nome completo" required>
 							</div>
 							<div class="form-row">
 								<div class="form-group">
 									<label for="email">E-mail</label>
-									<input type="email" id="email" placeholder="seu@email.com" required>
+									<input type="email" id="email" name="email" autocomplete="email" spellcheck="false" placeholder="seu@email.com" required>
 								</div>
 								<div class="form-group">
 									<label for="telefone">WhatsApp / Telefone</label>
-									<input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+									<input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="tel" placeholder="(00) 00000-0000" required>
 								</div>
+							</div>
+							<div class="form-group">
+								<label for="documento">CPF ou CNPJ</label>
+								<input type="text" id="documento" name="documento" autocomplete="off" inputmode="numeric" placeholder="Só números" required>
 							</div>
 						</div>
 
 						<!-- Seção 2: Endereço de Entrega -->
 						<div class="form-block">
 							<h3>2. Endereço de Entrega</h3>
+
+							<!-- Só aparece se o usuário tiver endereços salvos -->
+							<div id="enderecos-salvos-checkout" class="form-group" style="display:none;">
+								<label for="endereco-salvo-select">Usar um endereço salvo</label>
+								<select id="endereco-salvo-select" name="enderecoSalvo" autocomplete="off">
+									<option value="novo">Novo endereço</option>
+								</select>
+							</div>
+
 							<div class="form-row">
 								<div class="form-group flex-2">
 									<label for="cep">CEP</label>
-									<input type="text" id="cep" placeholder="00000-000" required>
+									<input type="text" id="cep" name="cep" autocomplete="postal-code" inputmode="numeric" placeholder="00000-000" required>
 								</div>
 								<div class="form-group flex-1">
 									<label for="estado">Estado</label>
-									<input type="text" id="estado" placeholder="UF" maxlength="2" required>
+									<input type="text" id="estado" name="estado" autocomplete="address-level1" placeholder="UF" maxlength="2" required>
 								</div>
 							</div>
+
+							<div id="frete-opcoes" class="frete-opcoes"></div>
 							<div class="form-row">
 								<div class="form-group flex-3">
 									<label for="rua">Rua / Avenida</label>
-									<input type="text" id="rua" placeholder="Logradouro" required>
+									<input type="text" id="rua" name="rua" autocomplete="address-line1" placeholder="Logradouro" required>
 								</div>
 								<div class="form-group flex-1">
 									<label for="numero">Número</label>
-									<input type="text" id="numero" placeholder="123" required>
+									<input type="text" id="numero" name="numero" autocomplete="address-line2" inputmode="numeric" placeholder="123" required>
 								</div>
 							</div>
 							<div class="form-row">
 								<div class="form-group">
 									<label for="complemento">Complemento (opcional)</label>
-									<input type="text" id="complemento" placeholder="Apto, Bloco, etc.">
+									<input type="text" id="complemento" name="complemento" autocomplete="off" placeholder="Apto, Bloco, etc.">
 								</div>
 								<div class="form-group">
 									<label for="bairro">Bairro</label>
-									<input type="text" id="bairro" placeholder="Seu bairro" required>
+									<input type="text" id="bairro" name="bairro" autocomplete="address-level3" placeholder="Seu bairro" required>
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="cidade">Cidade</label>
-								<input type="text" id="cidade" placeholder="Sua cidade" required>
+								<input type="text" id="cidade" name="cidade" autocomplete="address-level2" placeholder="Sua cidade" required>
 							</div>
+
+							<label class="form-group" style="flex-direction:row; align-items:center; gap:8px;">
+								<input type="checkbox" id="salvar-endereco-checkbox" name="salvarEndereco" style="width:auto;">
+								Salvar este endereço para próximas compras (até 3 endereços)
+							</label>
 						</div>
 
-						<button class="btn-checkout">Finalizar e Pagar</button>
+						<button class="btn-checkout" disabled>Finalizar e Pagar</button>
 					</form>
 				</div>
 
@@ -109,11 +134,10 @@
 							<!-- Item Exemplo -->
 							<div class="cart-item">
 								<div class="item-details">
-									<h4>Maria, a Flauta de Deus</h4>
-									<p>Edição de Estreia</p>
-									<span class="item-qty">Qtd: 1</span>
+
+									<span class="item-qty"></span>
 								</div>
-								<div class="item-price">R$ 49,90</div>
+								<div class="item-price"></div>
 							</div>
 						</div>
 
@@ -121,12 +145,12 @@
 
 						<div class="summary-lines">
 							<div class="summary-line">
-								<span>Subtotal</span>
-								<span>R$ 49,90</span>
+								<span></span>
+								<span></span>
 							</div>
 							<div class="summary-line">
 								<span>Frete</span>
-								<span>R$ 15,00</span>
+								<span></span>
 							</div>
 						</div>
 
@@ -154,6 +178,8 @@
 		<p class="blessing">Fique conosco, conte com a nossa amizade e que Deus te abençoe.</p>
 		<p class="fine">COR INDIVISUM &middot; Iniciativa católica leiga &middot; Produção audiovisual &amp; editora</p>
 	</footer>
+<script src="/src/scripts/firebase-init.js"></script>
+<script src="/src/scripts/auth-guard.js"></script>
 <script src="checkout.js"></script>
 </body>
 

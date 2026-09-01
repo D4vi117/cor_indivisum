@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loja · Cor Indivisum</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- styles.css entra primeiro: traz as variáveis de cor, fontes e reset da identidade visual -->
+  <link rel="stylesheet" href="/styles.css">
+  <!-- loja.css entra depois e cuida só do que é específico da loja (grid, cards, modal do carrinho) -->
+  <link rel="stylesheet" href="loja.css">
+
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="/src/scripts/firebase-init.js"></script>
+</head>
+<body>
+
+<!-- TOPO COM BOTÃO QUE ABRE O MODAL -->
+
+<header class="loja-header">
+  <div class="loja-header-inner">
+    <a href="/" class="brand-logo">COR INDIVISUM</a>
+    <nav class="nav-links" id="nav-links">
+			<a href="/">Home</a>
+			<a href="/loja">Loja</a>
+			<a href="/minha-conta">Minha Conta</a>
+		</nav>
+
+    <div class="header-actions">
+      <div class="header-right">
+			<nav class="nav-links-desktop" id="nav-links-desktop">
+
+			<a href="/">Home</a>
+				<a href="/loja">Loja</a>
+				<a href="/minha-conta">Minha Conta</a>
+			</nav>
+      <button type="button" class="btn-carrinho-topo" id="btn-abrir-carrinho">
+        <img src="/src/images/icons/cart.svg" alt="Carrinho"> Carrinho (<span id="cart-count">0</span>)
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MODAL DRAWER DO CARRINHO (Aparece ao clicar no carrinho) -->
+<div class="carrinho-modal-overlay" id="carrinho-modal" hidden>
+  <div class="carrinho-modal-content" role="dialog" aria-modal="true" aria-labelledby="carrinho-modal-titulo">
+    <div class="carrinho-modal-header">
+      <h3 id="carrinho-modal-titulo">Seu Carrinho</h3>
+      <button type="button" class="btn-fechar-modal" id="btn-fechar-carrinho" aria-label="Fechar carrinho">&times;</button>
+    </div>
+
+    <div class="carrinho-modal-body" id="modal-carrinho-itens">
+      <!-- Os itens do carrinho renderizam aqui via JS -->
+    </div>
+
+    <div class="carrinho-modal-footer">
+      <div class="subtotal-wrap">
+        <span>Subtotal:</span>
+        <strong id="modal-carrinho-subtotal">R$ 0,00</strong>
+      </div>
+      <div class="modal-acoes-duplas">
+        <a href="/loja/carrinho" class="btn-secundario text-center">Ver Carrinho Completo</a>
+        <a href="/loja/checkout" class="btn-primary text-center">Finalizar Compra</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <main class="loja-container">
+
+    <!-- BARRA DE FILTROS E BUSCA -->
+    <section class="loja-controles">
+      <div class="busca-wrap">
+        <input type="text" id="input-busca" placeholder="Buscar produtos...">
+      </div>
+
+      <div class="filtro-wrap">
+        <select id="select-categoria">
+          <option value="">Todas as Categorias</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- GRID DE PRODUTOS -->
+    <section class="produtos-grid" id="produtos-container">
+      <p class="loading-state">Carregando catálogo...</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="cross">✝</div>
+    <p class="fine">COR INDIVISUM &middot; Iniciativa católica leiga &middot; Produção audiovisual &amp; editora</p>
+  </footer>
+  <script src="/src/scripts/checkout-utils.js"></script>
+  <script src="loja.js"></script>
+</body>
+</html>

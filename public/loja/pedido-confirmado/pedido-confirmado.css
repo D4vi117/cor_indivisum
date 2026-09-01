@@ -1,0 +1,360 @@
+:root {
+    --oxblood: #3E1119;
+    --oxblood-deep: #200A0F;
+    --ember: #8C2F39;
+    --parchment: #F4EEDF;
+    --parchment-dim: #E9E0CB;
+    --gold: #B8923D;
+    --gold-bright: #D4B15E;
+    --ink: #2A1F1A;
+    --ink-soft: #5A4B3E;
+    --hair: rgba(184, 146, 61, 0.35);
+    --sucesso: #2f6b3e;
+    --erro: #7a2020;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--parchment-dim);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+h1, h2, .eyebrow {
+    font-family: 'Cinzel', serif;
+}
+
+.eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: inline-block;
+    margin-bottom: 0.4rem;
+}
+
+/* ---------- topo ---------- */
+.conta-top {
+    background: var(--oxblood-deep);
+    padding: 1.4rem 1.5rem;
+}
+
+.conta-top-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+}
+
+.conta-brand {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.12em;
+    color: var(--parchment);
+    font-size: 1.05rem;
+    text-decoration: none;
+}
+
+.conta-brand-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: rgba(244, 238, 223, 0.6);
+    font-size: 0.95rem;
+}
+
+/* ---------- shell ---------- */
+.conta-shell {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.6rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+.conta-titulo {
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: var(--ink);
+    margin: 0 0 0.4rem;
+}
+
+.conta-nota {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    margin: 0 0 1.6rem;
+}
+
+.conta-card {
+    background: var(--parchment);
+    border: 1px solid var(--hair);
+    padding: 2rem 2.2rem;
+}
+
+.conta-card h1,
+.conta-card h2 {
+    font-weight: 500;
+    font-size: 1.35rem;
+    margin: 0 0 1.4rem;
+    color: var(--ink);
+}
+
+/* ---------- estados ---------- */
+.pc-estado {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    text-align: left;
+    animation: pc-in 0.5s ease both;
+}
+
+.pc-estado[hidden] {
+    display: none;
+}
+
+@keyframes pc-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#estadoSemLogin,
+#estadoErro {
+    text-align: center;
+    align-items: center;
+    padding: 3rem 1rem;
+}
+
+#estadoSemLogin .conta-nota,
+#estadoErro .conta-nota {
+    max-width: 34em;
+}
+
+/* ---------- selo de sucesso ---------- */
+.pc-selo {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--oxblood-deep);
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.6rem;
+    animation: pc-selo-in 0.6s ease both;
+}
+
+@keyframes pc-selo-in {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.pc-selo-check {
+    color: var(--gold-bright);
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.pc-titulo-centro {
+    text-align: center;
+}
+
+.pc-subtitulo-centro {
+    text-align: center;
+    margin: 0 auto 1.6rem;
+    max-width: 32em;
+}
+
+.pc-card-numero {
+    text-align: center;
+}
+
+.pc-card-numero h2 {
+    font-size: 1.6rem;
+    margin-bottom: 0.9rem;
+    color: var(--ember);
+}
+
+/* ---------- itens (reaproveita padrão de pedido-card) ---------- */
+.pedidos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+}
+
+.pc-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--hair);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+}
+
+.pc-item:last-child {
+    border-bottom: none;
+}
+
+.pc-total-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hair);
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.pc-total-linha strong {
+    font-size: 1.3rem;
+    color: var(--ember);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* ---------- status (mesma linguagem visual do Minha Conta) ---------- */
+.pedido-status {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.8rem;
+    border-radius: 10px;
+    background: rgba(90, 75, 62, 0.12);
+    color: var(--ink-soft);
+    display: inline-block;
+}
+
+.pedido-status[data-status="pago"],
+.pedido-status[data-status="entregue"] {
+    background: rgba(47, 107, 62, 0.14);
+    color: var(--sucesso);
+}
+
+.pedido-status[data-status="aguardando_pagamento"],
+.pedido-status[data-status="preparando"],
+.pedido-status[data-status="saiu"] {
+    background: rgba(184, 146, 61, 0.18);
+    color: #8a6a1f;
+}
+
+.pedido-status[data-status="recusado"],
+.pedido-status[data-status="cancelado"] {
+    background: rgba(122, 32, 32, 0.12);
+    color: var(--erro);
+}
+
+.pedido-status[data-status="reembolsado"] {
+    background: rgba(90, 75, 62, 0.16);
+    color: var(--ink-soft);
+}
+
+/* ---------- rastreio ---------- */
+.pc-rastreio-linha {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+}
+
+.pc-rastreio-codigo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+}
+
+.pc-rastreio-btn {
+    display: inline-block;
+    width: auto;
+}
+
+.pc-rastreio-nota {
+    margin: 1rem 0 0;
+}
+
+/* ---------- próximos passos ---------- */
+.pc-passos {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+/* ---------- ações e botões ---------- */
+.pc-acoes {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.pc-acoes > a {
+    flex: 1 1 200px;
+}
+
+.text-center { text-align: center; }
+
+.btn-secundario,
+.btn-primary {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.85rem 1rem;
+    border-radius: 2px;
+    transition: background 0.3s ease, color 0.3s ease;
+    border: 1px solid var(--ember);
+    cursor: pointer;
+}
+
+.btn-secundario {
+    background: transparent;
+    color: var(--oxblood-deep);
+}
+
+.btn-secundario:hover {
+    background: var(--ember);
+    color: var(--parchment);
+}
+
+.btn-primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--oxblood-deep);
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: var(--gold-bright);
+}
+
+@media (max-width: 560px) {
+    .conta-card {
+        padding: 1.6rem 1.3rem;
+    }
+
+    .pc-acoes {
+        flex-direction: column;
+    }
+}

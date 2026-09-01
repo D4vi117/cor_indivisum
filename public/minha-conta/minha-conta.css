@@ -1,0 +1,580 @@
+:root {
+    --oxblood: #3E1119;
+    --oxblood-deep: #200A0F;
+    --ember: #8C2F39;
+    --parchment: #F4EEDF;
+    --parchment-dim: #E9E0CB;
+    --gold: #B8923D;
+    --gold-bright: #D4B15E;
+    --ink: #2A1F1A;
+    --ink-soft: #5A4B3E;
+    --hair: rgba(184, 146, 61, 0.35);
+    --sucesso: #2f6b3e;
+    --erro: #7a2020;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--parchment-dim);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+h1, h2, .eyebrow {
+    font-family: 'Cinzel', serif;
+}
+
+.eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: inline-block;
+    margin-bottom: 0.4rem;
+}
+
+/* ---------- topo ---------- */
+.conta-top {
+    background: var(--oxblood-deep);
+    padding: 1.4rem 1.5rem;
+}
+
+.conta-top-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+}
+
+.conta-brand {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.12em;
+    color: var(--parchment);
+    font-size: 1.05rem;
+    text-decoration: none;
+}
+
+.conta-brand-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: rgba(244, 238, 223, 0.6);
+    font-size: 0.95rem;
+}
+
+/* ---------- shell ---------- */
+.conta-shell {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.6rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+.conta-titulo {
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: var(--ink);
+    margin: 0 0 0.4rem;
+}
+
+/* ---------- abas ---------- */
+.conta-tabs {
+    display: flex;
+    gap: 0.4rem;
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.conta-tab {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--ink-soft);
+    padding: 0.8rem 0.3rem;
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.conta-tab + .conta-tab {
+    margin-left: 1.2rem;
+}
+
+.conta-tab:hover {
+    color: var(--ink);
+}
+
+.conta-tab.active {
+    color: var(--ember);
+    border-bottom-color: var(--ember);
+}
+
+.conta-painel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+.conta-painel[hidden] {
+    display: none;
+}
+
+/* ---------- pedidos ---------- */
+.pedidos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pedidos-vazio {
+    color: var(--ink-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.02rem;
+    padding: 1.4rem 0;
+    text-align: center;
+}
+
+.pedido-card {
+    border: 1px solid var(--hair);
+    padding: 1.2rem 1.4rem;
+    background: var(--parchment-dim);
+}
+
+.pedido-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.pedido-topo strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+}
+
+.pedido-status {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 10px;
+    background: rgba(90, 75, 62, 0.12);
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+
+.pedido-status[data-status="pago"],
+.pedido-status[data-status="entregue"] {
+    background: rgba(47, 107, 62, 0.14);
+    color: var(--sucesso);
+}
+
+.pedido-status[data-status="aguardando_pagamento"],
+.pedido-status[data-status="preparando"],
+.pedido-status[data-status="saiu"],
+.pedido-status[data-status="Pendente"] {
+    background: rgba(184, 146, 61, 0.18);
+    color: #8a6a1f;
+}
+
+.pedido-status[data-status="recusado"],
+.pedido-status[data-status="cancelado"] {
+    background: rgba(122, 32, 32, 0.12);
+    color: var(--erro);
+}
+
+.pedido-itens {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    margin: 0 0 0.7rem;
+}
+
+.pedido-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.7rem;
+}
+
+.pedido-info strong {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--ember);
+}
+
+.pedido-link {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--oxblood-deep);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 1px;
+}
+
+.pedido-link:hover {
+    color: var(--ember);
+    border-color: var(--ember);
+}
+
+.conta-card {
+    background: var(--parchment);
+    border: 1px solid var(--hair);
+    padding: 2rem 2.2rem;
+}
+
+.conta-card h1,
+.conta-card h2 {
+    font-weight: 500;
+    font-size: 1.35rem;
+    margin: 0 0 1.4rem;
+    color: var(--ink);
+}
+
+.conta-nota {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    margin: 0 0 1.6rem;
+}
+
+/* ---------- endereços salvos ---------- */
+.enderecos-salvos-lista {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.endereco-salvo-card {
+    background: var(--parchment-dim);
+    border: 1px solid var(--hair);
+    padding: 1.1rem 1.2rem;
+}
+
+.endereco-salvo-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin: 0 0 0.45rem;
+}
+
+.endereco-salvo-linha {
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.45;
+}
+
+.endereco-salvo-complemento {
+    color: var(--ink-soft);
+}
+
+.endereco-salvo-acao {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--oxblood-deep);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    margin-top: 0.8rem;
+}
+
+.endereco-salvo-acao:hover {
+    color: var(--ember);
+    border-color: var(--ember);
+}
+
+.enderecos-vazio {
+    color: var(--ink-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+/* ---------- linha de perfil ---------- */
+.perfil-linha {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--hair);
+}
+
+.perfil-linha:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.perfil-linha label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.perfil-editavel {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.perfil-editavel input {
+    flex: 1 1 220px;
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--hair);
+    background: #fff;
+    color: var(--ink);
+}
+
+.perfil-editavel input:focus {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 1px;
+}
+
+.perfil-linha-estatica {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ---------- provedores ---------- */
+.provedor-linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--hair);
+    flex-wrap: wrap;
+}
+
+.provedor-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.provedor-info strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.provedor-status {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.provedor-status[data-status="on"] {
+    color: var(--sucesso);
+}
+
+.provedor-status[data-status="off"] {
+    color: var(--ink-soft);
+}
+
+.conta-telefone-painel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    max-width: 360px;
+    margin-top: 1rem;
+}
+
+.conta-telefone-painel input {
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--hair);
+    background: #fff;
+    color: var(--ink);
+}
+
+.conta-telefone-painel input:focus {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 1px;
+}
+
+/* ---------- botões ---------- */
+.btn-secundario {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--oxblood-deep);
+    border: 1px solid var(--ember);
+    padding: 0.65rem 1.1rem;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+    white-space: nowrap;
+}
+
+.btn-secundario:hover {
+    background: var(--ember);
+    color: var(--parchment);
+}
+
+.btn-secundario:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.btn-sair {
+    align-self: flex-start;
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--erro);
+    border: 1px solid var(--erro);
+    padding: 0.7rem 1.3rem;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.btn-sair:hover {
+    background: var(--erro);
+    color: var(--parchment);
+}
+
+.conta-erro {
+    color: var(--erro);
+    font-size: 0.85rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 560px) {
+    .conta-card {
+        padding: 1.6rem 1.3rem;
+    }
+
+    .provedor-linha {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ======================================================
+   MODAL DE LOGIN (gerado por auth-guard.js)
+   ====================================================== */
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(32, 10, 15, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 50;
+}
+
+.auth-box {
+    background: var(--parchment);
+    border: 1px solid var(--hair);
+    max-width: 380px;
+    width: 100%;
+    padding: 2.2rem 2rem;
+    text-align: center;
+}
+
+.auth-box h2 {
+    font-family: 'Cinzel', serif;
+    font-weight: 500;
+    font-size: 1.25rem;
+    margin: 0 0 0.6rem;
+    color: var(--ink);
+}
+
+/* Botão do Google seguindo as diretrizes de marca (fundo claro, texto neutro) */
+.gsi-material-button {
+    -webkit-user-select: none;
+    user-select: none;
+    appearance: none;
+    background-color: #FFFFFF;
+    border: 1px solid #747775;
+    border-radius: 12px;
+    color: #1F1F1F;
+    cursor: pointer;
+    font-family: 'Roboto', 'EB Garamond', arial, sans-serif;
+    height: 44px;
+    padding: 0 12px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.gsi-material-button:hover {
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
+
+.gsi-material-button-content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.gsi-material-button-icon {
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+}
+
+.gsi-material-button-contents {
+    font-family: 'EB Garamond', arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+#authPhoneToggle:hover {
+    filter: brightness(0.97);
+}
+
+#authSendCodeBtn:hover,
+#authConfirmCodeBtn:hover {
+    background: var(--oxblood);
+}
+
+#authCancelBtn {
+    margin-top: 16px;
+    background: transparent;
+    border: none;
+    color: var(--ink-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: underline;
+}

@@ -24,14 +24,52 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
-    ]
-  },
-  "redirects": [
+      "**/node_modules/**",
+      "APITest/**"
+    ],
+    "rewrites": [
       {
-        "source": "/loja",
-        "destination": "/loja/checkout",
-        "type": 301
+        "source": "/api/melhor-envio/auth-start",
+        "function": {
+          "functionId": "melhorEnvioAuthStart",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/melhor-envio/auth-callback",
+        "function": {
+          "functionId": "melhorEnvioAuthCallback",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/melhor-envio/status",
+        "function": {
+          "functionId": "melhorEnvioStatus",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/melhor-envio/calcular-frete",
+        "function": {
+          "functionId": "melhorEnvioCalcularFrete",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/webhook-melhor-envio",
+        "function": {
+          "functionId": "webhookMelhorEnvio",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/webhook-mp",
+        "function": {
+          "functionId": "webhookMP",
+          "region": "southamerica-east1"
+        }
       }
     ]
+  }
 }

@@ -1,22 +1,149 @@
 rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+// produtos: catálogo público apenas quando status.ativo e status.publicado
+//           são true. A equipe administra os documentos completos.
+// usuarios: perfil privado com nome, email, telefone, role e criadoEm.
+//           Campos adicionais de checkout são escritos somente pelo Admin SDK.
+// pedidos: contém dados pessoais, pagamento e rastreio; é criado e alterado
+//          somente por Cloud Functions (Admin SDK ignora estas regras).
+// Coleções operacionais: rate_limits, webhook_logs, melhor_envio_config e
+// estados OAuth não são acessíveis pelo cliente.
+// ===============================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Bloqueia todo o acesso público por padrão
-    match /{document=**} {
-      allow read, write: if false;
+    // =============================================================
+    // Funções auxiliares
+    // =============================================================
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Coleção de pedidos: NENHUM cliente acessa diretamente via web.
-    // Apenas a Cloud Function (Admin SDK) pode ler e criar pedidos.
+    function userPath(uid) {
+      return /databases/$(database)/documents/usuarios/$(uid);
+    }
+
+    function isStaff() {
+      return signedIn() &&
+        exists(userPath(request.auth.uid)) &&
+        get(userPath(request.auth.uid)).data.role in ["admin", "dev"];
+    }
+
+    function validString(value, minLength, maxLength) {
+      return value is string &&
+        value.size() >= minLength &&
+        value.size() <= maxLength;
+    }
+
+    function validOptionalString(data, key, maxLength) {
+      return !(key in data) ||
+        (data[key] is string && data[key].size() <= maxLength);
+    }
+
+    function validUserProfile(data) {
+      return data.keys().hasAll(["nome", "email", "telefone", "role", "criadoEm"]) &&
+        validString(data.nome, 0, 120) &&
+        validString(data.email, 0, 254) &&
+        validString(data.telefone, 0, 32) &&
+        data.role in ["cliente", "admin", "dev"] &&
+        data.criadoEm is timestamp;
+    }
+
+    function validPrices(data) {
+      return data is map &&
+        data.keys().hasAll(["de", "por", "emOferta"]) &&
+        data.keys().hasOnly(["de", "por", "emOferta"]) &&
+        data.de is number && data.de >= 0 && data.de <= 1000000 &&
+        data.por is number && data.por >= 0 && data.por <= 1000000 &&
+        data.emOferta is bool;
+    }
+
+    function validStatus(data) {
+      return data is map &&
+        data.keys().hasAll(["ativo", "publicado", "destaque"]) &&
+        data.keys().hasOnly(["ativo", "publicado", "destaque"]) &&
+        data.ativo is bool && data.publicado is bool && data.destaque is bool;
+    }
+
+    function validProduct(data) {
+      return data.keys().hasAll(["nome", "precos", "status"]) &&
+        data.keys().hasOnly([
+          "nome", "slug", "categoria", "meta", "precos", "estoque",
+          "dimensoesEmbalagem", "status", "midias", "conteudo", "seo",
+          "preco", "precoPromocional", "ativo", "publicado"
+        ]) &&
+        validString(data.nome, 1, 200) &&
+        validPrices(data.precos) && validStatus(data.status) &&
+        validOptionalString(data, "slug", 160) &&
+        validOptionalString(data, "categoria", 100);
+    }
+
+    function isPublishedProduct() {
+      return resource.data.status is map &&
+        resource.data.status.ativo == true &&
+        resource.data.status.publicado == true;
+    }
+
+    // =============================================================
+    // Produtos
+    // =============================================================
+    match /produtos/{produtoId} {
+      // A consulta pública deve conter os filtros de status usados pela loja.
+      allow get, list: if isPublishedProduct() || isStaff();
+      allow create, update: if isStaff() && validProduct(request.resource.data);
+      allow delete: if isStaff();
+    }
+
+    // =============================================================
+    // Usuários
+    // =============================================================
+    match /usuarios/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isStaff());
+
+      // Um usuário novo só pode criar o seu perfil como cliente.
+      allow create: if signedIn() &&
+        request.auth.uid == uid &&
+        request.resource.data.keys().hasOnly([
+          "nome", "email", "telefone", "role", "criadoEm"
+        ]) &&
+        request.resource.data.role == "cliente" &&
+        validUserProfile(request.resource.data);
+
+      // O dono só sincroniza dados de perfil; nunca cargo ou campos de checkout.
+      allow update: if signedIn() &&
+        request.auth.uid == uid &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(["nome", "email", "telefone"]) &&
+        request.resource.data.role == resource.data.role &&
+        validUserProfile(request.resource.data);
+
+      // A equipe pode manter contas, inclusive funções administrativas.
+      allow update, delete: if isStaff();
+    }
+
+    // =============================================================
+    // Pedidos
+    // =============================================================
+    match /pedidos/{pedidoId} {
+      // O cliente os acessa por callables que já verificam propriedade.
+      allow read: if isStaff();
+      allow create, update, delete: if false;
+    }
+
+    // Coleção legada: nenhum fluxo atual a usa diretamente.
     match /orders/{orderId} {
       allow read, write: if false;
     }
 
-    // Exemplo: Se você tiver produtos ou conteúdos públicos que qualquer um pode ler:
-    // match /produtos/{produtoId} {
-    //   allow read: if true;
-    //   allow write: if false;
-    // }
+    // =============================================================
+    // Padrão seguro
+    // =============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Pedido Confirmado · Cor Indivisum</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" href="pedido-confirmado.css">
+	<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+
+<body>
+
+	<!-- ============ TOPO ============ -->
+	<header class="conta-top">
+		<div class="conta-top-inner">
+			<a href="/" class="conta-brand">COR INDIVISUM</a>
+			<span class="conta-brand-sub">Pedido confirmado</span>
+		</div>
+	</header>
+
+	<main class="conta-shell">
+
+		<!-- ============ ESTADO: CARREGANDO ============ -->
+		<section id="estadoCarregando" class="pc-estado">
+			<span class="eyebrow">Só um instante</span>
+			<h1 class="conta-titulo">Verificando seu pedido…</h1>
+			<p class="conta-nota">Estamos confirmando o acesso e buscando os detalhes do pedido.</p>
+		</section>
+
+		<!-- ============ ESTADO: PRECISA LOGIN ============ -->
+		<section id="estadoSemLogin" class="pc-estado" hidden>
+			<span class="eyebrow">Acesso restrito</span>
+			<h1 class="conta-titulo">Entre na sua conta</h1>
+			<p class="conta-nota">Para ver os detalhes deste pedido, você precisa estar logado com a conta que
+				fez a compra.</p>
+			<a class="btn-primary" href="/minha-conta">Entrar / Minha conta</a>
+		</section>
+
+		<!-- ============ ESTADO: ERRO (não encontrado / não pertence) ============ -->
+		<section id="estadoErro" class="pc-estado" hidden>
+			<span class="eyebrow">Não foi possível abrir</span>
+			<h1 class="conta-titulo">Não encontramos este pedido</h1>
+			<p class="conta-nota" id="pcErroMsg">Verifique o link ou acesse a aba "Pedidos" na sua conta.</p>
+			<a class="btn-primary" href="/minha-conta">Ver meus pedidos</a>
+		</section>
+
+		<!-- ============ ESTADO: SUCESSO ============ -->
+		<section id="estadoSucesso" class="pc-estado" hidden>
+
+			<div class="pc-selo">
+				<span class="pc-selo-check">✓</span>
+			</div>
+
+			<span class="eyebrow" style="text-align:center;display:block;">Obrigado pela sua compra</span>
+			<h1 class="conta-titulo pc-titulo-centro">Pedido confirmado</h1>
+			<p class="conta-nota pc-subtitulo-centro">
+				Enviamos os detalhes para <strong id="pcEmail">—</strong>. Guarde o número do pedido abaixo.
+			</p>
+
+			<section class="conta-card pc-card-numero">
+				<span class="eyebrow">Número do pedido</span>
+				<h2 id="pcNumeroPedido">—</h2>
+				<span class="pedido-status" id="pcStatus" data-status="">—</span>
+			</section>
+
+			<section class="conta-card">
+				<h2>Itens</h2>
+				<div id="pcItensLista" class="pedidos-lista">
+					<!-- itens renderizam aqui via JS -->
+				</div>
+				<div class="pc-total-linha">
+					<span>Total</span>
+					<strong id="pcTotal">R$ 0,00</strong>
+				</div>
+			</section>
+
+			<section class="conta-card" id="pcRastreioCard" hidden>
+				<h2>Rastreio do Envio</h2>
+				<div class="pc-rastreio-linha" style="margin-bottom: 1rem;">
+					<span class="pedido-status" id="pcRastreioStatus" data-status="">—</span>
+					<!-- Exibição explícita do código de rastreio -->
+					<p id="pcRastreioCodigoWrapper" style="margin-top: 0.5rem; font-weight: 500;">
+						Código de Rastreio: <span id="pcRastreioCodigo">—</span>
+					</p>
+				</div>
+				
+				<!-- Botão/Link para o rastreio detalhado -->
+				<a class="btn-secundario text-center pc-rastreio-btn" id="pcRastreioLink" href="#" target="_blank" rel="noopener" hidden>
+					Acompanhar Rastreio Detalhado
+				</a>
+
+				<p class="conta-nota pc-rastreio-nota" id="pcRastreioNota" hidden>
+					O código de rastreio ainda não foi disponibilizado pela transportadora. Assim que gerado, o link de acompanhamento detalhado aparecerá aqui.
+				</p>
+			</section>
+
+			<section class="conta-card pc-proximos-passos">
+				<h2>O que acontece agora</h2>
+				<ol class="pc-passos">
+					<li>Assim que o pagamento é confirmado, você recebe um aviso por e-mail.</li>
+					<li>Você pode acompanhar o status a qualquer momento na aba "Pedidos" da sua conta.</li>
+					<li>Quando o pedido for enviado, o status será atualizado aqui e por e-mail.</li>
+				</ol>
+			</section>
+
+			<div class="pc-acoes">
+				<a class="btn-secundario text-center" href="/minha-conta">Ver meus pedidos</a>
+				<a class="btn-primary text-center" href="/loja">Continuar comprando</a>
+			</div>
+
+		</section>
+
+	</main>
+
+	<!-- Firebase (compat) -->
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+	<!-- Assume que firebase-config.js já existe no projeto e chama firebase.initializeApp(...) -->
+	<script src="/src/scripts/firebase-init.js"></script>
+
+	<script src="pedido-confirmado.js"></script>
+
+</body>
+
+</html>

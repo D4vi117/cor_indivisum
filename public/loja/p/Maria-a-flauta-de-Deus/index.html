@@ -9,14 +9,14 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
-	<link rel="stylesheet" href="/maria-a-flauta-de-Deus/maria-a-flauta-de-Deus.css">
-	<link rel="icon" href="favicon.png" type="image/png">
+	<link rel="stylesheet" href="maria-a-flauta-de-Deus.css">
+	<link rel="icon" href="/favicon.png" type="image/png">
 </head>
 
 <body>
 
 	<div class="breadcrumb">
-		<a href="#">Cor Indivisum</a><span class="sep">›</span><a href="#">Editora</a><span class="sep">›</span><span
+		<a href="/">Cor Indivisum</a><span class="sep">›</span><a href="/loja">Editora</a><span class="sep">›</span><span
 			class="current">Maria, a Flauta de Deus</span>
 	</div>
 
@@ -24,7 +24,7 @@
 	<header class="hero">
 		<div class="hero-grid">
 			<div class="book-mock" aria-hidden="true">
-				<img src="/src/images/MFD/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
+				<img src="images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
 			</div>
 
 			<div>
@@ -38,7 +38,7 @@
 					pertence a essa pequena linhagem de obras que nos fazem contemplar realidades conhecidas como se as
 					víssemos
 					pela primeira vez.</p>
-				<a href="#pre-venda" class="btn btn-gold">Garantir meu exemplar</a>
+				<button class="btn btn-gold" onclick="comprarDireto('jzebLMA8riOaLHoD0bVG')">Garantir meu exemplar</button>
 				<ul class="checks">
 					<li>edição inaugural</li>
 					<li>tradução inédita</li>
@@ -81,7 +81,7 @@
 				e
 				luminoso, capaz de nutrir a reflexão, a oração e uma compreensão mais íntima da Encarnação.</p>
 			<div class="photo-placeholder reveal">
-				<img src="/src/images/MFD/MFD_livro-aberto.webp" alt="Página aberta do livro Maria, a flauta de Deus">
+				<img src="images/MFD_livro-aberto.webp" alt="Página aberta do livro Maria, a flauta de Deus">
 			</div>
 		</div>
 	</section>
@@ -106,7 +106,7 @@
 			<p class="reveal">Daí a imagem que dá título ao livro.</p>
 
 			<div class="flauta-div" aria-hidden="true">
-				<img src="/src/images/MFD/MFD_flauta.webp" alt="Ilustração de uma flauta de cana" />
+				<img src="images/MFD_flauta.webp" alt="Ilustração de uma flauta de cana" />
 			</div>
 
 			<p class="reveal">Uma flauta nada possui de grandioso em si mesma. Seu valor reside em ser um instrumento
@@ -204,7 +204,7 @@
 				toda vida,
 				quando inteiramente entregue a Deus, pode tornar-se música.</p>
 			<div class="photo-round-placeholder reveal">
-				<img src="/src/images/MFD/MFD_caryll.webp" alt="Retrato de Caryll Houselander" />
+				<img src="images/MFD_caryll.webp" alt="Retrato de Caryll Houselander" />
 			</div>
 		</div>
 	</section>
@@ -373,16 +373,16 @@
 	<section class="cta-final">
 		<div class="cta-final-grid reveal">
 			<div class="book-mock small" aria-hidden="true">
-				<img src="/src/images/MFD/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
+				<img src="images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
 			</div>
 			<div>
 				<span class="eyebrow">Maria, a Flauta de Deus</span>
 				<h2>Grande clássico da espiritualidade mariana</h2>
 				<p class="taglines">Nova tradução brasileira.<br>Pré-venda exclusiva.</p>
-				<p class="price"><span class="was">de R$ 49,90</span>R$ 49,90 <span class="note">valor promocional da
+				<p class="price"><span class="was">de R$ 62,00</span>R$ 49,90 <span class="note">valor promocional da
 						pré-venda, até
 						30/07 &mdash; preço a confirmar</span></p>
-				<a href="#" class="btn btn-gold">Quero garantir meu exemplar</a>
+				<a href="/" class="btn btn-gold">Quero garantir meu exemplar</a>
 			</div>
 		</div>
 
@@ -399,7 +399,7 @@
 
 		<div class="closing-cover reveal">
 			<div class="book-mock small" aria-hidden="true">
-				<img src="/src/images/MFD/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
+				<img src="images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
 			</div>
 		</div>
 	</section>
@@ -422,7 +422,7 @@
 		}, { threshold: 0.12 });
 		document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 	</script>
-
+	<script src="/src/scripts/checkout-utils.js"></script>
 </body>
 
 </html>

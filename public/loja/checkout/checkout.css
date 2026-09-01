@@ -21,6 +21,18 @@
     background: var(--parchment-dim);
     padding: 3rem 1.5rem 5rem;
     min-height: calc(100vh - 200px);
+    flex: 1 0 auto;
+}
+
+/* O conteúdo do checkout nunca deve ser comprimido pelo rodapé da página. */
+.checkout-header,
+.checkout-section,
+body > footer {
+    flex-shrink: 0;
+}
+
+section {
+    padding: 0
 }
 
 .checkout-title-wrap {
@@ -184,6 +196,115 @@
     transform: translateY(-2px);
 }
 
+.btn-checkout:disabled {
+    background: var(--hair);
+    color: var(--ink-soft);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Opções de Frete */
+.frete-opcoes {
+    display: none;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin: 0.5rem 0 1.4rem;
+}
+
+.frete-opcoes.visible {
+    display: flex;
+}
+
+.frete-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin: 0 0 0.2rem;
+}
+
+.frete-status {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin: 0;
+}
+
+.frete-status.frete-erro {
+    color: var(--ember);
+}
+
+.frete-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--hair);
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.frete-option:hover {
+    background: var(--parchment);
+    border-color: var(--gold);
+}
+
+.frete-option.selected {
+    background: var(--parchment);
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--gold);
+}
+
+.frete-option input[type="radio"] {
+    display: none;
+}
+
+.frete-option .radio-custom {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--ember);
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.frete-option.selected .radio-custom::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: var(--ember);
+    border-radius: 50%;
+}
+
+.frete-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.frete-info strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+}
+
+.frete-info span {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.frete-price {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
 /* Summary Card */
 .summary-card {
     background: var(--oxblood-deep);
@@ -286,4 +407,35 @@
     font-size: 0.95rem;
     margin: 0;
     color: rgba(244, 238, 223, 0.7);
+}
+/* ---------- CHECKOUT RESPONSIVO ---------- */
+@media (max-width: 768px) {
+  .checkout-section, 
+  .pg-main {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .form-block {
+    padding: 1.2rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    width: 100%;
+  }
+
+  /* Resumo do pedido passa a ficar acima no mobile para facilitar a visualização */
+  .pg-wrap {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1.5rem;
+  }
+
+  .pg-pix-copy {
+    flex-direction: column;
+  }
 }

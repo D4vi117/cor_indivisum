@@ -1,440 +1,338 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="robots" content="noindex, nofollow">
-	<title>Console de Testes da API &middot; Cor Indivisum</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link
-		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
-		rel="stylesheet">
-	<link rel="stylesheet" href="/styles.css">
-	<link rel="stylesheet" href="teste-api.css">
-	<script src="https://sdk.mercadopago.com/js/v2"></script>
+<meta charset="UTF-8" />
+<title>Teste - Integração Melhor Envio</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #22c55e;
+    --error: #f87171;
+    --warn: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 15px;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 4px;
+  }
+  input {
+    width: 100%;
+    padding: 8px 10px;
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .row { display: flex; gap: 8px; }
+  .row > div { flex: 1; }
+  button {
+    background: #334155;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 10px;
+    margin-right: 6px;
+  }
+  button.primary { background: #16a34a; border-color: #16a34a; }
+  button.secondary { background: #2563eb; border-color: #2563eb; }
+  button:hover { filter: brightness(1.15); }
+  .status-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+  .status-ok { color: var(--accent); border-color: var(--accent); }
+  .status-bad { color: var(--error); border-color: var(--error); }
+  .status-unknown { color: var(--muted); }
+  #log {
+    background: #020617;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    height: 480px;
+    overflow-y: auto;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .log-line { white-space: pre-wrap; word-break: break-word; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed #1e293b; }
+  .log-time { color: var(--muted); }
+  .log-info { color: #93c5fd; }
+  .log-ok { color: var(--accent); }
+  .log-err { color: var(--error); }
+  .log-req { color: var(--warn); }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .opcoes-frete { margin-top: 10px; }
+  .opcao {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .opcao b { color: var(--accent); }
+  .opcao .erro { color: var(--error); }
+  code { color: #fbbf24; }
+</style>
 </head>
-
 <body>
 
-	<div class="breadcrumb">
-		<a href="/">Início</a><span class="sep">/</span><span class="current">Painel interno &middot; Teste de
-			API</span>
-	</div>
+<h1>Teste — Integração Melhor Envio</h1>
+<p class="subtitle">Página isolada, só para testar os endpoints do Cloud Functions. Não interfere no checkout/webhook.</p>
 
-	<header class="api-hero">
-		<span class="badge">Uso interno &middot; não indexar</span>
-		<h1>Console de Testes da API</h1>
-		<p class="kicker">Chama diretamente as Cloud Functions da loja &mdash; cálculo de frete, preferência e
-			pagamento Mercado Pago, e o webhook &mdash; para validar o fluxo antes de ligar o checkout de verdade.</p>
-	</header>
+<div class="grid">
+  <div>
 
-	<section>
-		<div class="wrap">
+    <div class="card">
+      <h2>0. Configuração</h2>
+      <label>Base URL das Cloud Functions</label>
+      <input id="baseUrl" placeholder="https://southamerica-east1-SEUPROJETO.cloudfunctions.net" />
+      <button class="secondary" onclick="salvarConfig()">Salvar</button>
+    </div>
 
-			<!-- ============ CONFIGURAÇÃO ============ -->
-			<div class="api-panel" id="painel-config">
-				<div class="api-panel-head">
-					<div>
-						<h3>Configuração</h3>
-						<p>Dados do projeto Firebase e a chave pública do Mercado Pago. Ficam salvos só neste
-							navegador (localStorage), nunca são enviados a lugar nenhum além do que você mesmo
-							disparar abaixo.</p>
-					</div>
-					<span class="fn-tag">local</span>
-				</div>
-				<div class="api-panel-body" style="grid-template-columns: 1fr;">
-					<form id="form-config">
-						<div class="config-grid">
-							<div class="field">
-								<label for="cfg-apiKey">Firebase apiKey</label>
-								<input id="cfg-apiKey" required>
-							</div>
-							<div class="field">
-								<label for="cfg-authDomain">Firebase authDomain</label>
-								<input id="cfg-authDomain" placeholder="projeto.firebaseapp.com" required>
-							</div>
-							<div class="field">
-								<label for="cfg-projectId">Firebase projectId</label>
-								<input id="cfg-projectId" required>
-							</div>
-							<div class="field">
-								<label for="cfg-appId">Firebase appId</label>
-								<input id="cfg-appId" required>
-							</div>
-							<div class="field">
-								<label for="cfg-region">Região das functions</label>
-								<input id="cfg-region" value="southamerica-east1" required>
-							</div>
-							<div class="field">
-								<label for="cfg-mpKey">Mercado Pago public key</label>
-								<input id="cfg-mpKey" placeholder="TEST-xxxxxxxx ou APP_USR-xxxxxxxx" required>
-							</div>
-						</div>
-						<button type="submit" class="btn btn-gold">Salvar e conectar</button>
-						<span id="config-status" class="config-status"></span>
-					</form>
-				</div>
-			</div>
+    <div class="card">
+      <h2>1. Autenticação <span id="statusBadge" class="status-badge status-unknown">desconhecido</span></h2>
+      <button class="primary" onclick="iniciarAuth()">Iniciar autenticação (abre nova aba)</button>
+      <button onclick="checarStatus()">Checar status</button>
+    </div>
 
-			<!-- ============ CALCULAR FRETE ============ -->
-			<div class="api-panel">
-				<div class="api-panel-head">
-					<div>
-						<h3>Calcular frete</h3>
-						<p>Chama <code>calcularFrete</code>. Consulta o Melhor Envio e cai para a tabela de
-							emergência se a API estiver fora do ar.</p>
-					</div>
-					<span class="fn-tag">calcularFrete</span>
-				</div>
-				<div class="api-panel-body">
-					<form id="form-frete">
-						<div class="field">
-							<label for="frete-cep">CEP de destino</label>
-							<input id="frete-cep" placeholder="somente números" required>
-						</div>
-						<div class="field">
-							<label for="frete-subtotal">Subtotal do pedido (R$)</label>
-							<input id="frete-subtotal" type="number" step="0.01" value="89.90">
-						</div>
-						<button type="submit" class="btn btn-gold">Calcular frete</button>
-					</form>
-					<div>
-						<span id="frete-status" class="status-pill idle">Aguardando</span>
-						<div id="frete-result" class="result-box empty">O resultado aparece aqui.</div>
-					</div>
-				</div>
-			</div>
+    <div class="card">
+      <h2>2. Calcular Frete</h2>
+      <div class="row">
+        <div>
+          <label>CEP origem</label>
+          <input id="cepOrigem" value="01310-100" />
+        </div>
+        <div>
+          <label>CEP destino</label>
+          <input id="cepDestino" value="20040-020" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Peso (kg)</label>
+          <input id="peso" type="number" step="0.1" value="0.5" />
+        </div>
+        <div>
+          <label>Valor (R$)</label>
+          <input id="valor" type="number" step="0.01" value="64.90" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Altura (cm)</label>
+          <input id="altura" type="number" value="4" />
+        </div>
+        <div>
+          <label>Largura (cm)</label>
+          <input id="largura" type="number" value="16" />
+        </div>
+        <div>
+          <label>Comprimento (cm)</label>
+          <input id="comprimento" type="number" value="23" />
+        </div>
+      </div>
+      <button class="primary" onclick="calcularFrete()">Calcular frete</button>
 
-			<!-- ============ CRIAR PREFERÊNCIA ============ -->
-			<div class="api-panel">
-				<div class="api-panel-head">
-					<div>
-						<h3>Criar preferência (Mercado Pago)</h3>
-						<p>Chama <code>criarPreferencia</code>. Precisa de um <code>pedidoId</code> já existente na
-							coleção <code>pedidos</code> do Firestore, com o array <code>itens</code> preenchido.</p>
-					</div>
-					<span class="fn-tag">criarPreferencia</span>
-				</div>
-				<div class="api-panel-body">
-					<form id="form-preferencia">
-						<div class="field">
-							<label for="pref-pedidoId">Pedido ID</label>
-							<input id="pref-pedidoId" placeholder="id do documento em /pedidos" required>
-						</div>
-						<button type="submit" class="btn btn-gold">Criar preferência</button>
-						<p class="field hint">Ao gerar, aparece um link para abrir o checkout do Mercado Pago com essa
-							preferência.</p>
-					</form>
-					<div>
-						<span id="pref-status" class="status-pill idle">Aguardando</span>
-						<div id="pref-result" class="result-box empty">O resultado aparece aqui.</div>
-						<p id="pref-link"></p>
-					</div>
-				</div>
-			</div>
+      <div id="opcoesFrete" class="opcoes-frete"></div>
+    </div>
 
-			<!-- ============ PROCESSAR PAGAMENTO ============ -->
-			<div class="api-panel">
-				<div class="api-panel-head">
-					<div>
-						<h3>Processar pagamento (Brick)</h3>
-						<p>Monta o Payment Brick oficial do Mercado Pago e envia o resultado direto para
-							<code>process_payment</code>. Use os cartões de teste do Mercado Pago ou Pix em modo
-							sandbox.</p>
-					</div>
-					<span class="fn-tag">process_payment</span>
-				</div>
-				<div class="api-panel-body">
-					<form id="form-brick-init">
-						<div class="field">
-							<label for="pag-pedidoId">Pedido ID</label>
-							<input id="pag-pedidoId" placeholder="id do documento em /pedidos" required>
-						</div>
-						<div class="field">
-							<label for="pag-valor">Valor a exibir no Brick (R$)</label>
-							<input id="pag-valor" type="number" step="0.01" value="89.90" required>
-						</div>
-						<div class="field">
-							<label for="pag-email">E-mail do pagador de teste</label>
-							<input id="pag-email" type="email" placeholder="teste@example.com" required>
-						</div>
-						<button type="submit" class="btn btn-gold">Montar formulário de pagamento</button>
-						<p class="field hint">O valor cobrado de verdade é o <code>pedido.total</code> salvo no
-							Firestore &mdash; o campo acima só alimenta a visualização do Brick.</p>
-					</form>
-					<div>
-						<span id="pag-status" class="status-pill idle">Aguardando</span>
-						<div id="brick-pagamento-container"></div>
-						<div id="pag-result" class="result-box empty">O resultado aparece aqui.</div>
-					</div>
-				</div>
-			</div>
+  </div>
 
-			<!-- ============ WEBHOOK ============ -->
-			<div class="api-panel">
-				<div class="api-panel-head">
-					<div>
-						<h3>Webhook do Mercado Pago</h3>
-						<p>Endpoint HTTP que o próprio Mercado Pago chama quando o status de um pagamento muda.
-							Cadastre esta URL no painel de notificações do MP.</p>
-					</div>
-					<span class="fn-tag">webhookMP</span>
-				</div>
-				<div class="api-panel-body">
-					<div>
-						<div class="webhook-url" id="webhook-url">preencha a configuração acima</div>
-						<button id="btn-copy-webhook" class="btn btn-outline-dark">Copiar URL</button>
-					</div>
-					<div>
-						<div class="warn-note">Isso dispara uma chamada real ao webhook. Use apenas com um
-							<code>paymentId</code> de teste (sandbox) que você mesmo gerou acima.</div>
-						<form id="form-webhook-test">
-							<div class="field">
-								<label for="webhook-paymentId">Payment ID (para simular a notificação)</label>
-								<input id="webhook-paymentId" placeholder="id retornado pelo pagamento de teste"
-									required>
-							</div>
-							<button type="submit" class="btn btn-gold">Simular notificação</button>
-						</form>
-						<span id="webhook-status" class="status-pill idle">Aguardando</span>
-						<div id="webhook-result" class="result-box empty">O resultado aparece aqui.</div>
-					</div>
-				</div>
-			</div>
+  <div>
+    <div class="card">
+      <div class="toolbar">
+        <h2 style="margin:0">Log completo</h2>
+        <div>
+          <button onclick="limparLog()">Limpar</button>
+        </div>
+      </div>
+      <div id="log"></div>
+    </div>
+  </div>
+</div>
 
-		</div>
-	</section>
+<script>
+let BASE_URL = localStorage.getItem("me_base_url") || "";
+document.getElementById("baseUrl").value = BASE_URL;
 
-	<footer>
-		<div class="cross">✝</div>
-		<p class="fine">COR INDIVISUM &middot; painel interno de testes &middot; não é a loja pública</p>
-		<a class="fine" href="/" style="text-decoration:none;color:var(--gold-bright);">&larr; Voltar ao site</a>
-	</footer>
+function salvarConfig() {
+  BASE_URL = document.getElementById("baseUrl").value.trim().replace(/\/$/, "");
+  localStorage.setItem("me_base_url", BASE_URL);
+  log("info", "Config salva. Base URL = " + BASE_URL);
+}
 
-	<script type="module">
-		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-		import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
+function agora() {
+  return new Date().toLocaleTimeString("pt-BR", { hour12: false }) + "." +
+    String(new Date().getMilliseconds()).padStart(3, "0");
+}
 
-		const STORAGE_KEY = "corIndivisum_apiTestConfig";
-		let app, functionsRef, mp;
+function log(tipo, msg) {
+  const el = document.getElementById("log");
+  const div = document.createElement("div");
+  div.className = "log-line";
+  const classe = { info: "log-info", ok: "log-ok", err: "log-err", req: "log-req" }[tipo] || "";
+  div.innerHTML = '<span class="log-time">[' + agora() + ']</span> <span class="' + classe + '">' + msg + "</span>";
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
 
-		function setPill(id, state, text) {
-			const el = document.getElementById(id);
-			el.className = "status-pill " + state;
-			el.textContent = text;
-		}
+function limparLog() {
+  document.getElementById("log").innerHTML = "";
+}
 
-		function showResult(id, data, isError) {
-			const el = document.getElementById(id);
-			el.classList.remove("empty");
-			el.textContent = JSON.stringify(data, null, 2);
-			el.style.color = isError ? "#e2a3a3" : "";
-		}
+function checarBaseUrl() {
+  if (!BASE_URL) {
+    log("err", "Configure a Base URL das Cloud Functions primeiro (passo 0).");
+    return false;
+  }
+  return true;
+}
 
-		function loadConfig() {
-			const raw = localStorage.getItem(STORAGE_KEY);
-			if (!raw) return null;
-			try { return JSON.parse(raw); } catch { return null; }
-		}
+async function chamar(nome, url, options) {
+  log("req", "→ " + (options?.method || "GET") + " " + url +
+    (options?.body ? "\nBody: " + options.body : ""));
+  try {
+    const res = await fetch(url, options);
+    const texto = await res.text();
+    let corpo;
+    try { corpo = JSON.parse(texto); } catch { corpo = texto; }
 
-		function fillConfigForm(cfg) {
-			if (!cfg) return;
-			for (const [key, val] of Object.entries(cfg)) {
-				const input = document.getElementById("cfg-" + key);
-				if (input) input.value = val;
-			}
-		}
+    if (res.ok) {
+      log("ok", "← [" + res.status + "] " + nome + "\n" + JSON.stringify(corpo, null, 2));
+    } else {
+      log("err", "← [" + res.status + "] " + nome + " (erro)\n" + JSON.stringify(corpo, null, 2));
+    }
+    return { ok: res.ok, status: res.status, corpo };
+  } catch (err) {
+    log("err", "✗ Falha de rede em " + nome + ": " + err.message);
+    return { ok: false, status: 0, corpo: null, erroRede: err.message };
+  }
+}
 
-		function connect(cfg) {
-			app = initializeApp({
-				apiKey: cfg.apiKey,
-				authDomain: cfg.authDomain,
-				projectId: cfg.projectId,
-				appId: cfg.appId,
-			});
-			functionsRef = getFunctions(app, cfg.region || "southamerica-east1");
-			mp = new MercadoPago(cfg.mpKey, { locale: "pt-BR" });
-			document.getElementById("webhook-url").textContent =
-				`https://${cfg.region || "southamerica-east1"}-${cfg.projectId}.cloudfunctions.net/webhookMP`;
-		}
+function iniciarAuth() {
+  if (!checarBaseUrl()) return;
+  const url = BASE_URL + "/melhorEnvioAuthStart?state=teste_" + Date.now();
+  log("info", "Abrindo autenticação em nova aba: " + url);
+  window.open(url, "_blank");
+}
 
-		// ---- inicialização a partir do que já estiver salvo ----
-		const saved = loadConfig();
-		if (saved) {
-			fillConfigForm(saved);
-			try {
-				connect(saved);
-				document.getElementById("config-status").textContent = "Conectado.";
-				document.getElementById("config-status").className = "config-status ok";
-			} catch (e) {
-				document.getElementById("config-status").textContent = "Falha ao conectar: " + e.message;
-				document.getElementById("config-status").className = "config-status bad";
-			}
-		}
+async function checarStatus() {
+  if (!checarBaseUrl()) return;
+  const r = await chamar("melhorEnvioStatus", BASE_URL + "/melhorEnvioStatus");
+  const badge = document.getElementById("statusBadge");
+  if (r.ok && r.corpo?.autenticado) {
+    const expirado = r.corpo.expirado;
+    badge.textContent = expirado ? "token expirado" : "autenticado";
+    badge.className = "status-badge " + (expirado ? "status-bad" : "status-ok");
+  } else if (r.ok) {
+    badge.textContent = "não autenticado";
+    badge.className = "status-badge status-bad";
+  } else {
+    badge.textContent = "erro ao checar";
+    badge.className = "status-badge status-bad";
+  }
+}
 
-		document.getElementById("form-config").addEventListener("submit", (e) => {
-			e.preventDefault();
-			const cfg = {
-				apiKey: document.getElementById("cfg-apiKey").value.trim(),
-				authDomain: document.getElementById("cfg-authDomain").value.trim(),
-				projectId: document.getElementById("cfg-projectId").value.trim(),
-				appId: document.getElementById("cfg-appId").value.trim(),
-				region: document.getElementById("cfg-region").value.trim(),
-				mpKey: document.getElementById("cfg-mpKey").value.trim(),
-			};
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
-			const statusEl = document.getElementById("config-status");
-			try {
-				connect(cfg);
-				statusEl.textContent = "Conectado.";
-				statusEl.className = "config-status ok";
-			} catch (err) {
-				statusEl.textContent = "Falha ao conectar: " + err.message;
-				statusEl.className = "config-status bad";
-			}
-		});
+async function calcularFrete() {
+  if (!checarBaseUrl()) return;
 
-		function ensureConnected() {
-			if (!functionsRef) throw new Error("Salve a configuração acima antes de testar.");
-		}
+  const payload = {
+    cepOrigem: document.getElementById("cepOrigem").value,
+    cepDestino: document.getElementById("cepDestino").value,
+    produtos: [
+      {
+        id: "produto-1",
+        peso: parseFloat(document.getElementById("peso").value),
+        altura: parseFloat(document.getElementById("altura").value),
+        largura: parseFloat(document.getElementById("largura").value),
+        comprimento: parseFloat(document.getElementById("comprimento").value),
+        valor: parseFloat(document.getElementById("valor").value),
+        quantidade: 1,
+      },
+    ],
+  };
 
-		// ---- Calcular frete ----
-		document.getElementById("form-frete").addEventListener("submit", async (e) => {
-			e.preventDefault();
-			setPill("frete-status", "loading", "Calculando...");
-			try {
-				ensureConnected();
-				const cep = document.getElementById("frete-cep").value;
-				const subtotal = Number(document.getElementById("frete-subtotal").value || 0);
-				const calcularFrete = httpsCallable(functionsRef, "calcularFrete");
-				const resp = await calcularFrete({ cep, subtotal });
-				showResult("frete-result", resp.data, false);
-				setPill("frete-status", "ok", "Sucesso");
-			} catch (err) {
-				showResult("frete-result", { erro: err.message, detalhes: err.details || null }, true);
-				setPill("frete-status", "err", "Erro");
-			}
-		});
+  const r = await chamar("melhorEnvioCalcularFrete", BASE_URL + "/melhorEnvioCalcularFrete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-		// ---- Criar preferência ----
-		document.getElementById("form-preferencia").addEventListener("submit", async (e) => {
-			e.preventDefault();
-			setPill("pref-status", "loading", "Criando...");
-			document.getElementById("pref-link").innerHTML = "";
-			try {
-				ensureConnected();
-				const pedidoId = document.getElementById("pref-pedidoId").value;
-				const criarPreferencia = httpsCallable(functionsRef, "criarPreferencia");
-				const resp = await criarPreferencia({ pedidoId });
-				showResult("pref-result", resp.data, false);
-				setPill("pref-status", "ok", "Sucesso");
-				if (resp.data?.preferenceId) {
-					const url = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${resp.data.preferenceId}`;
-					document.getElementById("pref-link").innerHTML =
-						`<a class="btn btn-outline-dark" href="${url}" target="_blank" rel="noopener">Abrir checkout desta preferência</a>`;
-				}
-			} catch (err) {
-				showResult("pref-result", { erro: err.message, detalhes: err.details || null }, true);
-				setPill("pref-status", "err", "Erro");
-			}
-		});
+  const container = document.getElementById("opcoesFrete");
+  container.innerHTML = "";
 
-		// ---- Payment Brick + process_payment ----
-		let brickController = null;
+  if (!r.ok) {
+    container.innerHTML = '<div class="opcao erro">Falha ao calcular frete. Veja o log.</div>';
+    return;
+  }
 
-		document.getElementById("form-brick-init").addEventListener("submit", async (e) => {
-			e.preventDefault();
-			try {
-				ensureConnected();
-			} catch (err) {
-				setPill("pag-status", "err", "Erro");
-				showResult("pag-result", { erro: err.message }, true);
-				return;
-			}
-			const pedidoId = document.getElementById("pag-pedidoId").value;
-			const valor = Number(document.getElementById("pag-valor").value || 0);
-			const email = document.getElementById("pag-email").value;
+  const opcoes = r.corpo?.opcoes || [];
+  if (!Array.isArray(opcoes) || opcoes.length === 0) {
+    container.innerHTML = '<div class="opcao">Nenhuma opção retornada.</div>';
+    return;
+  }
 
-			if (brickController) {
-				brickController.unmount();
-				brickController = null;
-			}
-			document.getElementById("brick-pagamento-container").innerHTML = "";
-			setPill("pag-status", "loading", "Carregando Brick...");
+  opcoes.forEach((op) => {
+    const div = document.createElement("div");
+    div.className = "opcao";
+    if (op.error) {
+      div.innerHTML = "<b>" + (op.name || op.company?.name || "?") + "</b> — <span class='erro'>" + op.error + "</span>";
+    } else {
+      div.innerHTML =
+        "<b>" + (op.company?.name || op.name) + "</b> (" + op.name + ")<br/>" +
+        "Preço: R$ " + op.price + " — Prazo: " + op.delivery_time + " dia(s)";
+    }
+    container.appendChild(div);
+  });
+}
 
-			try {
-				const bricksBuilder = mp.bricks();
-				brickController = await bricksBuilder.create("payment", "brick-pagamento-container", {
-					initialization: {
-						amount: valor,
-						payer: { email },
-					},
-					customization: {
-						paymentMethods: { creditCard: "all", pix: "all", bankTransfer: "all" },
-					},
-					callbacks: {
-						onReady: () => setPill("pag-status", "idle", "Preencha o pagamento"),
-						onError: (error) => {
-							setPill("pag-status", "err", "Erro no Brick");
-							showResult("pag-result", { erroBrick: error }, true);
-						},
-						onSubmit: ({ formData }) => {
-							setPill("pag-status", "loading", "Processando...");
-							return new Promise(async (resolve, reject) => {
-								try {
-									const process_payment = httpsCallable(functionsRef, "process_payment");
-									const resp = await process_payment({ pedidoId, formData });
-									showResult("pag-result", resp.data, false);
-									setPill("pag-status", "ok", resp.data.status || "Concluído");
-									resolve();
-								} catch (err) {
-									showResult("pag-result", { erro: err.message, detalhes: err.details || null }, true);
-									setPill("pag-status", "err", "Erro");
-									reject();
-								}
-							});
-						},
-					},
-				});
-			} catch (err) {
-				setPill("pag-status", "err", "Erro ao montar Brick");
-				showResult("pag-result", { erro: err.message }, true);
-			}
-		});
-
-		// ---- Simular webhook ----
-		document.getElementById("form-webhook-test").addEventListener("submit", async (e) => {
-			e.preventDefault();
-			setPill("webhook-status", "loading", "Enviando...");
-			try {
-				const cfg = loadConfig();
-				if (!cfg) throw new Error("Salve a configuração acima primeiro.");
-				const url = `https://${cfg.region || "southamerica-east1"}-${cfg.projectId}.cloudfunctions.net/webhookMP`;
-				const paymentId = document.getElementById("webhook-paymentId").value;
-				const resp = await fetch(url, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ type: "payment", data: { id: paymentId } }),
-				});
-				showResult("webhook-result", { httpStatus: resp.status, ok: resp.ok }, !resp.ok);
-				setPill("webhook-status", resp.ok ? "ok" : "err", resp.ok ? "Enviado" : "Erro");
-			} catch (err) {
-				showResult("webhook-result", { erro: err.message }, true);
-				setPill("webhook-status", "err", "Erro");
-			}
-		});
-
-		document.getElementById("btn-copy-webhook").addEventListener("click", () => {
-			const text = document.getElementById("webhook-url").textContent;
-			navigator.clipboard.writeText(text);
-			const btn = document.getElementById("btn-copy-webhook");
-			const original = btn.textContent;
-			btn.textContent = "Copiado!";
-			setTimeout(() => (btn.textContent = original), 1500);
-		});
-	</script>
+log("info", "Página carregada. Configure a Base URL e comece pelo passo 1.");
+</script>
 
 </body>
-
 </html>

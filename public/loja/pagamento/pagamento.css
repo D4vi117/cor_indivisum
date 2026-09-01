@@ -1,0 +1,316 @@
+/* ======================================================
+   PAGAMENTO — herda as variáveis (--oxblood, --gold, etc.)
+   já definidas em :root no styles.css
+   ====================================================== */
+
+body {
+	background: var(--parchment-dim);
+}
+
+/* ---------- HEADER ---------- */
+.pg-header {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1.1rem 1.6rem;
+	background: var(--oxblood-deep);
+	border-bottom: 1px solid var(--hair);
+}
+
+.pg-logo-link {
+	text-decoration: none;
+}
+
+.pg-logo {
+	font-family: 'Cinzel', serif;
+	font-size: 1rem;
+	letter-spacing: 0.22em;
+	color: var(--parchment);
+}
+
+.pg-steps {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	font-family: 'Cinzel', serif;
+	font-size: 0.68rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: rgba(244, 238, 223, 0.45);
+}
+
+.pg-step.done,
+.pg-step.active {
+	color: var(--gold-bright);
+}
+
+.pg-step-sep {
+	color: rgba(244, 238, 223, 0.25);
+}
+
+@media (max-width: 560px) {
+	.pg-steps {
+		display: none;
+	}
+}
+
+/* ---------- LAYOUT ---------- */
+.pg-main {
+	padding: 3.4rem 1.5rem 6rem;
+}
+
+.pg-wrap {
+	max-width: 1040px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 1.35fr 1fr;
+	gap: 3rem;
+	align-items: start;
+}
+
+@media (max-width: 860px) {
+	.pg-wrap {
+		grid-template-columns: 1fr;
+	}
+
+	.pg-summary-col {
+		order: -1;
+	}
+}
+
+.pg-payment-col h1 {
+	margin: 0 0 0.7rem;
+}
+
+.pg-lede {
+	color: var(--ink-soft);
+	max-width: 34em;
+	margin: 0 0 2.2rem;
+}
+
+/* ---------- BRICK CONTAINER ---------- */
+.pg-brick {
+	background: var(--parchment);
+	border: 1px solid var(--hair);
+	padding: 0.4rem;
+}
+
+.pg-brick:empty {
+	display: none;
+}
+
+/* ---------- ESTADOS (loading / erro / sucesso / pix) ---------- */
+.pg-state {
+	background: var(--parchment);
+	border: 1px solid var(--hair);
+	padding: 2.6rem 2rem;
+	text-align: center;
+}
+
+.pg-spinner {
+	width: 34px;
+	height: 34px;
+	margin: 0 auto 1.2rem;
+	border-radius: 50%;
+	border: 3px solid var(--hair);
+	border-top-color: var(--ember);
+	animation: pg-spin 0.9s linear infinite;
+}
+
+@keyframes pg-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pg-spinner {
+		animation-duration: 2.4s;
+	}
+}
+
+.pg-state p {
+	color: var(--ink-soft);
+	margin: 0;
+}
+
+.pg-state-title {
+	font-family: 'Cinzel', serif;
+	font-size: 1.15rem;
+	color: var(--ink);
+	margin: 0 0 0.6rem !important;
+}
+
+.pg-state-error {
+	border-color: var(--ember);
+}
+
+.pg-error-title {
+	font-family: 'Cinzel', serif;
+	font-size: 1.05rem;
+	color: var(--ember);
+	margin: 0 0 0.6rem !important;
+}
+
+.pg-error-detail {
+	margin: 0 0 1.6rem !important;
+}
+
+.pg-state-success .pg-cross {
+	font-family: 'Cinzel', serif;
+	color: var(--gold);
+	font-size: 1.6rem;
+	letter-spacing: 0.3em;
+	margin-bottom: 1rem;
+}
+
+.pg-state-success p {
+	margin: 0 0 1.6rem;
+}
+
+.pg-state button.yt-btn {
+	margin-top: 0.4rem;
+	background: transparent;
+	font-family: 'Cinzel', serif;
+}
+
+/* ---------- PIX ---------- */
+.pg-state-pix p {
+	margin: 0 0 1.2rem;
+}
+
+.pg-pix-qr {
+	width: 200px;
+	height: 200px;
+	margin: 0 auto 1.6rem;
+	display: block;
+	border: 1px solid var(--hair);
+	background: #fff;
+	padding: 0.6rem;
+}
+
+.pg-pix-label {
+	display: block;
+	font-family: 'Cinzel', serif;
+	font-size: 0.68rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--gold);
+	margin-bottom: 0.6rem;
+}
+
+.pg-pix-copy {
+	display: flex;
+	gap: 0.6rem;
+	max-width: 420px;
+	margin: 0 auto 1.4rem;
+}
+
+.pg-pix-copy input {
+	flex: 1 1 auto;
+	min-width: 0;
+	background: var(--parchment-dim);
+	border: 1px solid var(--hair);
+	color: var(--ink-soft);
+	padding: 0.7rem 0.8rem;
+	font-family: 'EB Garamond', serif;
+	font-size: 0.92rem;
+}
+
+.pg-pix-copy button {
+	flex: 0 0 auto;
+}
+
+.pg-pix-note {
+	font-size: 0.85rem !important;
+	color: var(--ink-soft) !important;
+	opacity: 0.8;
+}
+
+/* ---------- RESUMO DO PEDIDO ---------- */
+.pg-summary {
+	position: sticky;
+	top: 5.4rem;
+	background: var(--parchment);
+	border: 1px solid var(--hair);
+	padding: 1.8rem 1.8rem 1.6rem;
+}
+
+.pg-summary .eyebrow {
+	margin-bottom: 1rem;
+}
+
+.pg-summary-item {
+	padding-bottom: 1.2rem;
+	margin-bottom: 1.2rem;
+	border-bottom: 1px solid var(--hair);
+}
+
+.pg-summary-item-name {
+	font-family: 'Cinzel', serif;
+	font-size: 0.95rem;
+	color: var(--ink);
+	margin: 0 0 0.3rem;
+}
+
+.pg-summary-item-desc {
+	font-size: 0.9rem;
+	color: var(--ink-soft);
+	margin: 0;
+}
+
+.pg-summary-total {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	font-family: 'Cinzel', serif;
+	font-size: 0.78rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--ink);
+}
+
+#pg-summary-total-value {
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 1.5rem;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--ember);
+}
+
+/* Skeleton enquanto carrega o resumo */
+.pg-summary-skeleton {
+	height: 0.95rem;
+	margin-bottom: 0.55rem;
+	background: linear-gradient(90deg, var(--parchment-dim), var(--hair), var(--parchment-dim));
+	background-size: 200% 100%;
+	animation: pg-shimmer 1.4s ease-in-out infinite;
+}
+
+.pg-summary-skeleton.short {
+	width: 60%;
+	margin-bottom: 0;
+}
+
+section {
+    padding: 0
+}
+@keyframes pg-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pg-summary-skeleton {
+		animation: none;
+	}
+}
