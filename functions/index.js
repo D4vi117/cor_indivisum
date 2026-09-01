@@ -23,6 +23,7 @@ const MELHOR_ENVIO_BASE_URL = process.env.MELHOR_ENVIO_BASE_URL;
 const MELHOR_ENVIO_REDIRECT_URI = process.env.MELHOR_ENVIO_REDIRECT_URI;
 const REMETENTE_POSTAL_CODE = process.env.REMETENTE_POSTAL_CODE;
 const MP_WEBHOOK_URL = "https://corindivisum.com.br/api/webhook-mp";
+const MELHOR_ENVIO_OAUTH_STATE_TTL_MS = 30 * 60 * 1000;
 
 function cepOrigemConfigurado() {
   const cep = String(REMETENTE_POSTAL_CODE || "").replace(/\D/g, "");
@@ -473,7 +474,7 @@ exports.iniciarAutorizacaoMelhorEnvio = onCall(async (request) => {
   await db.collection("melhor_envio_oauth_states").doc(state).set({
     uid: request.auth.uid,
     criadoEm: FieldValue.serverTimestamp(),
-    expiraEm: new Date(Date.now() + 10 * 60 * 1000),
+    expiraEm: new Date(Date.now() + MELHOR_ENVIO_OAUTH_STATE_TTL_MS),
   });
 
   return {
@@ -487,6 +488,10 @@ exports.melhorEnvioAuthStart = onRequest(async (req, res) => {
   const stateSnap = stateRef ? await stateRef.get() : null;
   const expiraEm = stateSnap?.data()?.expiraEm?.toDate?.();
   if (!stateSnap?.exists || !expiraEm || expiraEm.getTime() < Date.now()) {
+    console.warn("melhorEnvioAuthStart: state inválido", {
+      stateEncontrado: Boolean(stateSnap?.exists),
+      expirado: Boolean(expiraEm && expiraEm.getTime() < Date.now()),
+    });
     if (stateSnap?.exists) await stateRef.delete();
     return res.status(403).send("Solicitação de autorização inválida ou expirada");
   }
@@ -534,6 +539,11 @@ exports.melhorEnvioAuthCallback = onRequest(
       const stateSnap = stateRef ? await stateRef.get() : null;
       const expiraEm = stateSnap?.data()?.expiraEm?.toDate?.();
       if (!stateSnap?.exists || !expiraEm || expiraEm.getTime() < Date.now()) {
+        console.warn("melhorEnvioAuthCallback: state inválido", {
+          stateRecebido: Boolean(stateValue),
+          stateEncontrado: Boolean(stateSnap?.exists),
+          expirado: Boolean(expiraEm && expiraEm.getTime() < Date.now()),
+        });
         if (stateSnap?.exists) await stateRef.delete();
         return res.status(403).send("Estado de autorização inválido ou expirado");
       }
