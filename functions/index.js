@@ -1453,6 +1453,22 @@ async function verificarAdmin(uid) {
   }
 }
 
+function validarPedidoParaGerarEtiqueta(pedido) {
+  if (pedido.status !== "pago") {
+    throw new HttpsError(
+      "failed-precondition",
+      "A etiqueta só pode ser gerada depois da confirmação do pagamento do pedido."
+    );
+  }
+
+  if (pedido.etiqueta?.cartItemId) {
+    throw new HttpsError(
+      "already-exists",
+      "Este pedido já possui uma etiqueta gerada."
+    );
+  }
+}
+
 exports.gerarEtiquetaPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async (request) => {
   await verificarAdmin(request.auth?.uid);
 
@@ -1462,6 +1478,7 @@ exports.gerarEtiquetaPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }
   }
 
   const pedido = await getPedido(pedidoId);
+  validarPedidoParaGerarEtiqueta(pedido);
 
   try {
     const etiqueta = await comprarEtiquetaMelhorEnvio(pedidoId, pedido);
@@ -1492,6 +1509,7 @@ exports.gerarEtiquetasEmLote = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] 
   for (const pedidoId of pedidoIds) {
     try {
       const pedido = await getPedido(pedidoId);
+      validarPedidoParaGerarEtiqueta(pedido);
       const etiqueta = await comprarEtiquetaMelhorEnvio(pedidoId, pedido);
       await pedidoRef(pedidoId).update({
         etiqueta: { ...etiqueta, geradaEm: FieldValue.serverTimestamp() },
@@ -1500,9 +1518,11 @@ exports.gerarEtiquetasEmLote = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] 
       resultados.push({ pedidoId, sucesso: true, ...etiqueta });
     } catch (err) {
       console.error(`gerarEtiquetasEmLote falhou (${pedidoId}):`, err);
-      await pedidoRef(pedidoId)
-        .update({ etiquetaErro: err.message || "erro desconhecido" })
-        .catch(() => {});
+      if (err.code !== "failed-precondition" && err.code !== "already-exists") {
+        await pedidoRef(pedidoId)
+          .update({ etiquetaErro: err.message || "erro desconhecido" })
+          .catch(() => {});
+      }
       resultados.push({ pedidoId, sucesso: false, erro: err.message || "erro desconhecido" });
     }
   }

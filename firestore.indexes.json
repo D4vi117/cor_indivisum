@@ -54,6 +54,14 @@
         { "fieldPath": "status.ativo", "order": "ASCENDING" },
         { "fieldPath": "status.publicado", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "pedidos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "cliente.uid", "order": "ASCENDING" },
+        { "fieldPath": "criadoEm", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
