@@ -1,0 +1,465 @@
+/* ======================================================
+   LOJA · Cor Indivisum
+   Usa as variáveis de cor e fontes definidas em styles.css
+   (--oxblood, --gold, --parchment, Cinzel, EB Garamond etc.)
+   Este arquivo assume que styles.css já foi carregado antes.
+   ====================================================== */
+
+body {
+  background: var(--parchment);
+}
+
+section {
+    padding: 0
+}
+
+.loja-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.loading-state {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 3rem 0;
+}
+
+/* ---------- HEADER ---------- */
+.loja-header {
+  background: var(--oxblood-deep);
+  border-bottom: 1px solid var(--hair);
+  padding: 1rem 2rem;
+}
+
+.loja-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-carrinho-topo {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  padding: 0.6rem 1.1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn-carrinho-topo:hover {
+  background: var(--gold);
+  color: var(--oxblood-deep);
+}
+
+/* ---------- MODAL DO CARRINHO ---------- */
+.carrinho-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(32, 10, 15, 0.55);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+  overscroll-behavior: contain;
+}
+
+body.carrinho-modal-aberto {
+  overflow: hidden;
+}
+
+.carrinho-modal-overlay[hidden] {
+  display: none;
+}
+
+.carrinho-modal-content {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  background: var(--parchment);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -12px 0 30px rgba(0, 0, 0, 0.25);
+  animation: modal-in 0.35s ease both;
+}
+
+@keyframes modal-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.carrinho-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid var(--hair);
+  background: var(--oxblood-deep);
+}
+
+.carrinho-modal-header h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  margin: 0;
+}
+
+.btn-fechar-modal {
+  background: none;
+  border: none;
+  color: var(--gold-bright);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.btn-fechar-modal:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 4px;
+}
+
+.carrinho-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem 1.6rem;
+}
+
+.carrinho-modal-footer {
+  border-top: 1px solid var(--hair);
+  padding: 1.2rem 1.6rem 1.6rem;
+  background: var(--parchment-dim);
+}
+
+.subtotal-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+  font-family: 'Cinzel', serif;
+  color: var(--ink);
+}
+
+.subtotal-wrap strong {
+  color: var(--ember);
+  font-size: 1.2rem;
+}
+
+.modal-acoes-duplas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.text-center { text-align: center; }
+
+.btn-secundario,
+.btn-primary {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.85rem 1rem;
+  border-radius: 2px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 1px solid var(--ember);
+  color: var(--oxblood-deep);
+}
+
+.btn-secundario:hover {
+  background: var(--ember);
+  color: var(--parchment);
+}
+
+.btn-primary {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--oxblood-deep);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: var(--gold-bright);
+}
+
+/* ---------- BUSCA E FILTRO ---------- */
+.loja-controles {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.busca-wrap { flex: 1; min-width: 200px; }
+
+.busca-wrap input,
+.filtro-wrap select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  border-radius: 2px;
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+}
+
+.busca-wrap input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+.busca-wrap input:focus,
+.filtro-wrap select:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+/* ---------- GRID DE PRODUTOS ---------- */
+.produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.produto-card {
+  background: #fff;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.produto-card:hover {
+  box-shadow: 0 12px 26px rgba(42, 31, 26, 0.12);
+  transform: translateY(-2px);
+}
+
+.card-thumb {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: var(--parchment-dim);
+}
+
+.card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tag-destaque {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--gold);
+  color: var(--oxblood-deep);
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card-content {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-categoria {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.card-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0.35rem 0;
+}
+
+.card-titulo a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.card-titulo a:hover {
+  color: var(--ember);
+}
+
+.card-descricao {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.card-preco-wrap {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.preco-antigo {
+  text-decoration: line-through;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  font-size: 0.88rem;
+}
+
+.preco-atual {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ember);
+}
+
+.card-acoes {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-adicionar-carrinho {
+  flex: 1;
+  padding: 0.65rem;
+  background: transparent;
+  border: 1px solid var(--ember);
+  color: var(--oxblood-deep);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn-comprar-direto {
+  flex: 1;
+  padding: 0.65rem;
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--oxblood-deep);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.btn-adicionar-carrinho:hover {
+  background: var(--ember);
+  color: var(--parchment);
+}
+
+.btn-comprar-direto:hover {
+  background: var(--gold-bright);
+}
+
+/* ---------- FOOTER DA LOJA ---------- */
+
+
+.loja-container ~ footer .cross {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  letter-spacing: 0.3em;
+}
+
+.loja-container ~ footer .fine {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: rgba(244, 238, 223, 0.4);
+}
+
+@media (max-width: 600px) {
+  .loja-header-inner {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+}
+/* ---------- LOJA & HEADER MOBILE ---------- */
+@media (max-width: 600px) {
+  .loja-header {
+    padding: 0.8rem 1rem;
+  }
+
+  .loja-header-inner {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .btn-carrinho-topo {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.7rem;
+  }
+
+  /* Ajuste dos filtros de busca */
+  .loja-controles {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .busca-wrap, 
+  .filtro-wrap select {
+    width: 100%;
+  }
+
+  /* Grid de Produtos: 1 Coluna em celulares pequenos */
+  .produtos-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

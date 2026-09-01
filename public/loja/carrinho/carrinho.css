@@ -1,0 +1,481 @@
+/* ==========================================================================
+   CARRINHO.CSS
+   Cobre dois contextos que compartilham este arquivo:
+   1) O modal-drawer do mini-carrinho (usado na página /loja)
+   2) A página dedicada /loja/carrinho (tabela completa)
+   Usa os tokens de cor/tipografia de styles.css — mesma identidade do site.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. MODAL-DRAWER (mini-carrinho, aberto a partir da /loja)
+   ========================================================================== */
+
+.carrinho-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(32, 10, 15, 0.72); /* var(--oxblood-deep) com transparência */
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.carrinho-modal-content {
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  background: var(--parchment);
+  border-left: 1px solid var(--hair);
+  display: flex;
+  flex-direction: column;
+}
+
+.carrinho-modal-header {
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid var(--hair);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--oxblood-deep);
+}
+
+.carrinho-modal-header h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--parchment);
+  margin: 0;
+}
+
+.btn-fechar-modal {
+  background: transparent;
+  border: none;
+  color: rgba(244, 238, 223, 0.7);
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-fechar-modal:hover {
+  color: var(--gold-bright);
+}
+
+.carrinho-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem;
+}
+
+.carrinho-vazio-text {
+  color: var(--ink-soft);
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.95rem;
+}
+
+.cart-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--hair);
+}
+
+.cart-item-row img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--hair);
+}
+
+.cart-item-details { flex: 1; }
+
+.cart-item-details h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 0.3rem;
+}
+
+.cart-item-price {
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cart-item-qtd-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.cart-item-qtd-ctrl span {
+  font-size: 0.9rem;
+  color: var(--ink);
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.cart-item-qtd-ctrl button {
+  background: var(--parchment-dim);
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'EB Garamond', serif;
+  line-height: 1;
+}
+
+.cart-item-qtd-ctrl button:hover {
+  border-color: var(--gold);
+  color: var(--ember);
+}
+
+.btn-remover-item {
+  background: transparent;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  align-self: flex-start;
+  padding: 0 0 0 0.4rem;
+}
+
+.btn-remover-item:hover {
+  color: var(--ember);
+}
+
+.carrinho-modal-footer {
+  padding: 1.2rem 1.4rem;
+  border-top: 1px solid var(--hair);
+  background: var(--parchment-dim);
+}
+
+.subtotal-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.subtotal-wrap strong {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  color: var(--ember);
+}
+
+.modal-acoes-duplas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ==========================================================================
+   2. PÁGINA DEDICADA /loja/carrinho
+   ========================================================================== */
+
+.loja-header {
+  background: var(--oxblood-deep);
+  padding: 1rem 1.5rem;
+}
+
+.loja-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.brand-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: var(--parchment);
+  text-decoration: none;
+}
+
+.btn-voltar {
+  color: rgba(244, 238, 223, 0.7);
+  text-decoration: none;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.btn-voltar:hover {
+  color: var(--gold-bright);
+}
+
+.carrinho-pagina-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.4rem 1.5rem 5rem;
+}
+
+.carrinho-pagina-container > h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 2rem;
+}
+
+.carrinho-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* ---------- Tabela ---------- */
+.carrinho-tabela-wrap {
+  background: var(--parchment);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.carrinho-tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.carrinho-tabela thead {
+  background: var(--parchment-dim);
+}
+
+.carrinho-tabela th {
+  text-align: left;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--hair);
+}
+
+.carrinho-tabela td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--hair);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.carrinho-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.col-produto {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.col-produto img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--hair);
+}
+
+.col-produto span {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.qtd-control {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.qtd-control span {
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.qtd-control button {
+  background: var(--parchment-dim);
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  width: 26px;
+  height: 26px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'EB Garamond', serif;
+  line-height: 1;
+}
+
+.qtd-control button:hover {
+  border-color: var(--gold);
+  color: var(--ember);
+}
+
+.btn-remover {
+  background: transparent;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.btn-remover:hover {
+  color: var(--ember);
+}
+
+#carrinho-vazio-msg {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+}
+
+#carrinho-vazio-msg p {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin: 0 0 1.4rem;
+}
+
+/* ---------- Resumo lateral ---------- */
+.carrinho-resumo-card {
+  background: var(--parchment);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  padding: 1.6rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.carrinho-resumo-card h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 1.2rem;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 0.8rem;
+}
+
+.resumo-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+}
+
+.resumo-linha strong {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: var(--ember);
+}
+
+.frete-aviso {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin: 0 0 1.4rem;
+}
+
+/* ---------- Botões (autocontido, não depende de outro CSS global) ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: var(--oxblood-deep);
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  padding: 0.8rem 1.2rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+
+.btn-block {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.text-center {
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .carrinho-grid {
+    grid-template-columns: 1fr;
+  }
+  .carrinho-resumo-card {
+    position: static;
+  }
+  .col-produto span {
+    font-size: 0.85rem;
+  }
+}
+/* ---------- CARRINHO RESPONSIVO ---------- */
+@media (max-width: 640px) {
+  .carrinho-tabela, 
+  .carrinho-tabela thead, 
+  .carrinho-tabela tbody, 
+  .carrinho-tabela th, 
+  .carrinho-tabela td, 
+  .carrinho-tabela tr {
+    display: block;
+  }
+
+  /* Esconde o cabeçalho da tabela */
+  .carrinho-tabela thead {
+    display: none;
+  }
+
+  .carrinho-tabela tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--hair);
+    background: var(--parchment);
+    padding: 0.8rem;
+    border-radius: 4px;
+  }
+
+  .carrinho-tabela td {
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--hair);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .carrinho-tabela td:last-child {
+    border-bottom: none;
+  }
+
+  /* Modal do carrinho (drawer) ocupa a tela cheia em celulares */
+  .carrinho-modal-content {
+    max-width: 100vw;
+  }
+}

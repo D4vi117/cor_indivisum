@@ -17,9 +17,7 @@
   font-style: normal;
   font-display: swap;
 }
-* {
-    box-sizing: border-box;
-}
+
 
 html {
     scroll-behavior: smooth;
@@ -32,6 +30,13 @@ body {
     font-family: 'EB Garamond', serif;
     font-size: 19px;
     line-height: 1.7;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+html, body {
+    height: 100%;
+    margin: 0;
 }
 
 h1,
@@ -165,23 +170,38 @@ font-family: 'Felix Titling', 'Cinzel', 'Cormorant Garamond', serif;
 }
 
 /* Responsividade para telas menores (Celulares) */
+/* ---------- HERO MOBILE ADJUSTMENTS ---------- */
 @media (max-width: 768px) {
+  .hero {
+    padding: 3rem 1rem 4rem;
+    min-height: 100dvh; /* Usa a altura real da viewport do mobile */
+  }
+
   .hero-content {
-    flex-direction: column; /* Empilha ícone e texto em telas muito pequenas */
+    flex-direction: column;
     text-align: center;
-    gap: 1rem;
+    gap: 1.2rem;
   }
 
   .hero-icon {
-    width: 70px;
+    width: 90px; /* Redimensionamento proporcional do ícone */
   }
 
   .hero-title {
-    font-size: 6rem;
+    /* Ajusta dinamicamente a fonte para não estourar a tela */
+    font-size: clamp(2.2rem, 8vw, 3.8rem);
+    white-space: normal; /* Permite quebrar linha se necessário */
+    word-break: break-word;
+    letter-spacing: 0.05em;
   }
 
   .hero-subtitle {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+  }
+
+  .scroll-cue {
+    bottom: 1rem;
+    font-size: 0.75rem;
   }
 }
 .emblem {
@@ -561,6 +581,7 @@ footer {
     color: rgba(244, 238, 223, 0.7);
     text-align: center;
     padding: 5rem 1.5rem 3rem;
+    margin-top: auto;
 }
 
 footer .cross {
@@ -585,3 +606,28 @@ footer .fine {
     letter-spacing: 0.06em;
     color: rgba(244, 238, 223, 0.4);
 }
+
+.nav-links{display:none}
+.nav-links a {
+    margin-right: 1rem;
+    color: #F4EEDF;
+}
+/* ── BOTÕES ── */
+button {
+  background: var(--gold);
+  color: var(--parchment);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(12px);
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover { opacity: 0.9; }
+.nav-links-desktop{display:flex;gap:18px}
+.nav-links-desktop a{color:#F4F0EC;text-decoration:none;font-size:.85rem;font-weight:600;opacity:.85}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-profile{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#6B1E1E;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.avatar svg{width:18px;height:18px;fill:#F4F0EC}
+.header-name{font-size:.82rem;color:#F4F0EC;font-weight:bold;line-height:1.2;opacity:.92}
+.header-email{font-size:.7rem;color:rgba(244,240,236,.5);line-height:1}

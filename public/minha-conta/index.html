@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Minha Conta · Cor Indivisum</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" href="minha-conta.css">
+	<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+
+<body>
+
+	<!-- ============ TOPO ============ -->
+	<header class="conta-top">
+		<div class="conta-top-inner">
+			<a href="/" class="conta-brand">COR INDIVISUM</a>
+			<span class="conta-brand-sub">Minha conta</span>
+		</div>
+	</header>
+
+	<main class="conta-shell">
+
+		<span class="eyebrow">Minha conta</span>
+		<h1 class="conta-titulo">Minha Conta</h1>
+
+		<!-- ============ ABAS ============ -->
+		<nav class="conta-tabs" id="contaTabs">
+			<button class="conta-tab active" data-tab="pedidos" type="button">Pedidos</button>
+			<button class="conta-tab" data-tab="dados" type="button">Meus dados</button>
+			<button class="conta-tab" data-tab="seguranca" type="button">Segurança</button>
+		</nav>
+
+		<!-- ============ ABA: PEDIDOS ============ -->
+		<section class="conta-painel" id="painel-pedidos">
+			<section class="conta-card">
+				<h2>Meus pedidos</h2>
+				<div id="pedidosLista" class="pedidos-lista">
+					<div class="pedidos-vazio">Carregando pedidos…</div>
+				</div>
+			</section>
+		</section>
+
+		<!-- ============ ABA: MEUS DADOS ============ -->
+		<section class="conta-painel" id="painel-dados" hidden>
+			<section class="conta-card">
+				<span class="eyebrow">Seus dados</span>
+				<h2>Perfil</h2>
+
+				<div class="perfil-linha">
+					<label for="contaNomeInput">Nome</label>
+					<div class="perfil-editavel">
+						<input type="text" id="contaNomeInput" placeholder="Seu nome completo">
+						<button class="btn-secundario" id="contaSalvarNomeBtn" type="button">Salvar</button>
+					</div>
+				</div>
+			</section>
+
+			<section class="conta-card">
+				<h2>Endereços salvos</h2>
+				<p class="conta-nota">Escolha um endereço para usá-lo na próxima compra.</p>
+				<div id="enderecosSalvosLista" class="enderecos-salvos-lista" aria-live="polite">
+					<div class="enderecos-vazio">Carregando endereços…</div>
+				</div>
+			</section>
+		</section>
+
+		<!-- ============ ABA: SEGURANÇA ============ -->
+		<section class="conta-painel" id="painel-seguranca" hidden>
+			<section class="conta-card">
+				<span class="eyebrow">Acesso</span>
+				<h2>Formas de entrar na sua conta</h2>
+				<p class="conta-nota">Você pode manter o Google e o celular vinculados à mesma conta e usar qualquer um
+					dos dois para entrar da próxima vez.</p>
+
+				<div class="provedor-linha" id="provedorGoogle">
+					<div class="provedor-info">
+						<strong>Google</strong>
+						<span class="provedor-status" data-status="">—</span>
+					</div>
+					<button class="btn-secundario" id="contaVincularGoogleBtn" type="button">Vincular Google</button>
+				</div>
+
+				<div class="provedor-linha" id="provedorTelefone">
+					<div class="provedor-info">
+						<strong>Celular</strong>
+						<span class="provedor-status" data-status="">—</span>
+					</div>
+					<div class="provedor-acao" id="contaVincularTelefoneAcao">
+						<button class="btn-secundario" id="contaVincularTelefoneBtn" type="button">Vincular
+							celular</button>
+					</div>
+				</div>
+
+				<div id="contaTelefonePainel" class="conta-telefone-painel" style="display:none;">
+					<input type="tel" id="contaTelefoneNumero" placeholder="+55 11 91234-5678">
+					<button class="btn-secundario" id="contaEnviarCodigoVinculoBtn" type="button">Enviar código</button>
+
+					<div id="contaCodigoVinculoRow" style="display:none;">
+						<input type="text" id="contaCodigoVinculo" placeholder="Código recebido por SMS">
+						<button class="btn-secundario" id="contaConfirmarCodigoVinculoBtn" type="button">Confirmar
+							código</button>
+					</div>
+				</div>
+
+				<!-- Contêiner exigido pelo Firebase para o reCAPTCHA invisível do vínculo de celular -->
+				<div id="contaLinkRecaptcha"></div>
+
+				<div id="contaLinkErro" class="conta-erro" style="display:none;"></div>
+			</section>
+		</section>
+
+		<button class="btn-sair" id="contaSairBtn" type="button">Sair da conta</button>
+
+	</main>
+
+	<!-- Firebase (compat), na mesma linha do que auth-guard.js espera -->
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+	<!-- Assume que firebase-config.js já existe no projeto e chama firebase.initializeApp(...) -->
+	<script src="/src/scripts/firebase-init.js"></script>
+
+	<!-- minha-conta.js na mesma página -->
+	<script src="minha-conta.js"></script>
+
+</body>
+
+</html>

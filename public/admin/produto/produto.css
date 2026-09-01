@@ -1,0 +1,504 @@
+/* ==========================================================================
+   PRODUTO.CSS — Editor de produto (admin)
+   Reaproveita os tokens de cor/tipografia de styles.css (a mesma
+   identidade visual do site público) em vez do tema escuro genérico
+   de admin. Este arquivo é autocontido: não depende de admin.css.
+   ========================================================================== */
+
+body {
+  background: var(--parchment-dim);
+}
+
+/* ---------- TOPO ---------- */
+.admin-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--oxblood-deep);
+  border-bottom: 1px solid var(--hair);
+  padding: 0.9rem 1.5rem;
+}
+
+.admin-top-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.admin-top-inner > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.admin-brand {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--parchment);
+}
+
+.btn-voltar {
+  color: rgba(244, 238, 223, 0.65);
+  text-decoration: none;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-right: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-voltar:hover {
+  color: var(--gold-bright);
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------- BOTÕES ---------- */
+.btn-primary,
+.btn-secundario {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--oxblood-deep);
+  border-color: var(--gold);
+}
+
+.btn-primary:hover {
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+
+.btn-secundario {
+  background: transparent;
+  color: rgba(244, 238, 223, 0.85);
+  border-color: rgba(244, 238, 223, 0.25);
+}
+
+.btn-secundario:hover {
+  border-color: var(--gold-bright);
+  color: var(--gold-bright);
+}
+
+/* Dentro dos cards (fundo claro), os botões secundários precisam de
+   contraste diferente do usado no topo escuro. */
+.editor-card .btn-secundario,
+.sidebar-actions .btn-secundario {
+  color: var(--ink-soft);
+  border-color: var(--hair);
+}
+
+.editor-card .btn-secundario:hover,
+.sidebar-actions .btn-secundario:hover {
+  color: var(--ember);
+  border-color: var(--ember);
+}
+
+.btn-danger {
+  color: var(--ember) !important;
+  border-color: var(--ember) !important;
+}
+
+.btn-danger:hover {
+  background: var(--ember);
+  color: var(--parchment) !important;
+}
+
+.btn-block {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.65rem;
+}
+
+/* ---------- LAYOUT ---------- */
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  max-width: 1300px;
+  margin: 2.4rem auto;
+  padding: 0 20px;
+}
+
+.editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.editor-card {
+  background: var(--parchment);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  padding: 1.8rem;
+}
+
+.editor-card h3 {
+  margin-top: 0;
+  margin-bottom: 1.3rem;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 0.7rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+.col-12 { grid-column: span 12; }
+.col-6 { grid-column: span 6; }
+.col-4 { grid-column: span 4; }
+.col-3 { grid-column: span 3; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.7rem;
+  background: #fff;
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  border-radius: 3px;
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184, 146, 61, 0.15);
+}
+
+.media-hint {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: -6px 0 10px;
+}
+
+.checkbox-group {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+}
+
+.editor-divider {
+  border: 0;
+  border-top: 1px solid var(--hair);
+  margin: 1.4rem 0;
+}
+
+/* ---------- MÍDIA / UPLOADS ---------- */
+.media-block h4 {
+  margin: 0 0 12px 0;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.upload-area {
+  margin-bottom: 12px;
+}
+
+.preview-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.preview-container img {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--hair);
+}
+
+.galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.galeria-item {
+  position: relative;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--parchment-dim);
+  display: flex;
+  flex-direction: column;
+}
+
+.galeria-item img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+}
+
+.galeria-item-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+  background: var(--oxblood-deep);
+}
+
+.galeria-item-actions button {
+  background: none;
+  border: none;
+  color: var(--parchment);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+}
+
+.galeria-item-actions button:hover {
+  color: var(--gold-bright);
+}
+
+/* ---------- WYSIWYG ---------- */
+.wysiwyg-toolbar {
+  display: flex;
+  gap: 4px;
+  background: var(--parchment-dim);
+  padding: 6px;
+  border: 1px solid var(--hair);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  flex-wrap: wrap;
+}
+
+.wysiwyg-toolbar button {
+  background: #fff;
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  padding: 4px 9px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'EB Garamond', serif;
+}
+
+.wysiwyg-toolbar button:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--oxblood-deep);
+}
+
+.wysiwyg-editor {
+  min-height: 180px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--hair);
+  border-radius: 0 0 3px 3px;
+  color: var(--ink);
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  overflow-y: auto;
+}
+
+.wysiwyg-editor:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* ---------- SEO PREVIEW ---------- */
+.google-preview {
+  margin-top: 16px;
+  background: var(--parchment-dim);
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--hair);
+}
+
+.preview-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.google-title {
+  color: #1a0dab;
+  font-family: Arial, sans-serif;
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+  word-break: break-all;
+}
+
+.google-url {
+  color: #006621;
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.google-desc {
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #545454;
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar-card {
+  position: sticky;
+  top: 90px;
+}
+
+.sidebar-thumb-wrap {
+  width: 100%;
+  height: 180px;
+  background: var(--parchment-dim);
+  border: 1px solid var(--hair);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sidebar-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sidebar-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 6px;
+}
+
+.info-item span {
+  color: var(--ink-soft);
+}
+
+.info-item strong {
+  color: var(--ink);
+}
+
+.status-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 12px;
+  color: var(--ink);
+}
+
+.status-badge[data-status="ok"] {
+  background: rgba(30, 122, 52, 0.14);
+  color: #1e7a34;
+}
+
+.status-badge[data-status="partial"] {
+  background: rgba(184, 146, 61, 0.18);
+  color: #8a6a1f;
+}
+
+.status-badge[data-status="off"] {
+  background: rgba(90, 75, 62, 0.12);
+  color: var(--ink-soft);
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+  .col-6, .col-4, .col-3 {
+    grid-column: span 12;
+  }
+  .sidebar-card {
+    position: static;
+  }
+}

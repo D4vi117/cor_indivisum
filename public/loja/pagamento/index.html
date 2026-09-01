@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Pagamento &middot; Cor Indivisum</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" href="/styles.css">
+	<link rel="stylesheet" href="pagamento.css">
+	<link rel="icon" href="/favicon.png" type="image/png">
+
+	<!-- SDK do Mercado Pago (Bricks) -->
+	<script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+
+<body>
+
+<!-- ============ CABEÇALHO ============ -->
+	<header class="pg-header">
+		<a href="/" class="pg-logo-link">
+			<span class="pg-logo">COR INDIVISUM</span>
+		</a>
+		<div class="pg-steps">
+			<span class="pg-step done">Carrinho</span>
+			<span class="pg-step-sep">&mdash;</span>
+			<span class="pg-step active">Pagamento</span>
+			<span class="pg-step-sep">&mdash;</span>
+			<span class="pg-step">Confirmação</span>
+		</div>
+	</header>
+ 
+	<!-- ============ CONTEÚDO ============ -->
+	<main class="pg-main">
+		<div class="pg-wrap">
+ 
+			<!-- Coluna do formulário / Brick -->
+			<section class="pg-payment-col">
+				<span class="eyebrow reveal">Finalizar compra</span>
+				<h1 class="section-title reveal">Confirme seu pagamento</h1>
+				<p class="pg-lede reveal">Escolha a forma de pagamento abaixo. Seus dados são processados com
+					segurança pelo Mercado Pago.</p>
+ 
+				<!-- Estado: carregando -->
+				<div id="pg-loading" class="pg-state">
+					<div class="pg-spinner" aria-hidden="true"></div>
+					<p>Carregando opções de pagamento&hellip;</p>
+				</div>
+ 
+				<!-- Estado: erro -->
+				<div id="pg-error" class="pg-state pg-state-error" hidden>
+					<p class="pg-error-title">Não foi possível carregar o pagamento</p>
+					<p id="pg-error-detail" class="pg-error-detail">Verifique o link acessado ou tente novamente em
+						instantes.</p>
+					<button type="button" class="yt-btn" id="pg-retry">Tentar novamente</button>
+				</div>
+ 
+				<!-- Brick do Mercado Pago é renderizado aqui -->
+				<div id="paymentBrick_container" class="pg-brick"></div>
+
+				<!-- NOVO: Opção/Divisória para pagamento via InfinitePay -->
+				<div id="pg-infinitepay-container" class="pg-alternative-payment" hidden style="margin-top: 24px; text-align: center;">
+					<div style="display: flex; align-items: center; margin: 20px 0;">
+						<hr style="flex: 1; border: none; border-top: 1px solid #333;">
+						<span style="padding: 0 10px; opacity: 0.7; font-size: 0.9em;">OU</span>
+						<hr style="flex: 1; border: none; border-top: 1px solid #333;">
+					</div>
+					
+					<button type="button" id="btn-infinitepay" class="yt-btn" style="width: 100%;">
+						Pagar via InfinitePay (Cartão / Pix)
+					</button>
+				</div>
+ 
+				<!-- Estado: processando pagamento -->
+				<div id="pg-processing" class="pg-state" hidden>
+					<div class="pg-spinner" aria-hidden="true"></div>
+					<p>Processando seu pagamento&hellip;</p>
+				</div>
+ 
+				<!-- Estado: aprovado -->
+				<div id="pg-success" class="pg-state pg-state-success" hidden>
+					<div class="pg-cross">✝</div>
+					<p class="pg-state-title">Pagamento aprovado!</p>
+					<p>Obrigado pela sua compra. Você receberá um e-mail com a confirmação do seu pedido.</p>
+					<a class="yt-btn" href="/minha-conta">Ver meu pedido</a>
+				</div>
+ 
+				<!-- Estado: Pix pendente -->
+				<div id="pg-pix" class="pg-state pg-state-pix" hidden>
+					<p class="pg-state-title">Pague com Pix para concluir</p>
+					<p>Abra o app do seu banco e escaneie o QR Code, ou copie o código abaixo.</p>
+					<img id="pg-pix-qr" class="pg-pix-qr" alt="QR Code Pix" />
+					<label class="pg-pix-label" for="pg-pix-code">Pix copia e cola</label>
+					<div class="pg-pix-copy">
+						<input id="pg-pix-code" type="text" readonly>
+						<button type="button" class="yt-btn" id="pg-pix-copy-btn">Copiar</button>
+					</div>
+					<p class="pg-pix-note">O pagamento é confirmado automaticamente assim que identificado &mdash;
+						não é necessário atualizar a página.</p>
+				</div>
+ 
+				<!-- Estado: recusado -->
+				<div id="pg-rejected" class="pg-state pg-state-error" hidden>
+					<p class="pg-error-title">Pagamento não aprovado</p>
+					<p id="pg-rejected-detail" class="pg-error-detail">Tente novamente com outro cartão ou forma de
+						pagamento.</p>
+					<button type="button" class="yt-btn" id="pg-rejected-retry">Tentar novamente</button>
+				</div>
+			</section>
+ 
+			<!-- Coluna de resumo do pedido -->
+			<aside class="pg-summary-col">
+				<div class="pg-summary reveal">
+					<span class="eyebrow">Resumo do pedido</span>
+					<div id="pg-summary-item" class="pg-summary-item">
+						<div class="pg-summary-line pg-summary-skeleton"></div>
+						<div class="pg-summary-line pg-summary-skeleton short"></div>
+					</div>
+					<div class="pg-summary-total">
+						<span>Total</span>
+						<span id="pg-summary-total-value">&mdash;</span>
+					</div>
+				</div>
+			</aside>
+ 
+		</div>
+	</main>
+ 
+	<!-- ============ FOOTER ============ -->
+	<footer>
+		<div class="cross">✝</div>
+		<p class="blessing">Fique conosco, conte com a nossa amizade e que Deus te abençoe.</p>
+		<p class="fine">COR INDIVISUM &middot; Iniciativa católica leiga &middot; Produção audiovisual &amp; editora
+		</p>
+	</footer>
+ 
+	<!-- Firebase compatível com as demais páginas do site -->
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+ 
+    <script src="/src/scripts/firebase-init.js"></script>
+	<script src="/src/scripts/auth-guard.js"></script>
+	<script src="pagamento.js"></script>
+</body>
+
+</html>

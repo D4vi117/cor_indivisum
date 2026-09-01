@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Editar Produto · Cor Indivisum</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" href="/styles.css">
+	<link rel="stylesheet" href="produto.css">
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+</head>
+
+<body>
+
+	<!-- ============ TOPO ============ -->
+	<header class="admin-top">
+		<div class="admin-top-inner">
+			<div>
+				<a href="/admin" class="btn-voltar">&larr; Voltar ao painel</a>
+				<span class="admin-brand">COR INDIVISUM</span>
+			</div>
+			<div class="top-actions">
+				<button type="button" class="btn-secundario btn-danger" id="btn-excluir">Excluir</button>
+				<button type="button" class="btn-secundario" id="btn-cancelar">Cancelar</button>
+				<button type="button" class="btn-secundario" id="btn-salvar-visualizar">Salvar e Visualizar</button>
+				<button type="button" class="btn-primary" id="btn-salvar">Salvar</button>
+			</div>
+		</div>
+	</header>
+
+	<main class="editor-layout">
+		<!-- COLUNA PRINCIPAL DE EDICAO -->
+		<div class="editor-main">
+
+			<!-- INFORMAÇÕES BÁSICAS -->
+			<section class="editor-card">
+				<h3>Informações Principais</h3>
+				<div class="form-grid">
+					<div class="form-group col-12">
+						<label for="field-nome">Nome do Produto</label>
+						<input type="text" id="field-nome">
+					</div>
+					<div class="form-group col-6">
+						<label for="field-slug">Slug (URL)</label>
+						<input type="text" id="field-slug">
+					</div>
+					<div class="form-group col-6">
+						<label for="field-categoria">Categoria</label>
+						<input type="text" id="field-categoria">
+					</div>
+					<div class="form-group col-4">
+						<label for="field-preco">Preço (R$)</label>
+						<input type="number" id="field-preco" min="0" step="0.01">
+					</div>
+					<div class="form-group col-4">
+						<label for="field-precoPromocional">Preço Promocional (R$)</label>
+						<input type="number" id="field-precoPromocional" min="0" step="0.01">
+					</div>
+					<div class="form-group col-4">
+						<label for="field-estoque">Estoque</label>
+						<input type="number" id="field-estoque" min="0" step="1">
+					</div>
+				</div>
+			</section>
+
+			<!-- LOGÍSTICA / MEDIDAS -->
+			<section class="editor-card">
+				<h3>Dimensões e Peso</h3>
+				<div class="form-grid">
+					<div class="form-group col-3">
+						<label for="field-peso">Peso (kg)</label>
+						<input type="number" id="field-peso" min="0" step="0.001">
+					</div>
+					<div class="form-group col-3">
+						<label for="field-altura">Altura (cm)</label>
+						<input type="number" id="field-altura" min="0" step="0.1">
+					</div>
+					<div class="form-group col-3">
+						<label for="field-largura">Largura (cm)</label>
+						<input type="number" id="field-largura" min="0" step="0.1">
+					</div>
+					<div class="form-group col-3">
+						<label for="field-comprimento">Comprimento (cm)</label>
+						<input type="number" id="field-comprimento" min="0" step="0.1">
+					</div>
+				</div>
+			</section>
+
+			<!-- OPÇÕES E VISIBILIDADE -->
+			<section class="editor-card">
+				<h3>Visibilidade e Opções</h3>
+				<div class="checkbox-group">
+					<label class="checkbox-label">
+						<input type="checkbox" id="field-ativo">
+						Produto Ativo
+					</label>
+					<label class="checkbox-label">
+						<input type="checkbox" id="field-publicado">
+						Publicado no Site
+					</label>
+					<label class="checkbox-label">
+						<input type="checkbox" id="field-destaque">
+						Produto em Destaque
+					</label>
+				</div>
+			</section>
+
+			<!-- FOTOS -->
+			<section class="editor-card">
+				<h3>Fotos do Produto</h3>
+				
+				<div class="media-block">
+					<h4>Foto Principal</h4>
+					<div class="upload-area">
+						<input type="file" id="upload-foto-principal" accept="image/*">
+						<div class="preview-container" id="preview-principal-container" hidden>
+							<img src="" id="preview-foto-principal" alt="Foto Principal">
+							<button type="button" class="btn-secundario btn-danger btn-sm" id="btn-remover-principal">Remover</button>
+						</div>
+					</div>
+				</div>
+
+				<hr class="editor-divider">
+			</section>
+
+			<!-- CONTEÚDO E DESCRIÇÕES -->
+			<section class="editor-card">
+				<h3>Conteúdo do Produto</h3>
+				
+				<div class="form-group">
+					<label for="field-descricaoCurta">Descrição Curta</label>
+					<textarea id="field-descricaoCurta" rows="3"></textarea>
+				</div>
+
+				<div class="form-group">
+					<label>Descrição Completa (Editor HTML)</label>
+					<div class="wysiwyg-toolbar">
+						<button type="button" data-cmd="bold"><b>B</b></button>
+						<button type="button" data-cmd="italic"><i>I</i></button>
+						<button type="button" data-cmd="underline"><u>U</u></button>
+						<button type="button" data-cmd="insertUnorderedList">&bull; Lista</button>
+						<button type="button" data-cmd="insertOrderedList">1. Lista</button>
+						<button type="button" data-cmd="formatBlock" data-param="h3">H3</button>
+						<button type="button" data-cmd="formatBlock" data-param="p">P</button>
+						<button type="button" data-cmd="removeFormat">Limpar</button>
+					</div>
+					<div id="editor-html-content" class="wysiwyg-editor" contenteditable="true"></div>
+				</div>
+
+				<div class="form-group">
+					<label for="field-infoAdicionais">Informações Adicionais</label>
+					<textarea id="field-infoAdicionais" rows="3"></textarea>
+				</div>
+			</section>
+
+			<!-- SEO -->
+			<section class="editor-card">
+				<h3>Otimização para Buscadores (SEO)</h3>
+				<div class="form-group">
+					<label for="field-seoTitulo">Título SEO</label>
+					<input type="text" id="field-seoTitulo">
+				</div>
+				<div class="form-group">
+					<label for="field-seoDescricao">Descrição SEO</label>
+					<textarea id="field-seoDescricao" rows="2"></textarea>
+				</div>
+				<div class="form-group">
+					<label for="field-seoKeywords">Palavras-chave (Meta Keywords)</label>
+					<input type="text" id="field-seoKeywords" placeholder="">
+				</div>
+
+				<div class="google-preview">
+					<span class="preview-label">Pré-visualização do Google</span>
+					<div class="google-title" id="seo-preview-title">Título Exemplo no Google</div>
+					<div class="google-url" id="seo-preview-url">https://corindivisum.com/loja/slug-exemplo</div>
+					<div class="google-desc" id="seo-preview-desc">Descrição de exibição nos resultados de pesquisa do Google.</div>
+				</div>
+			</section>
+
+			<!-- GERADOR DE TAGS HEAD PARA SEO -->
+			<section class="editor-card">
+				<h3>Tags SEO do &lt;head&gt; (Para copiar)</h3>
+				<p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 12px;">
+					Copie este bloco de código e cole dentro da tag <code>&lt;head&gt;</code> do HTML público deste produto para garantir SEO e pré-visualização no WhatsApp:
+				</p>
+				<div class="form-group">
+					<textarea id="field-headCode" rows="10" readonly style="font-family: monospace; font-size: 0.8rem; background: #111; color: #a6e22e; cursor: text;"></textarea>
+				</div>
+				<button type="button" class="btn-secundario" id="btn-copiar-head">Copiar Código do &lt;head&gt;</button>
+			</section>
+
+		</div>
+
+		<!-- BARRA LATERAL -->
+		<aside class="editor-sidebar">
+			<div class="editor-card sidebar-card">
+				<h3>Resumo do Produto</h3>
+				
+				<div class="sidebar-thumb-wrap">
+					<img id="sidebar-preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23222'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23666' font-size='12'%3ESem imagem%3C/text%3E%3C/svg%3E" alt="Preview">
+				</div>
+
+				<div class="sidebar-info-list">
+					<div class="info-item">
+						<span>Preço:</span>
+						<strong id="sidebar-preco">R$ 0,00</strong>
+					</div>
+					<div class="info-item">
+						<span>Status:</span>
+						<strong id="sidebar-status" class="status-badge">Rascunho</strong>
+					</div>
+					<div class="info-item">
+						<span>Criado em:</span>
+						<small id="sidebar-criadoEm">-</small>
+					</div>
+					<div class="info-item">
+						<span>Última edição:</span>
+						<small id="sidebar-editadoEm">-</small>
+					</div>
+				</div>
+
+				<div class="sidebar-actions">
+					<a href="#" target="_blank" class="btn-secundario btn-block text-center" id="btn-ver-publico">Visualizar Página Pública</a>
+					<button type="button" class="btn-secundario btn-block" id="btn-copiar-url">Copiar URL</button>
+				</div>
+			</div>
+		</aside>
+	</main>
+
+	<script src="/src/scripts/firebase-init.js"></script>
+	<script src="produto.js"></script>
+</body>
+
+</html>
