@@ -21,6 +21,13 @@
   ],
   "hosting": {
     "public": "public",
+    "redirects": [
+      {
+        "source": "/loja/p/hedonismo-na-camara-de-tortura/images/HCT Mockup.jpeg",
+        "destination": "/loja/p/Hedonismo-na-camara-de-tortura/images/livro.jpg",
+        "type": 302
+      }
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",

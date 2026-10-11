@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Hedonismo na Câmara de Tortura, de Rodrigo Oliveira: 18 ensaios sobre prazer, dor e sentido na vida contemporânea. Conheça a edição Cor Indivisum.">
+<link rel="icon" href="/favicon.ico">
+<title>Hedonismo na Câmara de Tortura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: capa-tapeçaria. Hero sobre o padrão de corvos e espinhos, texto à esquerda, livro à direita;
+   seções seguintes em faixas escuras alternadas, coluna de leitura estreita, ficha técnica ao lado da capa. */
+:root{
+  --ink:#0f1719;        /* fundo, o verde-tinta do título da capa */
+  --ink-2:#17211f;      /* faixa alternada */
+  --bone:#e8e1cf;       /* creme da placa do título */
+  --bone-dim:#b9b2a2;   /* texto secundário */
+  --brown:#5b2c1c;      /* faixa marrom da capa */
+  --gold:#d9a93a;       /* fios dourados do padrão */
+  --crimson:#b23a3a;    /* maçã e flores */
+  --line:rgba(232,225,207,.16);
+  --f-display:"Cormorant Garamond","Iowan Old Style",Georgia,serif;
+  --f-body:"Newsreader",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0;background:var(--ink);color:var(--bone);font-family:var(--f-body);font-size:1.125rem;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{width:100%;max-width:70rem;margin-inline:auto;padding-inline:max(1rem,5vw)}
+.eyebrow{font-family:var(--f-display);font-size:.95rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
+section{padding-block:clamp(3.5rem,8vw,6.5rem)}
+
+/* topo */
+.bar{background:var(--brown);border-bottom:1px solid rgba(0,0,0,.4)}
+.bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-block:.7rem}
+.bar b{font-family:var(--f-display);letter-spacing:.14em;text-transform:uppercase;font-weight:600;font-size:1rem}
+.bar span{font-size:.9rem;color:var(--bone-dim);font-style:italic}
+
+/* hero */
+.hero{position:relative;padding-block:clamp(2.5rem,6vw,5rem);background:
+  linear-gradient(90deg,rgba(15,23,25,.94) 0%,rgba(15,23,25,.78) 55%,rgba(15,23,25,.55) 100%),
+  url(images/padrao.jpg) center/cover}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(2rem,5vw,4rem);align-items:center}
+.hero h1{font-size:clamp(2.4rem,5.6vw,4.4rem);margin-block:1rem 1.5rem;font-weight:600}
+.hero h1 em{color:var(--gold);font-style:italic}
+.lede{font-size:clamp(1.05rem,1.6vw,1.22rem);color:var(--bone);max-width:38rem}
+.lede i{font-style:italic}
+.cta{display:inline-block;margin-top:2rem;background:var(--crimson);color:#fff;text-decoration:none;font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:1.05rem;padding:1rem 1.8rem;border:1px solid rgba(255,255,255,.18);transition:background .2s,transform .2s}
+.cta:hover{background:#c64646;transform:translateY(-2px)}
+.seal{display:flex;align-items:center;gap:.8rem;margin-top:1.4rem;font-style:italic;color:var(--bone-dim);font-size:1rem}
+.seal::before{content:"";flex:none;width:2.2rem;height:1px;background:var(--gold)}
+.hero figure{margin:0;justify-self:center;max-width:26rem}
+.hero img{display:block;width:100%;height:auto;box-shadow:0 30px 60px rgba(0,0,0,.55)}
+
+/* problema */
+.problem{background:var(--ink)}
+.problem .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(2rem,6vw,5rem)}
+.problem h2{font-size:clamp(2rem,4vw,3rem);margin-top:.8rem}
+.problem .text{display:grid;gap:1.2rem}
+.traps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-block:.6rem}
+.trap{padding:1.3rem 1.2rem;background:var(--ink-2);border-top:3px solid var(--gold)}
+.trap h3{font-size:1.6rem;color:var(--gold);margin-bottom:.5rem}
+.trap p{font-size:1rem;color:var(--bone-dim);line-height:1.55}
+.quote{font-family:var(--f-display);font-style:italic;font-size:1.5rem;line-height:1.3;color:var(--bone);border-left:2px solid var(--crimson);padding-left:1.1rem}
+
+/* conteúdo */
+.content{background:var(--ink-2);border-block:1px solid var(--line)}
+.head{max-width:44rem;display:grid;gap:1rem;margin-bottom:clamp(2rem,5vw,3.5rem)}
+.head h2{font-size:clamp(2rem,4vw,3rem)}
+.head p{color:var(--bone-dim)}
+.themes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
+.themes li{padding:1.6rem 1.4rem 1.8rem 0;border-bottom:1px solid var(--line)}
+.themes li:nth-child(odd){border-right:1px solid var(--line)}
+.themes li:nth-child(even){padding-left:1.4rem}
+.themes h3{font-size:1.65rem;margin-bottom:.6rem}
+.themes p{color:var(--bone-dim);font-size:1.02rem;line-height:1.6}
+.themes i{font-style:italic;color:var(--bone)}
+
+/* autor */
+.author .wrap{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:clamp(2rem,6vw,5rem);align-items:center}
+.author figure{margin:0;position:relative}
+.author img{display:block;width:100%;height:auto;filter:saturate(.85)}
+.author figure::after{content:"";position:absolute;inset:.9rem -.9rem -.9rem .9rem;border:1px solid var(--gold);z-index:-1}
+.author h2{font-size:clamp(2rem,4vw,3rem);margin-block:.8rem 1.2rem}
+.author p{max-width:36rem}
+.author p+p{margin-top:1rem}
+.author i{font-style:italic}
+
+/* ficha */
+.buy{background:linear-gradient(rgba(15,23,25,.92),rgba(15,23,25,.92)),url(images/padrao.jpg) center/cover;border-block:1px solid var(--line)}
+.buy .wrap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(2rem,6vw,5rem);align-items:start}
+.buy figure{margin:0;max-width:22rem;justify-self:center}
+.buy img{display:block;width:100%;height:auto;box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.buy h2{font-size:clamp(2rem,4vw,3rem);margin-block:.8rem 1.6rem}
+dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:.7rem 1.6rem;margin:0 0 2rem}
+dt{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.16em;font-size:.88rem;color:var(--gold);font-weight:600;padding-top:.22rem}
+dd{margin:0}
+.perks{display:grid;gap:1rem;margin-bottom:.4rem}
+.perk{padding:1.1rem 1.2rem;background:rgba(232,225,207,.06);border-left:3px solid var(--crimson)}
+.perk h3{font-size:1.35rem;margin-bottom:.25rem}
+.perk p{font-size:1rem;color:var(--bone-dim);line-height:1.5}
+
+/* faq */
+.faq .wrap{max-width:52rem}
+.faq h2{font-size:clamp(2rem,4vw,3rem);margin-block:.8rem 2rem}
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding-block:1.2rem;font-family:var(--f-display);font-size:1.5rem;font-weight:600;line-height:1.2}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--gold);font-size:1.7rem;flex:none;line-height:1}
+details[open] summary::after{content:"\2212"}
+details p{padding-bottom:1.4rem;color:var(--bone-dim);max-width:42rem}
+
+footer{background:var(--brown);padding-block:2rem}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.6rem 2rem;align-items:center}
+footer b{font-family:var(--f-display);letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+footer span{font-size:.92rem;color:var(--bone-dim)}
+
+@media (max-width:52rem){
+  .hero .wrap,.problem .wrap,.author .wrap,.buy .wrap{grid-template-columns:minmax(0,1fr)}
+  .hero{background:linear-gradient(rgba(15,23,25,.88),rgba(15,23,25,.82)),url(images/padrao.jpg) center/cover}
+  .hero figure{order:-1;max-width:15rem}
+  .author figure{max-width:18rem}
+  .author figure::after{inset:.6rem -.6rem -.6rem .6rem}
+  .themes{grid-template-columns:minmax(0,1fr)}
+  .themes li:nth-child(odd){border-right:0}
+  .themes li:nth-child(even){padding-left:0}
+  .traps{grid-template-columns:minmax(0,1fr)}
+  .bar span{display:none}
+}
+@media (max-width:30rem){
+  dl{grid-template-columns:minmax(0,1fr);gap:.1rem}
+  dd{margin-bottom:.8rem}
+  .cta{display:block;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cta{transition:none}}
+
+.cta{cursor:pointer;line-height:1.3;max-width:100%}
+.cta:disabled{opacity:.65;cursor:wait;transform:none}
+.price{font-family:var(--f-display);font-size:1.8rem;margin-top:1.4rem}
+.price del{font-size:1.1rem;color:var(--bone-dim);margin-right:.6rem}
+.purchase-note{font-size:1rem;color:var(--bone-dim);margin-top:.8rem}
+.hero .question{font-family:var(--f-display);font-size:1.5rem;line-height:1.3;margin-bottom:1rem}
+.skip-link{position:absolute;left:1rem;top:-6rem;z-index:10;background:var(--ink);padding:.6rem}
+.skip-link:focus{top:1rem}
+.bar a{text-decoration:none}
+@media(max-width:30rem){button.cta{width:100%}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+
+<header class="bar">
+  <div class="wrap"><a href="/" aria-label="Cor Indivisum — início"><b>Cor Indivisum</b></a><a href="/loja/">Voltar à loja</a></div>
+</header>
+
+<main id="conteudo">
+<noscript><div class="wrap"><p>Ative o JavaScript para consultar o preço e comprar este livro. <a href="/loja/">Voltar à loja</a>.</p></div></noscript>
+<section class="hero" id="topo">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Rodrigo Oliveira · Hedonismo na câmara de tortura</p>
+      <h1>Hedonismo na Câmara de Tortura</h1>
+      <p class="question">Numa época que oferece todos os prazeres, por que estamos <em>mais infelizes</em> do que nunca?</p>
+      <p class="lede">Em seu novo livro, <i>Hedonismo na câmara de tortura</i>, o filósofo Rodrigo Oliveira revela como a busca obsessiva por dopamina, pelo consumo e pela exposição digital transformou a vida contemporânea num ciclo contínuo de anestesia e sofrimento. Uma investigação profunda sobre o (falso) prazer e a dor, o sentido (e a falta) e o resgate da alma na pós-modernidade.</p>
+      <p class="price" data-product-price>Consultando preço…</p>
+      <button type="button" class="cta" data-buy disabled>Garantir meu exemplar</button>
+      <p class="purchase-note">Frete e prazo de entrega calculados no checkout.</p>
+      <p class="purchase-note" id="purchase-status" role="status" aria-live="polite">Consultando disponibilidade…</p>
+      <p class="seal">Pré-venda — envio dos primeiros exemplares a partir de 24/10/2026</p>
+    </div>
+    <figure><img src="images/livro.jpg" width="900" height="1352" alt="Livro Hedonismo na câmara de tortura, de Rodrigo Oliveira, sobre uma mesa de madeira"></figure>
+  </div>
+</section>
+
+<section class="problem">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">A dor da anestesia existencial</p>
+      <h2>Você já se pegou rolando telas sem parar?</h2>
+    </div>
+    <div class="text">
+      <p>Tomado por uma ansiedade constante e por uma incapacidade crônica de relaxar ou encontrar paz? Vivemos cercados de confortos e facilidades jamais sonhados até mesmo por reis do passado. No entanto, a ansiedade, a sensação de esgotamento (<i>burnout</i>) e o vazio existencial tornaram-se a marca da nossa geração.</p>
+      <p>Em vez da libertação prometida pelo progresso tecnológico, fomos capturados por duas armadilhas psicológicas e espirituais:</p>
+      <div class="traps">
+        <div class="trap"><h3>A Anedonia</h3><p>O excesso de dopamina e de estímulos artificiais embotou nossa capacidade de sentir prazer nas coisas simples da vida.</p></div>
+        <div class="trap"><h3>A Hiperalgesia</h3><p>Viciados no conforto imediato, tornamo-nos hipersensíveis ao menor sinal de dor, tédio ou frustração.</p></div>
+      </div>
+      <p>Trocamos a vida interior e a contemplação pela tirania da exposição diária:</p>
+      <p class="quote">“Exponho-me, logo existo.”</p>
+      <p>Tornamo-nos reféns dos nossos próprios desejos, como o mítico rei Erisictão, que, tomado por uma fome insaciável, acabou devorando a si mesmo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Um diagnóstico e uma saída</p>
+      <h2>O que você vai encontrar nesta obra</h2>
+      <p>Para leitores interessados em filosofia, crítica cultural e psicologia analítica, <i>Hedonismo na câmara de tortura</i> não é apenas uma crítica cultural severa; é um mapa de navegação espiritual e filosófica. Ao longo de 18 ensaios, Rodrigo Oliveira combina a clareza da filosofia clássica com as contribuições da psicologia analítica de C. G. Jung e as intuições literárias de Dostoiévski e Hermann Hesse.</p>
+    </div>
+    <ul class="themes">
+      <li><h3>O Inferno do Igual &amp; A Nação Dopamina</h3><p>Como a lógica do consumo e do entretenimento padronizou nossos desejos e vozes, reduzindo as relações humanas a meros reflexos narcísicos (<i>amor sui</i>).</p></li>
+      <li><h3>A Pornificação da Existência</h3><p>Uma análise sem rodeios sobre como a hiper-exposição e a cultura da imagem destruíram a intimidade, a privacidade e a capacidade de contemplação.</p></li>
+      <li><h3>O Subsolo de Erisictão e os Falsos Ascetismos</h3><p>O perigo das soluções simplistas e masoquistas que transformam o sofrimento em orgulho, sem devolver o sentido real à existência.</p></li>
+      <li><h3>Individuação e Resgate da Virtude</h3><p>O caminho para vencer a massificação através da <i>phronesis</i> (sabedoria prática) aristotélica, da maturidade espiritual e da integração da psique.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="author">
+  <div class="wrap">
+    <figure><img src="images/autor.jpg" width="579" height="761" loading="lazy" alt="Retrato de Rodrigo Oliveira"></figure>
+    <div>
+      <p class="eyebrow">Sobre o autor</p>
+      <h2>Rodrigo Oliveira</h2>
+      <p>Professor de filosofia, escritor e pesquisador das intersecções entre filosofia clássica, literatura e psicologia analítica. Autor (sob o pseudônimo Seymour Glass) de obras como <i>Ensaios sobre os deuses depressivos</i> e <i>Almas de Mármore</i>, Rodrigo dedica sua trajetória ao ensino e ao diagnóstico das crises da cultura contemporânea.</p>
+      <p>Em <i>Hedonismo na câmara de tortura</i>, o autor consolida sua investigação sobre o sofrimento, a busca de sentido e a transcendência na era digital.</p>
+    </div>
+  </div>
+</section>
+
+<section class="buy" id="pre-venda">
+  <div class="wrap">
+    <figure><img src="images/capa.jpg" width="800" height="1200" loading="lazy" alt="Capa de Hedonismo na câmara de tortura: figura dourada com uma maçã, corvos e espinhos sobre padrão floral escuro"></figure>
+    <div>
+      <p class="eyebrow">Ficha técnica e condições de pré-venda</p>
+      <h2>Garanta o seu exemplar da primeira tiragem</h2>
+      <dl>
+        <dt>Título</dt><dd><i>Hedonismo na câmara de tortura</i></dd>
+        <dt>Autor</dt><dd>Rodrigo Oliveira</dd>
+        <dt>Editora</dt><dd>Cor Indivisum</dd>
+        <dt>Gênero</dt><dd>Filosofia / Crítica Cultural / Psicologia Analítica</dd>
+        <dt>Formato</dt><dd>Brochura 14 × 21 cm, com orelhas e papel de alta qualidade</dd>
+        <dt>Páginas</dt><dd>96</dd>
+      </dl>
+      <div class="perks">
+        <div class="perk"><h3>Envio da pré-venda</h3><p>Envio dos primeiros exemplares a partir de 24/10/2026. O prazo de transporte depende do endereço e da opção de frete escolhida no checkout.</p></div>
+        <div class="perk"><h3>Brinde de pré-venda</h3><p>Acompanha marcador de página com a identidade visual exclusiva da capa.</p></div>
+      </div>
+      <p class="price" data-product-price>Consultando preço…</p>
+      <button type="button" class="cta" data-buy disabled>Garantir meu exemplar</button>
+      <p class="purchase-note">Frete e prazo de entrega calculados no checkout.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="wrap">
+    <p class="eyebrow">Perguntas frequentes</p>
+    <h2>Antes de comprar</h2>
+    <details><summary>Quando o livro será enviado?</summary><p>O envio dos primeiros exemplares da pré-venda está previsto a partir de 24/10/2026. Consulte o valor do frete e o prazo de transporte para seu endereço no checkout.</p></details>
+    <details><summary>Por que garantir na pré-venda?</summary><p>A pré-venda assegura o seu exemplar da primeira tiragem com o brinde exclusivo, além de apoiar diretamente a publicação independente pela editora Cor Indivisum.</p></details>
+    <details><summary>Quais as formas de pagamento disponíveis?</summary><p>As opções disponíveis serão apresentadas na etapa de pagamento, após a confirmação dos dados do pedido.</p></details>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><a href="/loja/">Voltar à loja Cor Indivisum</a><span>Hedonismo na câmara de tortura · Rodrigo Oliveira</span></div></footer>
+
+<script src="/src/scripts/firebase-init.js"></script>
+<script src="/src/scripts/checkout-utils.js"></script>
+<script src="produto.js"></script>
+</body>
+</html>
