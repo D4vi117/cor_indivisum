@@ -11,6 +11,10 @@
 		rel="stylesheet">
 	<link rel="stylesheet" href="maria-a-flauta-de-Deus.css">
 	<link rel="icon" href="/favicon.png" type="image/png">
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 
 <body>
@@ -422,6 +426,7 @@
 		}, { threshold: 0.12 });
 		document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 	</script>
+	<script src="/src/scripts/firebase-init.js"></script>
 	<script src="/src/scripts/checkout-utils.js"></script>
 </body>
 

@@ -92,6 +92,19 @@ async function buscarCEP(cep) {
     const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`, {
       signal: controladorCep.signal,
     });
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const resposta = await res.text();
+      console.error("Endpoint de frete retornou resposta não JSON:", {
+        status: res.status,
+        contentType,
+        trecho: resposta.slice(0, 300),
+      });
+      if (consultaAtual !== consultaFreteAtual) return;
+      limparOpcoesFrete("O serviço de frete está indisponível no momento. Tente novamente mais tarde.");
+      return;
+    }
+
     const data = await res.json();
 
     if (consultaAtual !== consultaCepAtual) return;

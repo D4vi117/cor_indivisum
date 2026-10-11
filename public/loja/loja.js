@@ -55,14 +55,16 @@ function renderizarModalCarrinho(carrinho) {
       <img src="${item.foto || '/assets/placeholder-produto.png'}" alt="${item.nome}">
       <div class="cart-item-details">
         <h4>${item.nome}</h4>
-        <span class="cart-item-price">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
-        <div class="cart-item-qtd-ctrl">
-          <button type="button" onclick="alterarQtdModal(${idx}, -1)">-</button>
-          <span>${item.qtd}</span>
-          <button type="button" onclick="alterarQtdModal(${idx}, 1)">+</button>
+        <div class="cart-item-meta">
+          <span class="cart-item-price">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+          <div class="cart-item-qtd-ctrl" aria-label="Quantidade">
+            <button type="button" aria-label="Diminuir quantidade de ${item.nome}" onclick="alterarQtdModal(${idx}, -1)">-</button>
+            <span aria-label="Quantidade: ${item.qtd}">${item.qtd}</span>
+            <button type="button" aria-label="Aumentar quantidade de ${item.nome}" onclick="alterarQtdModal(${idx}, 1)">+</button>
+          </div>
         </div>
       </div>
-      <button type="button" class="btn-remover-item" onclick="removerDoCarrinho(${idx})">&times;</button>
+      <button type="button" class="btn-remover-item" aria-label="Remover ${item.nome} do carrinho" onclick="removerDoCarrinho(${idx})">&times;</button>
     `;
     container.appendChild(div);
   });

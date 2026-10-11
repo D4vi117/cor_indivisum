@@ -64,5 +64,12 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "rate_limits",
+      "fieldPath": "expiraEm",
+      "ttlConfig": {},
+      "indexes": []
+    }
+  ]
 }

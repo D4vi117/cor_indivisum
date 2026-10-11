@@ -21,6 +21,8 @@ const INFINITEPAY_HANDLE = process.env.INFINITEPAY_HANDLE;
 const MELHOR_ENVIO_CLIENT_ID = process.env.MELHOR_ENVIO_CLIENT_ID;
 const MELHOR_ENVIO_BASE_URL = process.env.MELHOR_ENVIO_BASE_URL;
 const MELHOR_ENVIO_REDIRECT_URI = process.env.MELHOR_ENVIO_REDIRECT_URI;
+const MELHOR_ENVIO_USER_AGENT = process.env.MELHOR_ENVIO_USER_AGENT ||
+  "Cor Indivisum (contato@corindivisum.com.br)";
 const REMETENTE_POSTAL_CODE = process.env.REMETENTE_POSTAL_CODE;
 const MP_WEBHOOK_URL = "https://corindivisum.com.br/api/webhook-mp";
 const MELHOR_ENVIO_OAUTH_STATE_TTL_MS = 30 * 60 * 1000;
@@ -554,6 +556,7 @@ exports.melhorEnvioAuthCallback = onRequest(
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
+          "User-Agent": MELHOR_ENVIO_USER_AGENT,
         },
         body: JSON.stringify({
           grant_type: "authorization_code",
@@ -630,6 +633,7 @@ async function getMelhorEnvioAccessToken() {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      "User-Agent": MELHOR_ENVIO_USER_AGENT,
     },
     body: JSON.stringify({
       grant_type: "refresh_token",
@@ -889,7 +893,7 @@ exports.melhorEnvioCalcularFrete = onRequest(
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
           Accept: "application/json",
-          "User-Agent": "Aplicacao teste (contato@corindivisum.com.br)",
+          "User-Agent": MELHOR_ENVIO_USER_AGENT,
         },
         body: JSON.stringify(payload),
       }
@@ -901,6 +905,23 @@ exports.melhorEnvioCalcularFrete = onRequest(
       console.error("melhorEnvioCalcularFrete erro:", resultado);
       return res.status(502).json({
         error: "Falha ao calcular frete no Melhor Envio",
+      });
+    }
+
+    const opcoesValidas = Array.isArray(resultado)
+      ? resultado.filter((opcao) =>
+        !opcao?.error && Number.isFinite(Number(opcao?.price)) && Number(opcao.price) >= 0
+      )
+      : [];
+    if (Array.isArray(resultado) && opcoesValidas.length === 0) {
+      console.warn("melhorEnvioCalcularFrete: todas as opções foram recusadas", {
+        opcoes: resultado.map((opcao) => ({
+          id: opcao?.id ?? null,
+          transportadora: opcao?.company?.name ?? null,
+          erro: typeof opcao?.error === "string"
+            ? opcao.error
+            : opcao?.error?.message || "Motivo não informado",
+        })),
       });
     }
 
