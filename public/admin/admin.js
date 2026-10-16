@@ -5,6 +5,9 @@ document.querySelectorAll(".admin-tab").forEach((tab) => {
 
     tab.classList.add("is-active");
     document.querySelector(`[data-panel="${tab.dataset.tab}"]`).classList.add("is-active");
+    if (tab.dataset.tab === "newsletter" && typeof window.iniciarNewsletterAdmin === "function") {
+      window.iniciarNewsletterAdmin();
+    }
   });
 });
 
@@ -250,6 +253,9 @@ firebase.auth().onAuthStateChanged(async (user) => {
   iniciarListenerPedidos();
   iniciarListenerContas();
   atualizarStatusMelhorEnvio();
+  if (new URLSearchParams(window.location.search).get("tab") === "newsletter") {
+    document.querySelector('[data-tab="newsletter"]')?.click();
+  }
 });
 
 /* ==========================================================================

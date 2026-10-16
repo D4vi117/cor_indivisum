@@ -414,6 +414,36 @@ body.carrinho-modal-aberto {
   text-transform: uppercase;
 }
 
+.tag-pre-venda {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--oxblood-deep);
+  color: var(--parchment);
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.estoque-disponivel,
+.estoque-esgotado {
+  margin: 0 0 0.8rem;
+  font-size: 0.82rem;
+}
+
+.estoque-disponivel { color: #386544; }
+.estoque-esgotado { color: #9a2828; font-weight: 600; }
+
+.btn-adicionar-carrinho:disabled,
+.btn-comprar-direto:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .card-content {
   padding: 1.2rem;
   display: flex;

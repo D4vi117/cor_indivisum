@@ -13,8 +13,6 @@
 	<link rel="stylesheet" href="pagamento.css">
 	<link rel="icon" href="/favicon.png" type="image/png">
 
-	<!-- SDK do Mercado Pago (Bricks) -->
-	<script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 
 <body>
@@ -41,8 +39,7 @@
 			<section class="pg-payment-col">
 				<span class="eyebrow reveal">Finalizar compra</span>
 				<h1 class="section-title reveal">Confirme seu pagamento</h1>
-				<p class="pg-lede reveal">Escolha a forma de pagamento abaixo. Seus dados são processados com
-					segurança pelo Mercado Pago.</p>
+				<p class="pg-lede reveal">Continue para o checkout seguro da InfinitePay para pagar com Pix ou cartão.</p>
  
 				<!-- Estado: carregando -->
 				<div id="pg-loading" class="pg-state">
@@ -58,19 +55,12 @@
 					<button type="button" class="yt-btn" id="pg-retry">Tentar novamente</button>
 				</div>
  
-				<!-- Brick do Mercado Pago é renderizado aqui -->
-				<div id="paymentBrick_container" class="pg-brick"></div>
+				<!-- Mantido vazio para compatibilidade com o controlador de estados. -->
+				<div id="paymentBrick_container" class="pg-brick" hidden></div>
 
-				<!-- NOVO: Opção/Divisória para pagamento via InfinitePay -->
 				<div id="pg-infinitepay-container" class="pg-alternative-payment" hidden style="margin-top: 24px; text-align: center;">
-					<div style="display: flex; align-items: center; margin: 20px 0;">
-						<hr style="flex: 1; border: none; border-top: 1px solid #333;">
-						<span style="padding: 0 10px; opacity: 0.7; font-size: 0.9em;">OU</span>
-						<hr style="flex: 1; border: none; border-top: 1px solid #333;">
-					</div>
-					
 					<button type="button" id="btn-infinitepay" class="yt-btn" style="width: 100%;">
-						Pagar via InfinitePay (Cartão / Pix)
+						Pagar com Pix ou cartão
 					</button>
 				</div>
  

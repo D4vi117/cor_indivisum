@@ -65,8 +65,10 @@ service cloud.firestore {
     function validStatus(data) {
       return data is map &&
         data.keys().hasAll(["ativo", "publicado", "destaque"]) &&
-        data.keys().hasOnly(["ativo", "publicado", "destaque"]) &&
-        data.ativo is bool && data.publicado is bool && data.destaque is bool;
+        data.keys().hasOnly(["ativo", "publicado", "destaque", "preVenda", "preVendaIgnoraEstoque"]) &&
+        data.ativo is bool && data.publicado is bool && data.destaque is bool &&
+        (!("preVenda" in data) || data.preVenda is bool) &&
+        (!("preVendaIgnoraEstoque" in data) || data.preVendaIgnoraEstoque is bool);
     }
 
     function validProduct(data) {
@@ -136,6 +138,20 @@ service cloud.firestore {
 
     // Coleção legada: nenhum fluxo atual a usa diretamente.
     match /orders/{orderId} {
+      allow read, write: if false;
+    }
+
+    // Newsletter integration secrets and campaign data are callable-only.
+    match /newsletter_config/{documentId} {
+      allow read, write: if false;
+    }
+    match /newsletter_private/{documentId} {
+      allow read, write: if false;
+    }
+    match /newsletter_oauth_states/{stateId} {
+      allow read, write: if false;
+    }
+    match /newsletter_campaigns/{campaignId} {
       allow read, write: if false;
     }
 

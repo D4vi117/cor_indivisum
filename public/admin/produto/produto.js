@@ -210,6 +210,9 @@ async function carregarProduto() {
     definirCheckedSeExiste("field-ativo", status.ativo);
     definirCheckedSeExiste("field-publicado", status.publicado);
     definirCheckedSeExiste("field-destaque", status.destaque);
+    definirCheckedSeExiste("field-pre-venda", status.preVenda);
+    definirCheckedSeExiste("field-pre-venda-ignorar-estoque", status.preVendaIgnoraEstoque);
+    atualizarControleIgnorarEstoque();
 
     definirValorSeExiste("field-descricaoCurta", conteudo.descricaoCurta);
     
@@ -285,7 +288,10 @@ function obterObjetoProduto() {
     status: {
       ativo: document.getElementById("field-ativo")?.checked || false,
       publicado: document.getElementById("field-publicado")?.checked || false,
-      destaque: document.getElementById("field-destaque")?.checked || false
+      destaque: document.getElementById("field-destaque")?.checked || false,
+      preVenda: document.getElementById("field-pre-venda")?.checked || false,
+      preVendaIgnoraEstoque: document.getElementById("field-pre-venda")?.checked === true &&
+        document.getElementById("field-pre-venda-ignorar-estoque")?.checked === true
     },
     midias: {
       fotoPrincipal: fotoPrincipalSrc,
@@ -333,6 +339,7 @@ async function excluirProduto() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("field-pre-venda")?.addEventListener("change", atualizarControleIgnorarEstoque);
   initWYSIWYG();
 
   ["field-nome", "field-slug", "field-seoTitulo", "field-seoDescricao", "field-seoKeywords", "field-preco"].forEach((id) => {
@@ -462,3 +469,11 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarProduto();
   });
 });
+
+function atualizarControleIgnorarEstoque() {
+  const preVenda = document.getElementById("field-pre-venda");
+  const ignorarEstoque = document.getElementById("field-pre-venda-ignorar-estoque");
+  if (!preVenda || !ignorarEstoque) return;
+  ignorarEstoque.disabled = !preVenda.checked;
+  if (!preVenda.checked) ignorarEstoque.checked = false;
+}

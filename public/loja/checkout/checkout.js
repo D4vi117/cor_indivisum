@@ -14,6 +14,16 @@ let controladorFrete = null;
 // no MELHOR_ENVIO_REDIRECT_URI do index.js). Ajuste se a região/projeto mudar.
 const FRETE_ENDPOINT =
   "https://corindivisum.com.br/api/melhor-envio/calcular-frete";
+const CHECKOUT_REQUEST_ID_KEY = "checkout_cor_indivisum_request_id";
+
+function obterCheckoutRequestId() {
+  let requestId = sessionStorage.getItem(CHECKOUT_REQUEST_ID_KEY);
+  if (!requestId) {
+    requestId = window.crypto.randomUUID();
+    sessionStorage.setItem(CHECKOUT_REQUEST_ID_KEY, requestId);
+  }
+  return requestId;
+}
 
 // 1. Obter carrinho do LocalStorage
 function obterCarrinho() {
@@ -174,7 +184,10 @@ async function calcularFrete(cepDestino) {
     if (consultaAtual !== consultaFreteAtual) return;
 
     if (!res.ok || !Array.isArray(data.opcoes)) {
-      limparOpcoesFrete("Não foi possível calcular o frete agora. Tente novamente.");
+      const mensagemEstoque = /estoque insuficiente|esgotado/i.test(data.error || "");
+      limparOpcoesFrete(mensagemEstoque
+        ? `${data.error} Revise as quantidades no carrinho.`
+        : "Não foi possível calcular o frete agora. Tente novamente.");
       return;
     }
 
@@ -355,6 +368,7 @@ async function processarPedido(e) {
     const salvarEndereco = document.getElementById("salvar-endereco-checkbox")?.checked;
     const criarPedido = functions.httpsCallable("criarPedido");
     const { data } = await criarPedido({
+      requestId: obterCheckoutRequestId(),
       cliente: { nome, email, telefone, documento },
       endereco,
       itens: carrinhoAtual.map((item) => ({ id: item.id, qtd: item.qtd })),
@@ -364,13 +378,22 @@ async function processarPedido(e) {
 
     // Limpa o carrinho
     localStorage.removeItem("carrinho_cor_indivisum");
+    sessionStorage.removeItem(CHECKOUT_REQUEST_ID_KEY);
 
     // Redireciona para a página de pagamento
     window.location.href = `/loja/pagamento?id=${data.pedidoId}`;
 
   } catch (err) {
     console.error("Erro ao salvar pedido:", err);
-    alert("Ocorreu um erro ao processar seu pedido. Tente novamente.");
+    if (
+      err?.code === "functions/failed-precondition" &&
+      /checkout já foi usado com outros dados/i.test(err.message || "")
+    ) {
+      sessionStorage.removeItem(CHECKOUT_REQUEST_ID_KEY);
+    }
+    alert(err?.code === "functions/failed-precondition" && /estoque|esgotado/i.test(err.message)
+      ? err.message
+      : "Ocorreu um erro ao processar seu pedido. Tente novamente.");
     btnCheckout.disabled = false;
     btnCheckout.textContent = "Finalizar e Pagar";
   }

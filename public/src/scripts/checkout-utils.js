@@ -63,6 +63,13 @@ async function comprarDireto(produtoId) {
     return;
   };
 
+  const ignoraEstoque = produto.status?.preVenda === true &&
+    produto.status?.preVendaIgnoraEstoque === true;
+  if (!ignoraEstoque && (Number(produto.estoque?.quantidade) || 0) < 1) {
+    window.alert("Este produto está esgotado no momento.");
+    return;
+  }
+
   const { precoFinal } = extrairDadosPreco(produto);
   const foto = produto.midias?.fotoPrincipal || produto.fotoPrincipal || "";
 
@@ -89,6 +96,14 @@ async function adicionarAoCarrinho(produtoId) {
 
   let carrinho = obterCarrinho();
   const index = carrinho.findIndex(item => item.id === produtoId);
+  const estoque = Number(produto.estoque?.quantidade) || 0;
+  const quantidadeAtual = index > -1 ? Number(carrinho[index].qtd) || 0 : 0;
+  const ignoraEstoque = produto.status?.preVenda === true &&
+    produto.status?.preVendaIgnoraEstoque === true;
+  if (!ignoraEstoque && estoque <= quantidadeAtual) {
+    window.alert(estoque > 0 ? `Há apenas ${estoque} unidade(s) disponíveis.` : "Este produto está esgotado no momento.");
+    return;
+  }
 
   const { precoFinal } = extrairDadosPreco(produto);
   const foto = produto.midias?.fotoPrincipal || produto.fotoPrincipal || "";

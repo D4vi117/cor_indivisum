@@ -135,9 +135,8 @@
     </div>
 
     <div class="card">
-      <h2>1. Autenticação <span id="statusBadge" class="status-badge status-unknown">desconhecido</span></h2>
+      <h2>1. Autenticação</h2>
       <button class="primary" onclick="iniciarAuth()">Iniciar autenticação (abre nova aba)</button>
-      <button onclick="checarStatus()">Checar status</button>
     </div>
 
     <div class="card">
@@ -259,23 +258,6 @@ function iniciarAuth() {
   const url = BASE_URL + "/melhorEnvioAuthStart?state=teste_" + Date.now();
   log("info", "Abrindo autenticação em nova aba: " + url);
   window.open(url, "_blank");
-}
-
-async function checarStatus() {
-  if (!checarBaseUrl()) return;
-  const r = await chamar("melhorEnvioStatus", BASE_URL + "/melhorEnvioStatus");
-  const badge = document.getElementById("statusBadge");
-  if (r.ok && r.corpo?.autenticado) {
-    const expirado = r.corpo.expirado;
-    badge.textContent = expirado ? "token expirado" : "autenticado";
-    badge.className = "status-badge " + (expirado ? "status-bad" : "status-ok");
-  } else if (r.ok) {
-    badge.textContent = "não autenticado";
-    badge.className = "status-badge status-bad";
-  } else {
-    badge.textContent = "erro ao checar";
-    badge.className = "status-badge status-bad";
-  }
 }
 
 async function calcularFrete() {

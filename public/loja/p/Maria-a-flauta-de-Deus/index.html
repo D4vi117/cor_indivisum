@@ -9,7 +9,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
-	<link rel="stylesheet" href="maria-a-flauta-de-Deus.css">
+	<link rel="stylesheet" href="/loja/p/Maria-a-flauta-de-Deus/maria-a-flauta-de-Deus.css">
 	<link rel="icon" href="/favicon.png" type="image/png">
 	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -28,11 +28,11 @@
 	<header class="hero">
 		<div class="hero-grid">
 			<div class="book-mock" aria-hidden="true">
-				<img src="images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
+				<img src="/loja/p/Maria-a-flauta-de-Deus/images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
 			</div>
 
 			<div>
-				<span class="badge">Pré-venda &middot; Edição brasileira inédita</span>
+				<span class="badge" id="badge-pre-venda" hidden>Pré-venda &middot; Edição brasileira inédita</span>
 				<h1>Maria, a Flauta de Deus</h1>
 				<p class="kicker">Conheça um dos grandes clássicos da espiritualidade mariana do século XX.</p>
 				<p class="body">Há livros que instruem a inteligência; outros, que inflamam a devoção. Poucos,
@@ -42,7 +42,8 @@
 					pertence a essa pequena linhagem de obras que nos fazem contemplar realidades conhecidas como se as
 					víssemos
 					pela primeira vez.</p>
-				<button class="btn btn-gold" onclick="comprarDireto('jzebLMA8riOaLHoD0bVG')">Garantir meu exemplar</button>
+				<button class="btn btn-gold" id="btn-comprar-produto" onclick="comprarDireto('jzebLMA8riOaLHoD0bVG')">Garantir meu exemplar</button>
+				<p id="aviso-estoque-produto" hidden></p>
 				<ul class="checks">
 					<li>edição inaugural</li>
 					<li>tradução inédita</li>
@@ -85,7 +86,7 @@
 				e
 				luminoso, capaz de nutrir a reflexão, a oração e uma compreensão mais íntima da Encarnação.</p>
 			<div class="photo-placeholder reveal">
-				<img src="images/MFD_livro-aberto.webp" alt="Página aberta do livro Maria, a flauta de Deus">
+				<img src="/loja/p/Maria-a-flauta-de-Deus/images/MFD_livro-aberto.webp" alt="Página aberta do livro Maria, a flauta de Deus">
 			</div>
 		</div>
 	</section>
@@ -110,7 +111,7 @@
 			<p class="reveal">Daí a imagem que dá título ao livro.</p>
 
 			<div class="flauta-div" aria-hidden="true">
-				<img src="images/MFD_flauta.webp" alt="Ilustração de uma flauta de cana" />
+				<img src="/loja/p/Maria-a-flauta-de-Deus/images/MFD_flauta.webp" alt="Ilustração de uma flauta de cana" />
 			</div>
 
 			<p class="reveal">Uma flauta nada possui de grandioso em si mesma. Seu valor reside em ser um instrumento
@@ -208,7 +209,7 @@
 				toda vida,
 				quando inteiramente entregue a Deus, pode tornar-se música.</p>
 			<div class="photo-round-placeholder reveal">
-				<img src="images/MFD_caryll.webp" alt="Retrato de Caryll Houselander" />
+				<img src="/loja/p/Maria-a-flauta-de-Deus/images/MFD_caryll.webp" alt="Retrato de Caryll Houselander" />
 			</div>
 		</div>
 	</section>
@@ -377,7 +378,7 @@
 	<section class="cta-final">
 		<div class="cta-final-grid reveal">
 			<div class="book-mock small" aria-hidden="true">
-				<img src="images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
+				<img src="/loja/p/Maria-a-flauta-de-Deus/images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
 			</div>
 			<div>
 				<span class="eyebrow">Maria, a Flauta de Deus</span>
@@ -403,7 +404,7 @@
 
 		<div class="closing-cover reveal">
 			<div class="book-mock small" aria-hidden="true">
-				<img src="images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
+				<img src="/loja/p/Maria-a-flauta-de-Deus/images/MFD_mockup.webp" alt="Capa do livro Maria, a Flauta de Deus" />
 			</div>
 		</div>
 	</section>
@@ -427,6 +428,28 @@
 		document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 	</script>
 	<script src="/src/scripts/firebase-init.js"></script>
+	<script>
+		(async () => {
+			const botao = document.getElementById("btn-comprar-produto");
+			const aviso = document.getElementById("aviso-estoque-produto");
+			try {
+				const produto = await db.collection("produtos").doc("jzebLMA8riOaLHoD0bVG").get();
+				const dadosProduto = produto.exists ? produto.data() : {};
+				const estoque = Number(dadosProduto.estoque?.quantidade) || 0;
+				document.getElementById("badge-pre-venda").hidden = dadosProduto.status?.preVenda !== true;
+				const ignoraEstoque = dadosProduto.status?.preVenda === true &&
+					dadosProduto.status?.preVendaIgnoraEstoque === true;
+				if (estoque < 1 && !ignoraEstoque) {
+					botao.disabled = true;
+					botao.textContent = "Esgotado";
+					aviso.textContent = "Este livro está sem unidades disponíveis no momento.";
+					aviso.hidden = false;
+				}
+			} catch (erro) {
+				console.error("Não foi possível verificar o estoque do produto:", erro);
+			}
+		})();
+	</script>
 	<script src="/src/scripts/checkout-utils.js"></script>
 </body>
 

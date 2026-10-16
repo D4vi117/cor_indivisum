@@ -26,7 +26,7 @@ const els = {
 	rejectedRetry: $("pg-rejected-retry"),
 	summaryItem: $("pg-summary-item"),
 	summaryTotal: $("pg-summary-total-value"),
-	// Novos elementos do InfinitePay
+	// Fluxo de pagamento InfinitePay
 	infinitePayContainer: $("pg-infinitepay-container"),
 	btnInfinitePay: $("btn-infinitepay"),
 };
@@ -84,62 +84,18 @@ async function iniciar() {
 
     renderResumo(pedido);
 
-    // Configura o clique no botão do InfinitePay
+    // Esta loja usa InfinitePay para concluir o pagamento.
     if (els.btnInfinitePay) {
       els.btnInfinitePay.onclick = () => {
         showState(null);
         els.processing.hidden = false;
-        acionarFallbackInfinitePay(pedidoId, "Redirecionando...");
+        acionarFallbackInfinitePay(pedidoId);
       };
     }
 
-    // 2. Cria a preferência do Mercado Pago
-    const criarPreferencia = functions.httpsCallable("criarPreferencia");
-    const { data } = await criarPreferencia({ pedidoId });
-
-    // 3. Inicializa o SDK e renderiza o Payment Brick
-    const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
-    const bricksBuilder = mp.bricks();
-
-    await bricksBuilder.create("payment", "paymentBrick_container", {
-      initialization: {
-        amount: Number(pedido.total),
-        preferenceId: data.preferenceId,
-        payer: {
-          email: pedido.email || undefined,
-        },
-      },
-      customization: {
-        visual: {
-          style: {
-            theme: "bootstrap",
-          },
-        },
-        paymentMethods: {
-          creditCard: "all",
-          bankTransfer: "all",
-          mercadoPago: "",
-          maxInstallments: 3,
-        },
-      },
-      callbacks: {
-        onReady: () => {
-          els.loading.hidden = false; // esconde spinner
-          els.loading.hidden = true;
-          // Exibe a opção manual do InfinitePay quando o Brick terminar de carregar
-          if (els.infinitePayContainer) els.infinitePayContainer.hidden = false;
-        },
-        onError: (error) => {
-          console.error("Payment Brick error:", error);
-          mostrarErro("Não foi possível carregar as formas de pagamento. Tente novamente.");
-        },
-        onSubmit: ({ selectedPaymentMethod, formData }) => {
-          console.log("Método selecionado:", selectedPaymentMethod);
-          console.log("formData gerado:", formData);
-          return processarPagamento(pedidoId, formData);
-        },
-      },
-    });
+    els.loading.hidden = true;
+    els.brick.hidden = true;
+    els.infinitePayContainer.hidden = false;
   } catch (err) {
     console.error("Erro ao iniciar pagamento:", err);
     mostrarErro(err?.message || "Erro ao carregar o pagamento. Tente novamente.");
@@ -157,58 +113,21 @@ function renderResumo(pedido) {
 	els.summaryTotal.textContent = formatBRL(pedido.total);
 }
  
-async function processarPagamento(pedidoId, formData) {
-	showState(null);
-	els.processing.hidden = false;
- 
-	try {
-		const processPayment = functions.httpsCallable("process_payment");
-		console.log("Enviando formData para process_payment:", formData);
-		const { data } = await processPayment({ pedidoId, formData });
- 
-		els.processing.hidden = true;
- 
-		if (data.status === "approved") {
-			mostrarSucesso();
-			return;
-		}
- 
-		if (data.pixQrCodeBase64) {
-			mostrarPix(data);
-			return;
-		}
- 
-		if (data.status === "pending" || data.status === "in_process") {
-			mostrarSucesso(
-				"Pagamento em análise. Você receberá um e-mail assim que for confirmado."
-			);
-			return;
-		}
-
-		// Fallback para InfinitePay se o Mercado Pago recusar
-		await acionarFallbackInfinitePay(pedidoId, data.statusDetail);
- 
-	} catch (err) {
-		console.error("Erro no Mercado Pago, redirecionando para fallback...", err);
-		// Fallback para InfinitePay em caso de exceção/erro do MP
-		await acionarFallbackInfinitePay(pedidoId, err?.message);
-	}
-}
-
-async function acionarFallbackInfinitePay(pedidoId, detalheErro) {
+async function acionarFallbackInfinitePay(pedidoId) {
 	try {
 		const processarInfinitePay = functions.httpsCallable("processarPagamentoInfinitePay");
 		const { data } = await processarInfinitePay({ pedidoId });
 
 		if (data?.paymentLink) {
-			// Redireciona diretamente para a tela de pagamento do InfinitePay
-			window.location.href = data.paymentLink;
+			const paymentUrl = new URL(data.paymentLink);
+			if (paymentUrl.protocol !== "https:") throw new Error("O link de pagamento recebido é inválido.");
+			window.location.assign(paymentUrl.href);
 		} else {
-			mostrarRecusado(detalheErro);
+			mostrarRecusado("Não recebemos um link válido da InfinitePay. Tente novamente.");
 		}
 	} catch (err) {
 		console.error("Erro no fallback do InfinitePay:", err);
-		mostrarRecusado(detalheErro || "Falha ao processar pagamento pelas vias disponíveis.");
+		mostrarRecusado("Não foi possível gerar o link da InfinitePay. Tente novamente em instantes.");
 	}
 }
  

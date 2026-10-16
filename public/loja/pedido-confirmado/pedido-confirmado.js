@@ -78,6 +78,17 @@
 		statusEl.dataset.status = status;
 		statusEl.textContent = STATUS_LABEL[status] || status;
 
+		const pagarLink = document.getElementById("pcPagarLink");
+		const pagamentoStatus = String(pedido.pagamento?.status || "").toLowerCase();
+		const estadosFinais = ["pago", "paid", "cancelado", "cancelled", "reembolsado", "refunded"];
+		const pagamentoAprovado = ["approved", "paid"].includes(pagamentoStatus);
+		if (!estadosFinais.includes(String(status).toLowerCase()) && !pagamentoAprovado) {
+			pagarLink.href = `/loja/pagamento?id=${encodeURIComponent(getPedidoIdDaUrl())}`;
+			pagarLink.hidden = false;
+		} else {
+			pagarLink.hidden = true;
+		}
+
 		document.getElementById("pcTotal").textContent = formatarMoeda(pedido.total);
 
 		const listaEl = document.getElementById("pcItensLista");

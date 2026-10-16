@@ -183,6 +183,11 @@ h1, h2, .eyebrow {
     color: var(--ember);
 }
 
+.pc-pagar-link {
+    display: inline-block;
+    margin-top: 1rem;
+}
+
 /* ---------- itens (reaproveita padrão de pedido-card) ---------- */
 .pedidos-lista {
     display: flex;

@@ -21,6 +21,7 @@
   ],
   "hosting": {
     "public": "public",
+    "predeploy": "node scripts/generate-image-manifest.js",
     "redirects": [
       {
         "source": "/loja/p/hedonismo-na-camara-de-tortura/images/HCT Mockup.jpeg",
@@ -36,6 +37,13 @@
     ],
     "rewrites": [
       {
+        "source": "/api/newsletter/resend/callback",
+        "function": {
+          "functionId": "resendNewsletterOAuthCallback",
+          "region": "southamerica-east1"
+        }
+      },
+      {
         "source": "/api/melhor-envio/auth-start",
         "function": {
           "functionId": "melhorEnvioAuthStart",
@@ -46,13 +54,6 @@
         "source": "/api/melhor-envio/auth-callback",
         "function": {
           "functionId": "melhorEnvioAuthCallback",
-          "region": "southamerica-east1"
-        }
-      },
-      {
-        "source": "/api/melhor-envio/status",
-        "function": {
-          "functionId": "melhorEnvioStatus",
           "region": "southamerica-east1"
         }
       },

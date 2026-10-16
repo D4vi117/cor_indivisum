@@ -74,6 +74,15 @@ function renderizarModalCarrinho(carrinho) {
 
 function alterarQtdModal(index, delta) {
   let carrinho = obterCarrinho();
+  const item = carrinho[index];
+  const produto = todosProdutos.find((p) => p.id === item?.id);
+  const estoque = Number(produto?.estoque?.quantidade) || 0;
+  const ignoraEstoque = produto?.status?.preVenda === true &&
+    produto?.status?.preVendaIgnoraEstoque === true;
+  if (delta > 0 && !ignoraEstoque && item.qtd + delta > estoque) {
+    alert(estoque > 0 ? `Há apenas ${estoque} unidade(s) disponíveis.` : "Este produto está esgotado.");
+    return;
+  }
   carrinho[index].qtd += delta;
 
   if (carrinho[index].qtd <= 0) {
@@ -180,6 +189,14 @@ function adicionarAoCarrinho(produtoId) {
 
   let carrinho = obterCarrinho();
   const index = carrinho.findIndex(item => item.id === produtoId);
+  const estoque = Number(produto.estoque?.quantidade) || 0;
+  const quantidadeAtual = index > -1 ? Number(carrinho[index].qtd) || 0 : 0;
+  const ignoraEstoque = produto.status?.preVenda === true &&
+    produto.status?.preVendaIgnoraEstoque === true;
+  if (!ignoraEstoque && estoque <= quantidadeAtual) {
+    alert(estoque > 0 ? `Há apenas ${estoque} unidade(s) disponíveis.` : "Este produto está esgotado.");
+    return;
+  }
 
   const { precoFinal } = extrairDadosPreco(produto);
   const foto = produto.midias?.fotoPrincipal || produto.fotoPrincipal || "";
@@ -274,10 +291,15 @@ function renderizarProdutos(produtos) {
     const fotoPrincipal = p.midias?.fotoPrincipal || '/assets/placeholder-produto.png';
     const descricaoCurta = p.conteudo?.descricaoCurta || '';
     const eDestaque = p.status?.destaque;
+    const emPreVenda = p.status?.preVenda;
+    const ignoraEstoque = emPreVenda === true && p.status?.preVendaIgnoraEstoque === true;
+    const estoque = Number(p.estoque?.quantidade) || 0;
+    const esgotado = !ignoraEstoque && estoque <= 0;
 
     card.innerHTML = `
       <div class="card-thumb">
         ${eDestaque ? `<span class="tag-destaque">Destaque</span>` : ""}
+        ${emPreVenda ? `<span class="tag-pre-venda">Pré-venda</span>` : ""}
         <a href="/loja/p/${p.slug || p.id}">
           <img src="${fotoPrincipal}" alt="${p.nome}" loading="lazy">
         </a>
@@ -296,11 +318,13 @@ function renderizarProdutos(produtos) {
           }
         </div>
 
+        ${ignoraEstoque ? `<p class="estoque-disponivel">Disponível em pré-venda</p>` : esgotado ? `<p class="estoque-esgotado">Esgotado</p>` : `<p class="estoque-disponivel">${estoque} ${estoque === 1 ? "unidade disponível" : "unidades disponíveis"}</p>`}
+
         <div class="card-acoes">
-          <button class="btn-adicionar-carrinho" onclick="adicionarAoCarrinho('${p.id}')">
+          <button class="btn-adicionar-carrinho" ${esgotado ? "disabled" : ""} onclick="adicionarAoCarrinho('${p.id}')">
             + Carrinho
           </button>
-          <button class="btn-comprar-direto" onclick="comprarDireto('${p.id}')">
+          <button class="btn-comprar-direto" ${esgotado ? "disabled" : ""} onclick="comprarDireto('${p.id}')">
             Comprar Agora
           </button>
         </div>

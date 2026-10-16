@@ -1,0 +1,64 @@
+{
+  "images": [
+    {
+      "path": "/favicon.png",
+      "name": "favicon.png",
+      "directory": ""
+    },
+    {
+      "path": "/loja/p/Hedonismo-na-camara-de-tortura/images/autor.jpg",
+      "name": "autor.jpg",
+      "directory": "loja/p/Hedonismo-na-camara-de-tortura/images"
+    },
+    {
+      "path": "/loja/p/Hedonismo-na-camara-de-tortura/images/capa.jpg",
+      "name": "capa.jpg",
+      "directory": "loja/p/Hedonismo-na-camara-de-tortura/images"
+    },
+    {
+      "path": "/loja/p/Hedonismo-na-camara-de-tortura/images/livro.jpg",
+      "name": "livro.jpg",
+      "directory": "loja/p/Hedonismo-na-camara-de-tortura/images"
+    },
+    {
+      "path": "/loja/p/Hedonismo-na-camara-de-tortura/images/padrao.jpg",
+      "name": "padrao.jpg",
+      "directory": "loja/p/Hedonismo-na-camara-de-tortura/images"
+    },
+    {
+      "path": "/loja/p/Maria-a-flauta-de-Deus/images/MFD_caryll.webp",
+      "name": "MFD_caryll.webp",
+      "directory": "loja/p/Maria-a-flauta-de-Deus/images"
+    },
+    {
+      "path": "/loja/p/Maria-a-flauta-de-Deus/images/MFD_flauta.webp",
+      "name": "MFD_flauta.webp",
+      "directory": "loja/p/Maria-a-flauta-de-Deus/images"
+    },
+    {
+      "path": "/loja/p/Maria-a-flauta-de-Deus/images/MFD_livro-aberto.webp",
+      "name": "MFD_livro-aberto.webp",
+      "directory": "loja/p/Maria-a-flauta-de-Deus/images"
+    },
+    {
+      "path": "/loja/p/Maria-a-flauta-de-Deus/images/MFD_mockup.webp",
+      "name": "MFD_mockup.webp",
+      "directory": "loja/p/Maria-a-flauta-de-Deus/images"
+    },
+    {
+      "path": "/src/images/Fundo.webp",
+      "name": "Fundo.webp",
+      "directory": "src/images"
+    },
+    {
+      "path": "/src/images/Icon.webp",
+      "name": "Icon.webp",
+      "directory": "src/images"
+    },
+    {
+      "path": "/src/images/icons/cart.svg",
+      "name": "cart.svg",
+      "directory": "src/images/icons"
+    }
+  ]
+}

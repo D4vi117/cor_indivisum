@@ -4,6 +4,7 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const crypto = require("crypto");
+const { createNewsletterFunctions } = require("./newsletter/functions");
 
 // Define a região global para TODAS as funções v2 deste arquivo
 setGlobalOptions({ region: "southamerica-east1" });
@@ -13,6 +14,7 @@ initializeApp();
 
 // Instancia o banco de dados
 const db = getFirestore();
+
 
 // ======================================================
 // CONFIGURAÇÕES VIA .ENV
@@ -92,6 +94,18 @@ function exigirDonoDoPedido(request, pedido) {
   }
 }
 
+function exigirPedidoPodeReceberPagamento(pedido) {
+  const estadosFinais = ["pago", "paid", "cancelado", "cancelled", "reembolsado", "refunded"];
+  const pagamentoAtual = pedido.pagamento || {};
+  const pagamentoAprovado = ["approved", "paid"].includes(String(pagamentoAtual.status || "").toLowerCase());
+  if (estadosFinais.includes(String(pedido.status || "").toLowerCase()) || pagamentoAprovado) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Este pedido não está disponível para pagamento. Consulte o status atual do pedido."
+    );
+  }
+}
+
 function precoAtualProduto(produto) {
   const precos = produto.precos;
   const precoBase = Number(precos?.de ?? produto.preco) || 0;
@@ -137,6 +151,19 @@ async function carregarItensDoCatalogo(itensSolicitados) {
       const preco = precoAtualProduto(produto);
       if (ativo !== true || publicado !== true || !Number.isFinite(preco) || preco <= 0) {
         throw new HttpsError("failed-precondition", "Produto indisponível");
+      }
+
+      const estoqueDisponivel = Number(produto.estoque?.quantidade) || 0;
+      const quantidadeSolicitada = quantidades.get(id);
+      const ignoraEstoque = produto.status?.preVenda === true &&
+        produto.status?.preVendaIgnoraEstoque === true;
+      if (!ignoraEstoque && (!Number.isInteger(estoqueDisponivel) || estoqueDisponivel < quantidadeSolicitada)) {
+        throw new HttpsError(
+          "failed-precondition",
+          estoqueDisponivel > 0
+            ? `Estoque insuficiente para ${produto.nome || "este produto"}. Disponível: ${estoqueDisponivel}.`
+            : `${produto.nome || "Este produto"} está esgotado.`
+        );
       }
 
       const dimensoes = produto.dimensoesEmbalagem || {};
@@ -276,7 +303,11 @@ const MELHOR_ENVIO_REMETENTE = {
   postal_code: REMETENTE_POSTAL_CODE,
 };
 
-async function criarCheckoutInfinitePay({ orderId, email, itens, total }) {
+async function criarCheckoutInfinitePay({ orderId, cliente = {}, entrega = {}, itens, total }) {
+  const telefone = String(cliente.telefone || "").replace(/\D/g, "");
+  const telefoneComPais = telefone
+    ? (telefone.startsWith("55") ? `+${telefone}` : `+55${telefone}`)
+    : null;
   const items = Array.isArray(itens) && itens.length > 0
     ? itens.map((item) => ({
         description: item.nome || item.title || "Item",
@@ -298,8 +329,19 @@ async function criarCheckoutInfinitePay({ orderId, email, itens, total }) {
     webhook_url: `https://southamerica-east1-cor-indivisum.cloudfunctions.net/webhookInfinitePay`,
     redirect_url: `https://corindivisum.com.br/loja/pedido-confirmado?id=${orderId}`,
     customer: {
-      email,
+      ...(cliente.nome ? { name: cliente.nome } : {}),
+      ...(cliente.email ? { email: cliente.email } : {}),
+      ...(telefoneComPais ? { phone_number: telefoneComPais } : {}),
     },
+    ...(entrega.cep ? {
+      address: {
+        cep: entrega.cep,
+        ...(entrega.rua ? { street: entrega.rua } : {}),
+        ...(entrega.bairro ? { neighborhood: entrega.bairro } : {}),
+        ...(entrega.numero ? { number: entrega.numero } : {}),
+        ...(entrega.complemento ? { complement: entrega.complemento } : {}),
+      },
+    } : {}),
   };
 
   const res = await fetch("https://api.checkout.infinitepay.io/links", {
@@ -329,10 +371,12 @@ exports.processarPagamentoInfinitePay = onCall(async (request) => {
   try {
     const pedido = await getPedido(pedidoId);
     exigirDonoDoPedido(request, pedido);
+    exigirPedidoPodeReceberPagamento(pedido);
 
     const checkout = await criarCheckoutInfinitePay({
       orderId: pedidoId,
-      email: pedido.cliente?.email || pedido.email,
+      cliente: pedido.cliente || {},
+      entrega: pedido.entrega || {},
       itens: itensParaPagamento(pedido),
       total: pedido.total,
     });
@@ -340,10 +384,22 @@ exports.processarPagamentoInfinitePay = onCall(async (request) => {
     const paymentLink =
       checkout?.link ||
       checkout?.url ||
+      checkout?.checkout_link ||
+      checkout?.paymentLink ||
+      checkout?.payment_url ||
       checkout?.payment_link ||
-      checkout?.checkout_url;
+      checkout?.checkout_url ||
+      checkout?.data?.link ||
+      checkout?.data?.url ||
+      checkout?.data?.checkout_url;
 
-    if (!paymentLink) {
+    let validPaymentLink;
+    try {
+      const parsed = new URL(paymentLink);
+      if (parsed.protocol === "https:") validPaymentLink = parsed.toString();
+    } catch {}
+
+    if (!validPaymentLink) {
       throw new Error("Não foi possível obter o link do InfinitePay.");
     }
 
@@ -353,12 +409,15 @@ exports.processarPagamentoInfinitePay = onCall(async (request) => {
       atualizadoEm: FieldValue.serverTimestamp(),
     });
 
-    return { paymentLink };
+    return { paymentLink: validPaymentLink };
   } catch (err) {
     console.error("Erro ao gerar fallback InfinitePay:", err);
+    if (err instanceof HttpsError) {
+      throw err;
+    }
     throw new HttpsError(
       "internal",
-      err.message || "Erro ao processar contingência de pagamento."
+      "Não foi possível iniciar o pagamento agora. Tente novamente."
     );
   }
 });
@@ -374,13 +433,7 @@ exports.webhookInfinitePay = onRequest(async (req, res) => {
   try {
     const event = req.body;
 
-    await db.collection("webhook_logs").add({
-      recebidoEm: FieldValue.serverTimestamp(),
-      headers: req.headers,
-      body: event,
-    });
-
-    const { order_nsu, transaction_nsu, capture_method, receipt_url } = event;
+    const { order_nsu, transaction_nsu, receipt_url } = event;
     const invoiceSlug = event.invoice_slug || event.slug;
 
     if (!order_nsu || !transaction_nsu || !invoiceSlug || !receipt_url) {
@@ -401,7 +454,7 @@ exports.webhookInfinitePay = onRequest(async (req, res) => {
     }
 
     const confirmacaoRes = await fetch(
-      "https://api.infinitepay.io/invoices/public/checkout/payment_check",
+      "https://api.checkout.infinitepay.io/payment_check",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -431,24 +484,50 @@ exports.webhookInfinitePay = onRequest(async (req, res) => {
       return res.status(422).send("Pagamento não confirmado");
     }
 
-    await pedidoDocRef.update({
-      status: "pago",
-      plataformaPagamento: "infinitepay",
-      atualizadoEm: FieldValue.serverTimestamp(),
-      pagamento: {
-        plataforma: "infinitepay",
-        metodo: capture_method || "pix_ou_cartao",
-        status: "approved",
-        receiptUrl: receipt_url,
-        transactionNsu: transaction_nsu,
-        valorPago: (confirmacao.paid_amount || confirmacao.amount) / 100,
+    const pagamentoConfirmadoAgora = await db.runTransaction(async (transaction) => {
+      const pedidoAtualSnap = await transaction.get(pedidoDocRef);
+      if (!pedidoAtualSnap.exists) {
+        return false;
+      }
+
+      const pedidoAtual = pedidoAtualSnap.data();
+      if (pedidoAtual.status === "pago" || pedidoAtual.status === "paid") {
+        return false;
+      }
+
+      transaction.update(pedidoDocRef, {
+        status: "pago",
+        plataformaPagamento: "infinitepay",
         atualizadoEm: FieldValue.serverTimestamp(),
-      },
-      infinitepay: {
-        ...event,
-        validated: true,
-        validatedAt: FieldValue.serverTimestamp(),
-      },
+        pagamento: {
+          plataforma: "infinitepay",
+          metodo: confirmacao.capture_method || "pix_ou_cartao",
+          status: "approved",
+          transactionNsu: transaction_nsu,
+          valorPago: (confirmacao.paid_amount || confirmacao.amount) / 100,
+          atualizadoEm: FieldValue.serverTimestamp(),
+        },
+        infinitepay: {
+          transaction_nsu,
+          invoice_slug: invoiceSlug,
+          validated: true,
+          validatedAt: FieldValue.serverTimestamp(),
+        },
+      });
+      return true;
+    });
+
+    if (!pagamentoConfirmadoAgora) {
+      return res.status(200).send("already paid");
+    }
+
+    await db.collection("webhook_logs").add({
+      recebidoEm: FieldValue.serverTimestamp(),
+      provedor: "infinitepay",
+      pedidoId: order_nsu,
+      transactionNsu: transaction_nsu,
+      invoiceSlug,
+      validado: true,
     });
 
     const numeroPedido = pedido.numeroPedido || order_nsu;
@@ -779,35 +858,6 @@ async function comprarEtiquetaMelhorEnvio(pedidoId, pedido) {
   };
 }
 
-exports.melhorEnvioStatus = onRequest({ cors: true }, async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "*");
-  try {
-    const snap = await melhorEnvioConfigRef().get();
-
-    if (!snap.exists) {
-      return res.status(200).json({ autenticado: false });
-    }
-
-    const data = snap.data();
-    const salvoEm = data.atualizadoEm?.toDate
-      ? data.atualizadoEm.toDate()
-      : null;
-    const expiraEm = salvoEm
-      ? new Date(salvoEm.getTime() + (data.expires_in || 0) * 1000)
-      : null;
-
-    return res.status(200).json({
-      autenticado: true,
-      ambiente: data.ambiente || null,
-      tokenExpiraEm: expiraEm,
-      expirado: expiraEm ? Date.now() > expiraEm.getTime() : null,
-    });
-  } catch (err) {
-    console.error("melhorEnvioStatus error:", err);
-    return res.status(500).json({ error: "erro interno" });
-  }
-});
-
 exports.obterStatusMelhorEnvioAdmin = onCall(async (request) => {
   await verificarAdmin(request.auth?.uid);
 
@@ -1043,6 +1093,7 @@ exports.criarPreferencia = onCall(
     try {
       const pedido = await getPedido(pedidoId);
       exigirDonoDoPedido(request, pedido);
+      exigirPedidoPodeReceberPagamento(pedido);
       const { preference } = getClients();
 
       const pref = await preference.create({
@@ -1067,7 +1118,10 @@ exports.criarPreferencia = onCall(
       return { preferenceId: pref.id };
     } catch (err) {
       console.error("criarPreferencia error:", err);
-      throw new HttpsError("internal", err?.message || "Falha ao criar preferência de pagamento");
+      if (err instanceof HttpsError) {
+        throw err;
+      }
+      throw new HttpsError("internal", "Não foi possível iniciar o pagamento agora. Tente novamente.");
     }
   }
 );
@@ -1077,7 +1131,18 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     throw new HttpsError("unauthenticated", "É preciso estar logado.");
   }
 
-  const { cliente: clienteRecebido, endereco, itens: itensSolicitados, freteId, salvarEndereco } = request.data;
+  const {
+    cliente: clienteRecebido,
+    endereco,
+    itens: itensSolicitados,
+    freteId,
+    salvarEndereco,
+    requestId,
+  } = request.data;
+  if (typeof requestId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
+    throw new HttpsError("invalid-argument", "Identificador de checkout inválido");
+  }
+
   const nome = typeof clienteRecebido?.nome === "string" ? clienteRecebido.nome.trim() : "";
   const telefone = typeof clienteRecebido?.telefone === "string" ? clienteRecebido.telefone.trim() : "";
   const documento = String(clienteRecebido?.documento || "").replace(/\D/g, "");
@@ -1137,7 +1202,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
   );
   const freteCentavos = Math.round(Number(freteEscolhido.price) * 100);
   const total = (subtotalCentavos + freteCentavos) / 100;
-  const pedidoRefDoc = db.collection("pedidos").doc();
+  const pedidoRefDoc = pedidoRef(requestId);
   const cliente = {
     uid: request.auth.uid,
     nome,
@@ -1155,40 +1220,69 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     cidade: String(endereco.cidade || "").trim(),
   };
 
-  await pedidoRefDoc.set({
-    cliente,
-    entrega,
-    itens: itens.map(({ dimensoes, ...item }) => item),
-    subtotal: subtotalCentavos / 100,
-    frete: {
-      id: freteEscolhido.id,
-      nome: freteEscolhido.name || null,
-      transportadora: freteEscolhido.company?.name || null,
-      valor: freteCentavos / 100,
-      prazo: freteEscolhido.delivery_time ?? freteEscolhido.custom_delivery_time ?? null,
-    },
-    total,
-    status: "aguardando_pagamento",
-    numeroPedido: pedidoRefDoc.id,
-    criadoEm: FieldValue.serverTimestamp(),
-  });
-
-  const perfil = { documento };
-  if (salvarEndereco) {
-    const perfilAtual = await db.collection("usuarios").doc(request.auth.uid).get();
-    const enderecosAnteriores = Array.isArray(perfilAtual.data()?.enderecos)
-      ? perfilAtual.data().enderecos
-      : [];
-    perfil.enderecos = [
+  const itensDoPedido = itens.map(({ dimensoes, ...item }) => item);
+  const fingerprint = crypto
+    .createHash("sha256")
+    .update(JSON.stringify({
+      uid: request.auth.uid,
+      cliente,
       entrega,
-      ...enderecosAnteriores.filter(
-        (item) => !(item.cep === entrega.cep && item.numero === entrega.numero && item.complemento === entrega.complemento)
-      ),
-    ].slice(0, 3);
-  }
-  await db.collection("usuarios").doc(request.auth.uid).set(perfil, { merge: true });
+      itens: itensDoPedido,
+      freteId: String(freteEscolhido.id),
+      salvarEndereco: Boolean(salvarEndereco),
+    }))
+    .digest("hex");
+  const perfilRef = db.collection("usuarios").doc(request.auth.uid);
 
-  return { pedidoId: pedidoRefDoc.id, total };
+  return db.runTransaction(async (transaction) => {
+    const pedidoExistente = await transaction.get(pedidoRefDoc);
+    if (pedidoExistente.exists) {
+      const dadosExistentes = pedidoExistente.data();
+      if (dadosExistentes.cliente?.uid !== request.auth.uid || dadosExistentes.requestFingerprint !== fingerprint) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Este checkout já foi usado com outros dados. Atualize a página para iniciar um novo pedido."
+        );
+      }
+      return { pedidoId: pedidoRefDoc.id, total: dadosExistentes.total };
+    }
+
+    const perfilAtual = await transaction.get(perfilRef);
+    const perfil = { documento };
+    if (salvarEndereco) {
+      const enderecosAnteriores = Array.isArray(perfilAtual.data()?.enderecos)
+        ? perfilAtual.data().enderecos
+        : [];
+      perfil.enderecos = [
+        entrega,
+        ...enderecosAnteriores.filter(
+          (item) => !(item.cep === entrega.cep && item.numero === entrega.numero && item.complemento === entrega.complemento)
+        ),
+      ].slice(0, 3);
+    }
+
+    transaction.create(pedidoRefDoc, {
+      cliente,
+      entrega,
+      itens: itensDoPedido,
+      subtotal: subtotalCentavos / 100,
+      frete: {
+        id: freteEscolhido.id,
+        nome: freteEscolhido.name || null,
+        transportadora: freteEscolhido.company?.name || null,
+        valor: freteCentavos / 100,
+        prazo: freteEscolhido.delivery_time ?? freteEscolhido.custom_delivery_time ?? null,
+      },
+      total,
+      status: "aguardando_pagamento",
+      numeroPedido: pedidoRefDoc.id,
+      requestFingerprint: fingerprint,
+      criadoEm: FieldValue.serverTimestamp(),
+    });
+    transaction.set(perfilRef, perfil, { merge: true });
+
+    return { pedidoId: pedidoRefDoc.id, total };
+  });
 });
 
 exports.process_payment = onCall(
@@ -1202,8 +1296,15 @@ exports.process_payment = onCall(
 
     const pedido = await getPedido(pedidoId);
     exigirDonoDoPedido(request, pedido);
+    exigirPedidoPodeReceberPagamento(pedido);
     const totalNumerico = Math.round(Number(pedido.total) * 100) / 100;
 
+    if (!formData || typeof formData !== "object" || Array.isArray(formData)) {
+      throw new HttpsError("invalid-argument", "Dados do pagamento inválidos");
+    }
+
+    // O Payment Brick envia transaction_amount. O backend continua sendo a
+    // autoridade para o valor, mas preserva os demais campos gerados pelo Brick.
     const payload = {
       ...formData,
       transaction_amount: totalNumerico,
@@ -1211,12 +1312,6 @@ exports.process_payment = onCall(
       external_reference: pedidoId,
       notification_url: MP_WEBHOOK_URL,
     };
-
-    if (payload.payment_method_id === "pix") {
-      payload.date_of_expiration = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-    } else {
-      payload.three_d_secure_mode = "optional";
-    }
 
     try {
       const { payment } = getClients();
@@ -1250,8 +1345,23 @@ exports.process_payment = onCall(
         pixCopiaECola: pagamento?.point_of_interaction?.transaction_data?.qr_code || null,
       };
     } catch (err) {
-      console.error("Erro no pagamento MP:", err);
-      throw new HttpsError("invalid-argument", err?.cause?.[0]?.description || "Pagamento recusado pelo Mercado Pago");
+      const mpError = err?.cause;
+      console.error("Erro no pagamento MP:", {
+        message: err?.message,
+        status: err?.status,
+        error: err?.error,
+        causes: Array.isArray(mpError)
+          ? mpError.map(({ code, description }) => ({ code, description }))
+          : undefined,
+        paymentMethodId: payload.payment_method_id || null,
+        hasToken: Boolean(payload.token),
+        hasPayerEmail: Boolean(payload.payer?.email),
+        hasPayerIdentification: Boolean(payload.payer?.identification?.number),
+      });
+      throw new HttpsError(
+        "invalid-argument",
+        "O pagamento não foi autorizado. Tente novamente ou escolha outra forma de pagamento."
+      );
     }
   }
 );
@@ -1427,6 +1537,18 @@ exports.obterPedido = onCall(async (request) => {
     pacoteNome: pedido.pacoteNome || null,
     total: pedido.total,
     status: pedido.status,
+    cliente: {
+      nome: pedido.cliente?.nome || null,
+      email: pedido.cliente?.email || null,
+      telefone: pedido.cliente?.telefone || null,
+    },
+    entrega: pedido.entrega ? {
+      cep: pedido.entrega.cep || null,
+      rua: pedido.entrega.rua || null,
+      bairro: pedido.entrega.bairro || null,
+      numero: pedido.entrega.numero || null,
+      complemento: pedido.entrega.complemento || null,
+    } : null,
     email: pedido.cliente?.email || null,
     rastreio,
   };
@@ -1469,8 +1591,12 @@ exports.inscreverNewsletter = onCall(async (request) => {
     { newsletter: true },
     { merge: true }
   );
-
-  return { inscrito: true };
+  try {
+    const result = await newsletterSubscriberService.syncNewsletterSubscriber({ uid: request.auth.uid, explicitOptIn: true });
+    return { inscrito: true, sincronizacao: result };
+  } catch {
+    return { inscrito: true, sincronizacao: { synced: false, retryable: true } };
+  }
 });
 
 async function verificarAdmin(uid) {
@@ -1483,6 +1609,16 @@ async function verificarAdmin(uid) {
     throw new HttpsError("permission-denied", "Apenas administradores podem fazer isso.");
   }
 }
+
+Object.assign(exports, createNewsletterFunctions({
+  onCall,
+  onRequest,
+  HttpsError,
+  db,
+  FieldValue,
+  verificarAdmin,
+}));
+const newsletterSubscriberService = exports.newsletterSubscriberService;
 
 function validarPedidoParaGerarEtiqueta(pedido) {
   if (pedido.status !== "pago") {
@@ -1498,6 +1634,70 @@ function validarPedidoParaGerarEtiqueta(pedido) {
       "Este pedido já possui uma etiqueta gerada."
     );
   }
+
+  if (pedido.etiquetaGeracao?.token) {
+    throw new HttpsError(
+      "already-exists",
+      "A geração da etiqueta deste pedido já está em andamento ou aguarda verificação manual."
+    );
+  }
+}
+
+async function reservarGeracaoEtiqueta(pedidoId) {
+  const ref = pedidoRef(pedidoId);
+  const token = crypto.randomUUID();
+  let pedido;
+
+  await db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+    if (!snap.exists) {
+      throw new HttpsError("not-found", "Pedido não encontrado");
+    }
+
+    pedido = { id: snap.id, ...snap.data() };
+    validarPedidoParaGerarEtiqueta(pedido);
+    transaction.update(ref, {
+      etiquetaGeracao: {
+        token,
+        iniciadaEm: FieldValue.serverTimestamp(),
+      },
+      etiquetaErro: FieldValue.delete(),
+    });
+  });
+
+  return { pedido, token };
+}
+
+async function concluirGeracaoEtiqueta(pedidoId, token, etiqueta) {
+  const ref = pedidoRef(pedidoId);
+  await db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+    if (!snap.exists || snap.data().etiquetaGeracao?.token !== token) {
+      throw new HttpsError("failed-precondition", "A reserva da etiqueta foi alterada.");
+    }
+
+    transaction.update(ref, {
+      etiqueta: { ...etiqueta, geradaEm: FieldValue.serverTimestamp() },
+      etiquetaErro: FieldValue.delete(),
+      etiquetaGeracao: FieldValue.delete(),
+    });
+  });
+}
+
+async function registrarFalhaGeracaoEtiqueta(pedidoId, token, erro) {
+  const ref = pedidoRef(pedidoId);
+  await db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+    if (!snap.exists || snap.data().etiquetaGeracao?.token !== token) {
+      return;
+    }
+
+    // O provedor pode ter concluído a compra mesmo se a resposta falhou.
+    // Mantenha a reserva até uma conferência manual para impedir duplicatas.
+    transaction.update(ref, {
+      etiquetaErro: `${erro || "Falha na geração"} — confira o Melhor Envio antes de liberar a reserva ou tentar novamente.`,
+    });
+  });
 }
 
 exports.gerarEtiquetaPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async (request) => {
@@ -1508,22 +1708,23 @@ exports.gerarEtiquetaPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }
     throw new HttpsError("invalid-argument", "pedidoId obrigatório");
   }
 
-  const pedido = await getPedido(pedidoId);
-  validarPedidoParaGerarEtiqueta(pedido);
+  const { pedido, token } = await reservarGeracaoEtiqueta(pedidoId);
 
   try {
     const etiqueta = await comprarEtiquetaMelhorEnvio(pedidoId, pedido);
-    await pedidoRef(pedidoId).update({
-      etiqueta: { ...etiqueta, geradaEm: FieldValue.serverTimestamp() },
-      etiquetaErro: FieldValue.delete(),
-    });
+    await concluirGeracaoEtiqueta(pedidoId, token, etiqueta);
     return { sucesso: true, ...etiqueta };
   } catch (err) {
     console.error(`gerarEtiquetaPedido falhou (${pedidoId}):`, err);
-    await pedidoRef(pedidoId)
-      .update({ etiquetaErro: err.message || "erro desconhecido" })
-      .catch(() => {});
-    throw new HttpsError("internal", err.message || "Falha ao gerar etiqueta");
+    const mensagemSegura = err instanceof HttpsError
+      ? err.message
+      : "Não foi possível confirmar a geração da etiqueta.";
+    await registrarFalhaGeracaoEtiqueta(pedidoId, token, mensagemSegura)
+      .catch((falhaRegistro) => console.error("Não foi possível registrar falha da etiqueta:", falhaRegistro));
+    if (err instanceof HttpsError) {
+      throw err;
+    }
+    throw new HttpsError("internal", "Não foi possível confirmar a geração da etiqueta. Confira o Melhor Envio antes de tentar novamente.");
   }
 });
 
@@ -1538,23 +1739,22 @@ exports.gerarEtiquetasEmLote = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] 
   const resultados = [];
 
   for (const pedidoId of pedidoIds) {
+    let reserva;
     try {
-      const pedido = await getPedido(pedidoId);
-      validarPedidoParaGerarEtiqueta(pedido);
-      const etiqueta = await comprarEtiquetaMelhorEnvio(pedidoId, pedido);
-      await pedidoRef(pedidoId).update({
-        etiqueta: { ...etiqueta, geradaEm: FieldValue.serverTimestamp() },
-        etiquetaErro: FieldValue.delete(),
-      });
+      reserva = await reservarGeracaoEtiqueta(pedidoId);
+      const etiqueta = await comprarEtiquetaMelhorEnvio(pedidoId, reserva.pedido);
+      await concluirGeracaoEtiqueta(pedidoId, reserva.token, etiqueta);
       resultados.push({ pedidoId, sucesso: true, ...etiqueta });
     } catch (err) {
       console.error(`gerarEtiquetasEmLote falhou (${pedidoId}):`, err);
-      if (err.code !== "failed-precondition" && err.code !== "already-exists") {
-        await pedidoRef(pedidoId)
-          .update({ etiquetaErro: err.message || "erro desconhecido" })
-          .catch(() => {});
+      const mensagemSegura = err instanceof HttpsError
+        ? err.message
+        : "Não foi possível confirmar a geração da etiqueta.";
+      if (reserva) {
+        await registrarFalhaGeracaoEtiqueta(pedidoId, reserva.token, mensagemSegura)
+          .catch((falhaRegistro) => console.error("Não foi possível registrar falha da etiqueta:", falhaRegistro));
       }
-      resultados.push({ pedidoId, sucesso: false, erro: err.message || "erro desconhecido" });
+      resultados.push({ pedidoId, sucesso: false, erro: mensagemSegura });
     }
   }
 

@@ -42,6 +42,7 @@
 			<button class="admin-tab" data-tab="pedidos" type="button">Pedidos</button>
 			<button class="admin-tab" data-tab="contas" type="button">Contas</button>
 			<button class="admin-tab" data-tab="integracoes" type="button">Integrações</button>
+			<button class="admin-tab" data-tab="newsletter" type="button">Newsletter</button>
 		</nav>
 
 		<!-- ============ PRODUTOS ============ -->
@@ -148,6 +149,63 @@
 			</article>
 		</section>
 
+		<section class="admin-panel" id="painel-newsletter" data-panel="newsletter">
+			<div class="panel-head"><div><span class="eyebrow">Comunicação</span><h2>Newsletter</h2></div></div>
+			<p id="newsletter-status" role="status" aria-live="polite">Verificando conexão...</p>
+			<div class="newsletter-actions">
+				<button class="btn-primary" id="newsletter-connect" type="button">Conectar Resend</button>
+				<button class="btn-outline" id="newsletter-disconnect" type="button" hidden>Desconectar</button>
+			</div>
+			<div id="newsletter-workspace" hidden>
+				<section class="newsletter-audience">
+					<h3>Audiência de inscritos</h3>
+					<div class="newsletter-actions"><select id="newsletter-audience" aria-label="Audiência"></select><button class="btn-outline" id="newsletter-create-audience" type="button">Criar audiência</button><button class="btn-outline" id="newsletter-save-audience" type="button">Usar audiência</button><button class="btn-outline" id="newsletter-sync" type="button">Sincronizar inscritos</button></div>
+					<p id="newsletter-recipient-count" aria-live="polite">Selecione uma audiência para ver inscritos ativos.</p>
+				</section>
+				<section class="newsletter-editor">
+					<h3>Editor da campanha</h3>
+					<label>Assunto<input id="newsletter-subject" maxlength="200" type="text"></label>
+					<label>Remetente verificado<select id="newsletter-sender"></select></label>
+					<div class="newsletter-content-mode" role="tablist" aria-label="Modo do editor">
+						<button class="btn-outline is-active" id="newsletter-mode-visual" type="button" role="tab" aria-selected="true">Visual</button>
+						<button class="btn-outline" id="newsletter-mode-html" type="button" role="tab" aria-selected="false">HTML</button>
+					</div>
+					<p class="newsletter-editor-help">Use o modo Visual para formatar o e-mail. Em “Inserir imagem do site”, busque pelo nome do produto ou do arquivo; aparecem as fotos principais e galerias de produtos ativos e publicados.</p>
+					<div id="newsletter-visual-panel" role="tabpanel">
+						<div class="wysiwyg-toolbar newsletter-toolbar" aria-label="Formatação do conteúdo">
+							<button type="button" data-cmd="bold" title="Negrito"><b>B</b></button>
+							<button type="button" data-cmd="italic" title="Itálico"><i>I</i></button>
+							<button type="button" data-cmd="underline" title="Sublinhado"><u>U</u></button>
+							<button type="button" data-cmd="insertUnorderedList">• Lista</button>
+							<button type="button" data-cmd="insertOrderedList">1. Lista</button>
+							<button type="button" data-cmd="formatBlock" data-param="h2">Título</button>
+							<button type="button" data-cmd="formatBlock" data-param="p">Parágrafo</button>
+							<button type="button" id="newsletter-insert-link">Inserir link</button>
+							<button type="button" id="newsletter-insert-image">Inserir imagem do site</button>
+							<button type="button" data-cmd="removeFormat">Limpar formatação</button>
+						</div>
+						<div class="newsletter-image-size" aria-label="Tamanho da imagem selecionada">
+							<label for="newsletter-image-width">Largura da imagem</label>
+							<input id="newsletter-image-width" type="range" min="10" max="100" step="5" value="100" disabled>
+							<output id="newsletter-image-width-value" for="newsletter-image-width">Selecione uma imagem</output>
+						</div>
+						<div id="newsletter-visual-editor" class="wysiwyg-editor newsletter-visual-editor" contenteditable="true" aria-label="Conteúdo visual da campanha"></div>
+						<div id="newsletter-image-picker" class="newsletter-image-picker" hidden>
+							<div class="newsletter-image-picker-head"><div><strong>Imagens do site</strong><span>Catálogo dos arquivos de imagem em Hosting, incluindo imagens sem cadastro de produto.</span></div><span id="newsletter-image-count" class="newsletter-image-count"></span></div>
+							<label for="newsletter-image-search">Buscar por pasta ou nome do arquivo</label>
+							<input id="newsletter-image-search" type="search" placeholder="Ex.: Hedonismo, images/livro.jpg">
+							<div id="newsletter-image-results" class="newsletter-image-results" role="listbox" aria-label="Imagens publicadas"></div>
+						</div>
+					</div>
+					<label id="newsletter-html-panel" hidden>HTML<textarea id="newsletter-html" rows="14" spellcheck="false"></textarea></label>
+					<div class="newsletter-actions"><button class="btn-outline" id="newsletter-preview" type="button">Atualizar prévia</button><button class="btn-outline" id="newsletter-save" type="button">Salvar rascunho</button><button class="btn-primary" id="newsletter-send" type="button">Enviar campanha</button></div>
+					<iframe id="newsletter-preview-frame" title="Prévia do e-mail" sandbox=""></iframe>
+				</section>
+				<section><h3>Campanhas e rascunhos</h3><div id="newsletter-history" aria-live="polite"></div></section>
+			</div>
+			<p id="newsletter-feedback" role="status" aria-live="polite"></p>
+		</section>
+
 	</div>
 
 <!-- ============ MODAL (usado para criação inicial de produto) ============ -->
@@ -204,6 +262,7 @@
 	</div>
 
 	<script src="/src/scripts/firebase-init.js"></script>
+	<script src="newsletter.js"></script>
 
 	<script src="admin.js"></script>
 
