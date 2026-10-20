@@ -507,6 +507,39 @@ body {
     border: 1px solid var(--hair);
 }
 
+.admin-filtros {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin: -0.55rem 0 1rem;
+}
+
+.admin-filtros input,
+.admin-filtros select {
+    min-width: min(100%, 15rem);
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--hair);
+    border-radius: 0.35rem;
+    background: var(--parchment);
+    color: var(--ink);
+    font: inherit;
+}
+
+.admin-filtros input {
+    flex: 1 1 22rem;
+}
+
+.admin-filtros select {
+    flex: 0 1 13rem;
+}
+
+.admin-contagem {
+    margin-left: auto;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -667,6 +700,84 @@ body {
     max-width: 420px;
     width: 100%;
     padding: 2rem;
+    position: relative;
+}
+
+.modal select {
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--hair);
+    background: #fff;
+    color: var(--ink);
+}
+
+.modal-fechar {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.7rem;
+    border: 0;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.modal-cliente-pedidos {
+    max-width: 680px;
+    max-height: min(85vh, 760px);
+    overflow: auto;
+}
+
+.cliente-pedidos-perfil {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+    padding: 0.8rem 0;
+    color: var(--ink-soft);
+}
+
+.cliente-pedidos-perfil p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.modal-cliente-pedidos h4 {
+    margin: 0.7rem 0;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ember);
+}
+
+.cliente-pedidos-lista {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.cliente-pedido-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--hair);
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.cliente-pedido-card div {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.cliente-pedido-card span {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+#editar-pedido-feedback {
+    color: var(--ember);
+    overflow-wrap: anywhere;
 }
 
 .modal h3 {
@@ -721,6 +832,15 @@ body {
 
     .panel-head {
         align-items: flex-start;
+    }
+
+    .cliente-pedido-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .cliente-pedido-card button {
+        width: 100%;
     }
 }
 

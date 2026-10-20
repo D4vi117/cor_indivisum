@@ -9,7 +9,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
-	<link rel="stylesheet" href="admin.css?v=cupons-20261020-2">
+	<link rel="stylesheet" href="admin.css?v=clientes-pedidos-20261020-2">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -55,7 +55,6 @@
 				</div>
 				<button class="btn-primary" data-action="novo-produto" type="button">+ Novo produto</button>
 			</div>
-
 			<div class="table-wrap">
 				<table class="admin-table" id="tabela-produtos">
 					<thead>
@@ -141,6 +140,14 @@
 					Gerar etiquetas selecionadas
 				</button>
 			</div>
+			<div class="admin-filtros" aria-label="Filtros de pedidos">
+				<input id="pedidos-busca" type="search" placeholder="Buscar nº, cliente, documento ou produto" aria-label="Buscar pedidos por número, cliente, documento ou produto">
+				<select id="pedidos-status" aria-label="Filtrar pedidos por status">
+					<option value="">Todos os status</option>
+					<option value="pendente">Pendente</option><option value="pago">Pago</option><option value="enviado">Enviado</option><option value="cancelado">Cancelado</option>
+				</select>
+				<span id="pedidos-contagem" class="admin-contagem" aria-live="polite"></span>
+			</div>
 
 			<div class="table-wrap">
 				<table class="admin-table" id="tabela-pedidos">
@@ -170,14 +177,20 @@
 					<h2>Contas</h2>
 				</div>
 			</div>
+			<div class="admin-filtros">
+				<input id="contas-busca" type="search" placeholder="Buscar por documento, nome, e-mail ou telefone" aria-label="Buscar contas por documento, nome, e-mail ou telefone">
+				<span id="contas-contagem" class="admin-contagem" aria-live="polite"></span>
+			</div>
 
 			<div class="table-wrap">
 				<table class="admin-table" id="tabela-contas">
 					<thead>
 						<tr>
 							<th>Nome</th>
+							<th>Documento</th>
 							<th>E-mail</th>
 							<th>WhatsApp</th>
+							<th>Pedidos</th>
 							<th class="col-acoes">Ações</th>
 						</tr>
 					</thead>
@@ -288,6 +301,49 @@
 	</div>
 
 	<!-- ============ MODAL (mensagem por e-mail ou WhatsApp) ============ -->
+	<div class="modal-backdrop" id="modal-cliente-pedidos" hidden>
+		<div class="modal modal-cliente-pedidos" role="dialog" aria-modal="true" aria-labelledby="cliente-pedidos-titulo">
+			<button class="modal-fechar" type="button" data-action="fechar-cliente-pedidos" aria-label="Fechar">×</button>
+			<span class="eyebrow">Relacionamento</span>
+			<h3 id="cliente-pedidos-titulo">Cliente</h3>
+			<div id="cliente-pedidos-perfil" class="cliente-pedidos-perfil"></div>
+			<h4>Pedidos deste cliente</h4>
+			<div id="cliente-pedidos-lista" class="cliente-pedidos-lista"></div>
+		</div>
+	</div>
+
+	<div class="modal-backdrop" id="modal-editar-pedido" hidden>
+		<div class="modal" role="dialog" aria-modal="true" aria-labelledby="editar-pedido-titulo">
+			<button class="modal-fechar" type="button" data-action="fechar-editar-pedido" aria-label="Fechar">×</button>
+			<span class="eyebrow">Operação</span>
+			<h3 id="editar-pedido-titulo">Editar pedido</h3>
+			<p id="editar-pedido-numero" class="modal-subinfo"></p>
+			<form id="form-editar-pedido">
+				<label>Status operacional
+					<select name="status" required>
+						<option value="aguardando_pagamento">Aguardando pagamento</option>
+						<option value="pago">Pago</option>
+						<option value="enviado">Enviado</option>
+						<option value="cancelado">Cancelado</option>
+						<option value="reembolsado">Reembolsado</option>
+						<option value="recusado">Recusado</option>
+						<option value="Pendente">Pendente (legado)</option>
+					</select>
+				</label>
+				<label>Link de pagamento
+					<input name="linkPagamento" type="url" inputmode="url" placeholder="https://…" maxlength="2048">
+				</label>
+				<p class="modal-subinfo">Ao marcar como pago, o status do pedido muda, mas o status registrado pelo provedor de pagamento permanece como histórico.</p>
+				<p id="editar-pedido-feedback" role="status" aria-live="polite"></p>
+				<div class="modal-acoes">
+					<button type="button" class="btn-secundario" data-action="fechar-editar-pedido">Cancelar</button>
+					<button type="submit" class="btn-primary">Salvar alterações</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- ============ MODAL (mensagem por e-mail ou WhatsApp) ============ -->
 	<div class="modal-backdrop" id="modal-mensagem" hidden>
 		<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-mensagem-titulo">
 			<h3 id="modal-mensagem-titulo">Mensagem</h3>
@@ -323,7 +379,7 @@
 	<script src="newsletter.js"></script>
 	<script src="cupons.js?v=cupons-20261020-2"></script>
 
-	<script src="admin.js"></script>
+	<script src="admin.js?v=clientes-pedidos-20261020-2"></script>
 
 </body>
 

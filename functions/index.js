@@ -1684,6 +1684,62 @@ Object.assign(exports, {
   emitirCupomAdmin: couponFunctions.emitirCupomAdmin,
   removerCupomClienteAdmin: couponFunctions.removerCupomClienteAdmin,
 });
+
+exports.adminAtualizarPedido = onCall(async (request) => {
+  await verificarAdmin(request.auth?.uid);
+  const pedidoId = String(request.data?.pedidoId || "").trim();
+  const status = String(request.data?.status || "");
+  const linkPagamento = typeof request.data?.linkPagamento === "string"
+    ? request.data.linkPagamento.trim()
+    : "";
+  const statusPermitidos = new Set([
+    "aguardando_pagamento", "pago", "enviado", "cancelado", "reembolsado", "recusado", "Pendente",
+  ]);
+  if (!pedidoId) throw new HttpsError("invalid-argument", "pedidoId é obrigatório.");
+  if (!statusPermitidos.has(status)) throw new HttpsError("invalid-argument", "Status operacional inválido.");
+  if (linkPagamento) {
+    let linkSeguro = false;
+    try {
+      linkSeguro = new URL(linkPagamento).protocol === "https:";
+    } catch {}
+    if (linkPagamento.length > 2048 || !linkSeguro) {
+      throw new HttpsError("invalid-argument", "O link de pagamento precisa ser uma URL HTTPS válida de até 2048 caracteres.");
+    }
+  }
+
+  const ref = pedidoRef(pedidoId);
+  const anterior = await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists) throw new HttpsError("not-found", "Pedido não encontrado.");
+    const pedido = snapshot.data();
+    const update = {
+      status,
+      atualizadoEm: FieldValue.serverTimestamp(),
+      ultimaEdicaoAdmin: {
+        uid: request.auth.uid,
+        email: request.auth.token?.email || null,
+        em: FieldValue.serverTimestamp(),
+        statusAnterior: pedido.status || null,
+        statusNovo: status,
+      },
+    };
+    update["infinitepay.url"] = linkPagamento || FieldValue.delete();
+    transaction.update(ref, update);
+    return { ...pedido, id: snapshot.id };
+  });
+
+  if (status === "pago" && anterior.status !== "pago") {
+    await confirmarUsoCupom(anterior).catch((error) => {
+      console.error("adminAtualizarPedido: não foi possível confirmar uso do cupom", error);
+    });
+  } else if (["cancelado", "reembolsado"].includes(status) && anterior.status !== status) {
+    await liberarReservaCupom(anterior, `status_admin_${status}`).catch((error) => {
+      console.error("adminAtualizarPedido: não foi possível liberar reserva do cupom", error);
+    });
+  }
+
+  return { atualizado: true };
+});
 const newsletterSubscriberService = exports.newsletterSubscriberService;
 
 function validarPedidoParaGerarEtiqueta(pedido) {

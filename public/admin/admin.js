@@ -38,6 +38,13 @@ function urlHttpsSegura(valor) {
   }
 }
 
+function linkPagamentoDoPedido(pedido) {
+  const checkout = pedido?.infinitepay || {};
+  return checkout.url || checkout.link || checkout.checkout_link || checkout.paymentLink ||
+    checkout.payment_url || checkout.payment_link || checkout.checkout_url ||
+    checkout.data?.link || checkout.data?.url || checkout.data?.checkout_url || "";
+}
+
 function abrirModal() {
   modal.hidden = false;
   form.reset();
@@ -269,6 +276,7 @@ const rotulosStatusPedido = {
   "Pendente": "Pendente",
   "pago": "Pago",
   "aguardando_pagamento": "Aguardando pagamento",
+  "enviado": "Enviado",
   "recusado": "Recusado",
   "cancelado": "Cancelado",
   "reembolsado": "Reembolsado",
@@ -305,7 +313,7 @@ function construirDetalhesPedido(p) {
     ? itens.map((i) => `<li>${escaparHtml(i.qtd || 1)}× ${escaparHtml(i.nome || "Item")} — ${formatBRLAdmin(i.preco)}</li>`).join("")
     : "<li>—</li>";
 
-  const pagamentoUrl = urlHttpsSegura(p.infinitepay?.url);
+  const pagamentoUrl = urlHttpsSegura(linkPagamentoDoPedido(p));
   const linkPagamento = pagamentoUrl
     ? `<a href="${escaparHtml(pagamentoUrl)}" target="_blank" rel="noopener">Abrir link de pagamento</a>`
     : "—";
@@ -317,6 +325,7 @@ function construirDetalhesPedido(p) {
         <p>${escaparHtml(cliente.nome || "—")}</p>
         <p>${escaparHtml(cliente.email || "—")}</p>
         <p>${escaparHtml(cliente.telefone || "—")}</p>
+        <button type="button" class="btn-tabela" data-ver-cliente-pedido="${escaparHtml(p.id)}">Ver cliente e pedidos</button>
       </div>
       <div class="detalhes-coluna">
         <h4>Entrega</h4>
@@ -347,6 +356,13 @@ const tbodyPedidos = document.querySelector("#tabela-pedidos tbody");
 const vazioPedidos = document.querySelector("#painel-pedidos .tabela-vazia");
 const checkboxSelecionarTodos = document.getElementById("checkbox-selecionar-todos");
 const btnGerarEtiquetasLote = document.getElementById("btn-gerar-etiquetas-lote");
+const buscaPedidos = document.getElementById("pedidos-busca");
+const filtroStatusPedidos = document.getElementById("pedidos-status");
+const contagemPedidos = document.getElementById("pedidos-contagem");
+const modalClientePedidos = document.getElementById("modal-cliente-pedidos");
+const modalEditarPedido = document.getElementById("modal-editar-pedido");
+const formEditarPedido = document.getElementById("form-editar-pedido");
+const feedbackEditarPedido = document.getElementById("editar-pedido-feedback");
 
 let pedidosCache = [];
 
@@ -357,16 +373,32 @@ function atualizarEstadoBotaoLote() {
 
 function renderizarPedidos(pedidos) {
   pedidosCache = pedidos;
+  const query = normalizarBusca(buscaPedidos?.value);
+  const queryDigitos = query.replace(/\D/g, "");
+  const statusFiltro = filtroStatusPedidos?.value || "";
+  const filtrados = pedidos.filter((p) => {
+    if (statusFiltro && p.status !== statusFiltro) return false;
+    const cliente = p.cliente || {};
+    const texto = normalizarBusca([
+      p.numeroPedido, p.id, cliente.nome, cliente.email, cliente.documento,
+      cliente.telefone, ...(p.itens || []).map((item) => item.nome),
+    ].join(" "));
+    return !query || texto.includes(query) || (queryDigitos.length >= 2 && String(cliente.documento || "").replace(/\D/g, "").includes(queryDigitos));
+  });
   tbodyPedidos.innerHTML = "";
+  if (contagemPedidos) contagemPedidos.textContent = `${filtrados.length} de ${pedidos.length} pedidos`;
 
-  if (pedidos.length === 0) {
+  if (filtrados.length === 0) {
     vazioPedidos.hidden = false;
+    vazioPedidos.textContent = pedidos.length ? "Nenhum pedido corresponde aos filtros." : "Nenhum pedido registrado ainda.";
+    checkboxSelecionarTodos.checked = false;
+    atualizarEstadoBotaoLote();
     return;
   }
 
   vazioPedidos.hidden = true;
 
-  pedidos.forEach((p) => {
+  filtrados.forEach((p) => {
     const tr = document.createElement("tr");
     tr.className = "linha-pedido";
 
@@ -397,6 +429,7 @@ function renderizarPedidos(pedidos) {
       <td>${escaparHtml(statusLabel)}</td>
       <td>${etiquetaCelula}</td>
       <td class="col-acoes">
+        <button class="btn-tabela" data-editar-pedido="${escaparHtml(p.id)}">Editar</button>
         <button class="btn-tabela" data-gerar-etiqueta="${escaparHtml(p.id)}" ${podeGerar ? "" : "disabled"}>
           Gerar etiqueta
         </button>
@@ -417,6 +450,14 @@ function renderizarPedidos(pedidos) {
 
     tbodyPedidos.appendChild(tr);
     tbodyPedidos.appendChild(trDetalhes);
+    tr.dataset.pedidoRowId = p.id;
+  });
+
+  tbodyPedidos.querySelectorAll("[data-editar-pedido]").forEach((btn) => {
+    btn.onclick = () => abrirEdicaoPedido(btn.dataset.editarPedido);
+  });
+  tbodyPedidos.querySelectorAll("[data-ver-cliente-pedido]").forEach((btn) => {
+    btn.onclick = () => abrirPerfilClienteDoPedido(btn.dataset.verClientePedido);
   });
 
   tbodyPedidos.querySelectorAll("[data-gerar-etiqueta]").forEach((btn) => {
@@ -430,6 +471,129 @@ function renderizarPedidos(pedidos) {
   checkboxSelecionarTodos.checked = false;
   atualizarEstadoBotaoLote();
 }
+
+function abrirEdicaoPedido(pedidoId) {
+  const pedido = pedidosCache.find((item) => item.id === pedidoId);
+  if (!pedido || !formEditarPedido) return;
+  formEditarPedido.dataset.pedidoId = pedidoId;
+  formEditarPedido.querySelector('[name="status"]').value = rotulosStatusPedido[pedido.status] ? pedido.status : "aguardando_pagamento";
+  formEditarPedido.querySelector('[name="linkPagamento"]').value = linkPagamentoDoPedido(pedido);
+  document.getElementById("editar-pedido-numero").textContent = `Pedido #${pedido.numeroPedido || pedido.id}`;
+  feedbackEditarPedido.textContent = "";
+  modalEditarPedido.hidden = false;
+}
+
+function pedidosDoCliente(cliente = {}) {
+  const uid = cliente.uid || cliente.id || "";
+  const documento = String(cliente.documento || "").replace(/\D/g, "");
+  const email = normalizarBusca(cliente.email);
+  return pedidosCache.filter((item) => {
+    const outro = item.cliente || {};
+    if (uid && outro.uid) return uid === outro.uid;
+    if (documento && String(outro.documento || "").replace(/\D/g, "") === documento) return true;
+    return Boolean(email && normalizarBusca(outro.email) === email);
+  }).sort((a, b) => {
+    const timeA = a.criadoEm?.toMillis?.() || 0;
+    const timeB = b.criadoEm?.toMillis?.() || 0;
+    return timeB - timeA;
+  });
+}
+
+function abrirPerfilClienteDoPedido(pedidoId) {
+  const pedido = pedidosCache.find((item) => item.id === pedidoId);
+  if (pedido) abrirPerfilCliente(pedido.cliente || {});
+}
+
+function abrirPerfilCliente(cliente = {}) {
+  const relacionados = pedidosDoCliente(cliente);
+
+  document.getElementById("cliente-pedidos-titulo").textContent = cliente.nome || "Cliente";
+  const profile = document.getElementById("cliente-pedidos-perfil");
+  profile.replaceChildren();
+  [cliente.documento && `Documento: ${cliente.documento}`, cliente.email && `E-mail: ${cliente.email}`, cliente.telefone && `Telefone: ${cliente.telefone}`]
+    .filter(Boolean).forEach((value) => {
+      const line = document.createElement("p");
+      line.textContent = value;
+      profile.appendChild(line);
+    });
+
+  const list = document.getElementById("cliente-pedidos-lista");
+  list.replaceChildren();
+  relacionados.forEach((item) => {
+    const row = document.createElement("article");
+    row.className = "cliente-pedido-card";
+    const info = document.createElement("div");
+    const heading = document.createElement("strong");
+    heading.textContent = `#${item.numeroPedido || item.id} · ${rotulosStatusPedido[item.status] || item.status || "—"}`;
+    const summary = document.createElement("span");
+    summary.textContent = `${formatarDataAdmin(item.criadoEm)} · ${formatBRLAdmin(item.total)}`;
+    info.append(heading, summary);
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "btn-tabela";
+    open.textContent = "Abrir pedido";
+    open.addEventListener("click", () => focarPedido(item.id));
+    row.append(info, open);
+    list.appendChild(row);
+  });
+  if (!relacionados.length) list.textContent = "Nenhum pedido encontrado para este cliente.";
+  modalClientePedidos.hidden = false;
+}
+
+function contarPedidosDaConta(conta) {
+  return pedidosDoCliente(conta).length;
+}
+
+function focarPedido(pedidoId) {
+  modalClientePedidos.hidden = true;
+  if (buscaPedidos) buscaPedidos.value = "";
+  if (filtroStatusPedidos) filtroStatusPedidos.value = "";
+  renderizarPedidos(pedidosCache);
+  const row = Array.from(tbodyPedidos.querySelectorAll("[data-pedido-row-id]"))
+    .find((item) => item.dataset.pedidoRowId === pedidoId);
+  if (!row) return;
+  row.scrollIntoView({ behavior: "smooth", block: "center" });
+  const details = row.nextElementSibling;
+  if (details?.classList.contains("linha-detalhes")) {
+    details.hidden = false;
+    row.classList.add("is-expandida");
+  }
+}
+
+document.querySelectorAll('[data-action="fechar-cliente-pedidos"]').forEach((button) => {
+  button.addEventListener("click", () => { modalClientePedidos.hidden = true; });
+});
+document.querySelectorAll('[data-action="fechar-editar-pedido"]').forEach((button) => {
+  button.addEventListener("click", () => { modalEditarPedido.hidden = true; });
+});
+modalClientePedidos?.addEventListener("click", (event) => {
+  if (event.target === modalClientePedidos) modalClientePedidos.hidden = true;
+});
+modalEditarPedido?.addEventListener("click", (event) => {
+  if (event.target === modalEditarPedido) modalEditarPedido.hidden = true;
+});
+
+formEditarPedido?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const pedidoId = formEditarPedido.dataset.pedidoId;
+  const status = formEditarPedido.querySelector('[name="status"]').value;
+  const linkPagamento = formEditarPedido.querySelector('[name="linkPagamento"]').value.trim();
+  if (["pago", "cancelado", "reembolsado"].includes(status) && !window.confirm(`Confirmar a alteração do status para “${rotulosStatusPedido[status]}”?`)) return;
+  const submit = formEditarPedido.querySelector('[type="submit"]');
+  submit.disabled = true;
+  feedbackEditarPedido.textContent = "Salvando…";
+  try {
+    const call = functions.httpsCallable("adminAtualizarPedido");
+    await call({ pedidoId, status, linkPagamento });
+    feedbackEditarPedido.textContent = "Pedido atualizado.";
+    modalEditarPedido.hidden = true;
+  } catch (error) {
+    console.error("Não foi possível atualizar o pedido:", error);
+    feedbackEditarPedido.textContent = error.message || "Não foi possível salvar as alterações.";
+  } finally {
+    submit.disabled = false;
+  }
+});
 
 async function gerarEtiquetaIndividual(pedidoId, btn) {
   const textoOriginal = btn.textContent;
@@ -503,6 +667,7 @@ function iniciarListenerPedidos() {
       });
 
       renderizarPedidos(pedidos);
+      renderizarContas(usuariosCache);
     }, (error) => {
       console.error("Erro no listener de pedidos:", error);
     });
@@ -514,28 +679,41 @@ function iniciarListenerPedidos() {
 
 const tbodyContas = document.querySelector("#tabela-contas tbody");
 const vazioContas = document.querySelector("#painel-contas .tabela-vazia");
+const buscaContas = document.getElementById("contas-busca");
+const contagemContas = document.getElementById("contas-contagem");
 
 let usuariosCache = [];
 
 function renderizarContas(usuarios) {
+  const query = normalizarBusca(buscaContas?.value);
+  const queryDigitos = query.replace(/\D/g, "");
+  const filtrados = usuarios.filter((u) => {
+    const texto = normalizarBusca([u.documento, u.nome, u.email, u.telefone].join(" "));
+    return !query || texto.includes(query) || (queryDigitos.length >= 2 && String(u.documento || "").replace(/\D/g, "").includes(queryDigitos));
+  });
   tbodyContas.innerHTML = "";
+  if (contagemContas) contagemContas.textContent = `${filtrados.length} de ${usuarios.length} contas`;
 
-  if (usuarios.length === 0) {
+  if (filtrados.length === 0) {
     vazioContas.hidden = false;
+    vazioContas.textContent = usuarios.length ? "Nenhuma conta corresponde à busca." : "Nenhuma conta cadastrada ainda.";
     return;
   }
 
   vazioContas.hidden = true;
 
   usuarios.forEach((u) => {
+    if (!filtrados.includes(u)) return;
     const tr = document.createElement("tr");
     const temEmail = !!u.email;
     const temTelefone = !!u.telefone;
 
     tr.innerHTML = `
       <td>${escaparHtml(u.nome || "Sem nome")}</td>
+      <td>${escaparHtml(u.documento || "—")}</td>
       <td>${escaparHtml(u.email || "—")}</td>
       <td>${escaparHtml(u.telefone || "—")}</td>
+      <td><button class="btn-tabela" data-ver-conta-pedidos="${escaparHtml(u.id)}">${contarPedidosDaConta(u)} pedido(s)</button></td>
       <td class="col-acoes">
         <button class="btn-tabela" data-msg-email="${escaparHtml(u.id)}" ${temEmail ? "" : "disabled"}>E-mail</button>
         <button class="btn-tabela" data-msg-whatsapp="${escaparHtml(u.id)}" ${temTelefone ? "" : "disabled"}>WhatsApp</button>
@@ -552,6 +730,13 @@ function renderizarContas(usuarios) {
     };
   });
 
+  tbodyContas.querySelectorAll("[data-ver-conta-pedidos]").forEach((btn) => {
+    btn.onclick = () => {
+      const conta = usuariosCache.find((item) => item.id === btn.dataset.verContaPedidos);
+      if (conta) abrirPerfilCliente(conta);
+    };
+  });
+
   tbodyContas.querySelectorAll("[data-msg-whatsapp]").forEach((btn) => {
     btn.onclick = () => {
       const u = usuariosCache.find((x) => x.id === btn.dataset.msgWhatsapp);
@@ -559,6 +744,14 @@ function renderizarContas(usuarios) {
     };
   });
 }
+
+function normalizarBusca(valor) {
+  return String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLocaleLowerCase("pt-BR");
+}
+
+buscaPedidos?.addEventListener("input", () => renderizarPedidos(pedidosCache));
+filtroStatusPedidos?.addEventListener("change", () => renderizarPedidos(pedidosCache));
+buscaContas?.addEventListener("input", () => renderizarContas(usuariosCache));
 
 function iniciarListenerContas() {
   db.collection("usuarios")
