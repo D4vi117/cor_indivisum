@@ -178,6 +178,152 @@ function extrairDadosPreco(p) {
   };
 }
 
+function escaparHtml(texto) {
+  return String(texto).replace(/[&<>"']/g, (caractere) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[caractere]);
+}
+
+function formatarMarkdownSimples(texto) {
+  return escaparHtml(texto)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\r?\n/g, "<br>");
+}
+
+function sanitizarDescricaoHtml(html) {
+  const documento = new DOMParser().parseFromString(String(html), "text/html");
+  const tagsPermitidas = new Set(["P", "BR", "STRONG", "B", "EM", "I", "U", "UL", "OL", "LI", "BLOCKQUOTE", "H2", "H3", "A", "IMG"]);
+
+  function copiarNo(no) {
+    if (no.nodeType === Node.TEXT_NODE) return document.createTextNode(no.nodeValue || "");
+    if (no.nodeType !== Node.ELEMENT_NODE) return document.createDocumentFragment();
+
+    const tag = no.tagName.toUpperCase();
+    const filhos = [...no.childNodes].map(copiarNo);
+    if (!tagsPermitidas.has(tag)) {
+      const fragmento = document.createDocumentFragment();
+      filhos.forEach((filho) => fragmento.appendChild(filho));
+      return fragmento;
+    }
+
+    const elemento = document.createElement(tag.toLowerCase());
+    if (tag === "A") {
+      try {
+        const url = new URL(no.getAttribute("href") || "", window.location.origin);
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          elemento.href = url.href;
+          elemento.rel = "noopener noreferrer";
+          elemento.target = "_blank";
+        }
+      } catch {}
+    }
+    if (tag === "IMG") {
+      try {
+        const url = new URL(no.getAttribute("src") || "", window.location.origin);
+        if (url.protocol !== "https:") return document.createDocumentFragment();
+        elemento.src = url.href;
+        elemento.alt = no.getAttribute("alt") || "";
+        elemento.loading = "lazy";
+        return elemento;
+      } catch {
+        return document.createDocumentFragment();
+      }
+    }
+    filhos.forEach((filho) => elemento.appendChild(filho));
+    return elemento;
+  }
+
+  const fragmento = document.createDocumentFragment();
+  [...documento.body.childNodes].forEach((no) => fragmento.appendChild(copiarNo(no)));
+  return fragmento;
+}
+
+function abrirModalDescricaoProduto(produto, conteudoHtml, botaoOrigem) {
+  const modal = document.getElementById("descricao-produto-modal");
+  const fechar = document.getElementById("descricao-produto-voltar");
+  const titulo = document.getElementById("descricao-produto-titulo");
+  const conteudo = document.getElementById("descricao-produto-conteudo");
+  const linkProduto = document.getElementById("descricao-produto-link");
+  if (!modal || !fechar || !titulo || !conteudo || !linkProduto) return;
+
+  titulo.textContent = produto.nome || "Descrição do produto";
+  conteudo.replaceChildren(sanitizarDescricaoHtml(conteudoHtml));
+  linkProduto.href = `/loja/p/${encodeURIComponent(produto.slug || produto.id)}`;
+  modal.hidden = false;
+  document.body.classList.add("descricao-produto-aberta");
+  modal._botaoOrigem = botaoOrigem;
+  fechar.focus();
+}
+
+function fecharModalDescricaoProduto() {
+  const modal = document.getElementById("descricao-produto-modal");
+  if (!modal || modal.hidden) return;
+  const botaoOrigem = modal._botaoOrigem;
+  modal.hidden = true;
+  document.body.classList.remove("descricao-produto-aberta");
+  document.getElementById("descricao-produto-conteudo")?.replaceChildren();
+  botaoOrigem?.focus();
+}
+
+function configurarModalDescricaoProduto() {
+  const modal = document.getElementById("descricao-produto-modal");
+  const fechar = document.getElementById("descricao-produto-voltar");
+  if (!modal || !fechar) return;
+
+  fechar.addEventListener("click", fecharModalDescricaoProduto);
+  modal.addEventListener("click", (evento) => {
+    if (evento.target === modal) fecharModalDescricaoProduto();
+  });
+  modal.addEventListener("keydown", (evento) => {
+    if (evento.key !== "Tab") return;
+    const focaveis = [...modal.querySelectorAll('button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])')];
+    if (!focaveis.length) return;
+    const primeiro = focaveis[0];
+    const ultimo = focaveis[focaveis.length - 1];
+    if (evento.shiftKey && document.activeElement === primeiro) {
+      evento.preventDefault();
+      ultimo.focus();
+    } else if (!evento.shiftKey && document.activeElement === ultimo) {
+      evento.preventDefault();
+      primeiro.focus();
+    }
+  });
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape") fecharModalDescricaoProduto();
+  });
+}
+
+function configurarDescricaoDoCard(card, produto) {
+  const descricaoEl = card.querySelector(".card-descricao");
+  const botao = card.querySelector(".card-ler-mais");
+  const html = produto.conteudo?.descricaoHTML || produto.conteudo?.descricaoHtml || produto.descricaoHTML || produto.descricaoHtml || "";
+  const curta = produto.conteudo?.descricaoCurta || produto.descricaoCurta || "";
+
+  descricaoEl.innerHTML = formatarMarkdownSimples(curta);
+  const descricaoSanitizada = html ? sanitizarDescricaoHtml(html) : document.createDocumentFragment();
+  const temDetalhesHtml = Boolean(html && (descricaoSanitizada.textContent.trim() || descricaoSanitizada.querySelector("img")));
+
+  requestAnimationFrame(() => {
+    const resumoLongo = descricaoEl.scrollHeight > descricaoEl.clientHeight + 2;
+    if (temDetalhesHtml || resumoLongo) {
+      botao.hidden = false;
+      botao.textContent = temDetalhesHtml ? "Ler descrição completa" : "Ler mais";
+      botao.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  botao.addEventListener("click", () => {
+    if (temDetalhesHtml) {
+      abrirModalDescricaoProduto(produto, html, botao);
+    } else {
+      const expandida = botao.getAttribute("aria-expanded") !== "true";
+      descricaoEl.classList.toggle("is-expanded", expandida);
+      botao.setAttribute("aria-expanded", String(expandida));
+      botao.textContent = expandida ? "Ler menos" : "Ler mais";
+    }
+  });
+}
+
 /* ==========================================================================
    4. AÇÕES DE COMPRA / ADIÇÃO
    ========================================================================== */
@@ -280,7 +426,7 @@ function renderizarProdutos(produtos) {
     return;
   }
 
-  produtos.forEach(p => {
+  produtos.forEach((p, indice) => {
     const card = document.createElement("article");
     card.className = "produto-card";
 
@@ -289,7 +435,6 @@ function renderizarProdutos(produtos) {
 
     // Mídias e descrições com suporte à estrutura nova e antiga
     const fotoPrincipal = p.midias?.fotoPrincipal || '/assets/placeholder-produto.png';
-    const descricaoCurta = p.conteudo?.descricaoCurta || '';
     const eDestaque = p.status?.destaque;
     const emPreVenda = p.status?.preVenda;
     const ignoraEstoque = emPreVenda === true && p.status?.preVendaIgnoraEstoque === true;
@@ -308,7 +453,8 @@ function renderizarProdutos(produtos) {
       <div class="card-content">
         <span class="card-categoria">${p.categoria || ''}</span>
         <h2 class="card-titulo"><a href="/loja/p/${p.slug || p.id}">${p.nome}</a></h2>
-        <p class="card-descricao">${descricaoCurta}</p>
+        <div class="card-descricao" aria-label="Descrição do produto"></div>
+        <button class="card-ler-mais" type="button" aria-expanded="false" hidden>Ler mais</button>
         <a href="/loja/p/${p.slug || p.id}" class="card-detalhes-link">Ver detalhes</a>
         <div class="card-preco-wrap">
           ${temDesconto 
@@ -332,6 +478,7 @@ function renderizarProdutos(produtos) {
     `;
 
     container.appendChild(card);
+    configurarDescricaoDoCard(card, p);
   });
 }
 
@@ -357,6 +504,7 @@ function aplicarFiltros() {
 document.addEventListener("DOMContentLoaded", () => {
   carregarProdutos();
   atualizarCarrinhoUI();
+  configurarModalDescricaoProduto();
 
   // Controles de Busca e Filtro
   const inputBusca = document.getElementById("input-busca");

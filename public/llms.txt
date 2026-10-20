@@ -1,0 +1,19 @@
+# Cor Indivisum
+
+> Iniciativa católica, dirigida e mantida por leigos, com duas vertentes: produção audiovisual (novenas, formações e catequeses gratuitas no YouTube) e uma editora de livros católicos. Site em português do Brasil.
+
+A Cor Indivisum se compromete a manter integralmente sua identidade católica, agindo "pela salvação das almas e para a maior glória de Deus". Os livros em pré-venda ajudam a financiar a produção.
+
+## Páginas principais
+
+- [Home](https://corindivisum.com.br/): Quem somos, vertentes de atuação, newsletter e formas de apoiar a iniciativa.
+- [Loja](https://corindivisum.com.br/loja/): Catálogo de livros da editora, incluindo o primeiro lançamento e obras em pré-venda.
+
+## Conteúdo audiovisual
+
+- [Canal no YouTube](https://www.youtube.com/@CORINDIVISUM): Novenas, orações, formações e catequeses, todas gratuitas.
+
+## Observações
+
+- Páginas de conta, carrinho e checkout (/minha-conta, /loja/carrinho, /loja/checkout) são privadas e não devem ser indexadas.
+- Idioma: português (pt-BR).

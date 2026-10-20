@@ -1,0 +1,21 @@
+{
+  "name": "Cor Indivisum",
+  "short_name": "Cor Indivisum",
+  "description": "Iniciativa católica leiga: produção audiovisual e editora.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "/src/images/Icon.webp", "sizes": "any", "type": "image/webp", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Loja", "url": "/loja/", "icons": [{ "src": "/src/images/Icon.webp", "sizes": "any", "type": "image/webp" }] }
+  ]
+}

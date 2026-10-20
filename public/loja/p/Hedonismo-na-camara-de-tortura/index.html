@@ -1,161 +1,44 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Hedonismo na Câmara de Tortura, de Rodrigo Oliveira: 18 ensaios sobre prazer, dor e sentido na vida contemporânea. Conheça a edição Cor Indivisum.">
-<link rel="icon" href="/favicon.ico">
-<title>Hedonismo na Câmara de Tortura</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
-<style>
-/* Layout: capa-tapeçaria. Hero sobre o padrão de corvos e espinhos, texto à esquerda, livro à direita;
-   seções seguintes em faixas escuras alternadas, coluna de leitura estreita, ficha técnica ao lado da capa. */
-:root{
-  --ink:#0f1719;        /* fundo, o verde-tinta do título da capa */
-  --ink-2:#17211f;      /* faixa alternada */
-  --bone:#e8e1cf;       /* creme da placa do título */
-  --bone-dim:#b9b2a2;   /* texto secundário */
-  --brown:#5b2c1c;      /* faixa marrom da capa */
-  --gold:#d9a93a;       /* fios dourados do padrão */
-  --crimson:#b23a3a;    /* maçã e flores */
-  --line:rgba(232,225,207,.16);
-  --f-display:"Cormorant Garamond","Iowan Old Style",Georgia,serif;
-  --f-body:"Newsreader",Georgia,"Times New Roman",serif;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;padding:0;background:var(--ink);color:var(--bone);font-family:var(--f-body);font-size:1.125rem;line-height:1.65;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;text-wrap:balance;margin:0}
-p{margin:0}
-a{color:inherit}
-:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.wrap{width:100%;max-width:70rem;margin-inline:auto;padding-inline:max(1rem,5vw)}
-.eyebrow{font-family:var(--f-display);font-size:.95rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
-section{padding-block:clamp(3.5rem,8vw,6.5rem)}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* topo */
-.bar{background:var(--brown);border-bottom:1px solid rgba(0,0,0,.4)}
-.bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-block:.7rem}
-.bar b{font-family:var(--f-display);letter-spacing:.14em;text-transform:uppercase;font-weight:600;font-size:1rem}
-.bar span{font-size:.9rem;color:var(--bone-dim);font-style:italic}
+    <!-- Meta Tags Principais de SEO -->
+    <title>Hedonismo na Câmara de Tortura — Rodrigo Oliveira | Cor Indivisum</title>
+    <meta name="description" content="Hedonismo na Câmara de Tortura, de Rodrigo Oliveira: 18 ensaios sobre prazer, dor e sentido na vida contemporânea. Conheça a edição Cor Indivisum.">
+    <meta name="author" content="Rodrigo Oliveira">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://corindivisum.com.br/loja/p/Hedonismo-na-camara-de-tortura/">
 
-/* hero */
-.hero{position:relative;padding-block:clamp(2.5rem,6vw,5rem);background:
-  linear-gradient(90deg,rgba(15,23,25,.94) 0%,rgba(15,23,25,.78) 55%,rgba(15,23,25,.55) 100%),
-  url(images/padrao.jpg) center/cover}
-.hero .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(2rem,5vw,4rem);align-items:center}
-.hero h1{font-size:clamp(2.4rem,5.6vw,4.4rem);margin-block:1rem 1.5rem;font-weight:600}
-.hero h1 em{color:var(--gold);font-style:italic}
-.lede{font-size:clamp(1.05rem,1.6vw,1.22rem);color:var(--bone);max-width:38rem}
-.lede i{font-style:italic}
-.cta{display:inline-block;margin-top:2rem;background:var(--crimson);color:#fff;text-decoration:none;font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:1.05rem;padding:1rem 1.8rem;border:1px solid rgba(255,255,255,.18);transition:background .2s,transform .2s}
-.cta:hover{background:#c64646;transform:translateY(-2px)}
-.seal{display:flex;align-items:center;gap:.8rem;margin-top:1.4rem;font-style:italic;color:var(--bone-dim);font-size:1rem}
-.seal::before{content:"";flex:none;width:2.2rem;height:1px;background:var(--gold)}
-.hero figure{margin:0;justify-self:center;max-width:26rem}
-.hero img{display:block;width:100%;height:auto;box-shadow:0 30px 60px rgba(0,0,0,.55)}
+    <!-- Open Graph / WhatsApp -->
+    <meta property="og:type" content="book">
+    <meta property="og:url" content="https://corindivisum.com.br/loja/p/Hedonismo-na-camara-de-tortura/">
+    <meta property="og:title" content="Hedonismo na Câmara de Tortura — Rodrigo Oliveira">
+    <meta property="og:description" content="18 ensaios sobre prazer, dor e sentido na vida contemporânea. Edição exclusiva Cor Indivisum.">
+    <!-- Substitua pelo caminho exato da capa do livro -->
+    <meta property="og:image" content="https://corindivisum.com.br/loja/p/Hedonismo-na-camara-de-tortura/images/capa.jpg">
+    <meta property="og:site_name" content="Cor Indivisum">
+    <meta property="og:locale" content="pt_BR">
 
-/* problema */
-.problem{background:var(--ink)}
-.problem .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(2rem,6vw,5rem)}
-.problem h2{font-size:clamp(2rem,4vw,3rem);margin-top:.8rem}
-.problem .text{display:grid;gap:1.2rem}
-.traps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-block:.6rem}
-.trap{padding:1.3rem 1.2rem;background:var(--ink-2);border-top:3px solid var(--gold)}
-.trap h3{font-size:1.6rem;color:var(--gold);margin-bottom:.5rem}
-.trap p{font-size:1rem;color:var(--bone-dim);line-height:1.55}
-.quote{font-family:var(--f-display);font-style:italic;font-size:1.5rem;line-height:1.3;color:var(--bone);border-left:2px solid var(--crimson);padding-left:1.1rem}
+    <!-- Preconnect & Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
 
-/* conteúdo */
-.content{background:var(--ink-2);border-block:1px solid var(--line)}
-.head{max-width:44rem;display:grid;gap:1rem;margin-bottom:clamp(2rem,5vw,3.5rem)}
-.head h2{font-size:clamp(2rem,4vw,3rem)}
-.head p{color:var(--bone-dim)}
-.themes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
-.themes li{padding:1.6rem 1.4rem 1.8rem 0;border-bottom:1px solid var(--line)}
-.themes li:nth-child(odd){border-right:1px solid var(--line)}
-.themes li:nth-child(even){padding-left:1.4rem}
-.themes h3{font-size:1.65rem;margin-bottom:.6rem}
-.themes p{color:var(--bone-dim);font-size:1.02rem;line-height:1.6}
-.themes i{font-style:italic;color:var(--bone)}
+    <!-- CSS & Favicon -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/loja/p/Hedonismo-na-camara-de-tortura/hedonismo.css">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="shortcut icon" href="/favicon.ico">
 
-/* autor */
-.author .wrap{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:clamp(2rem,6vw,5rem);align-items:center}
-.author figure{margin:0;position:relative}
-.author img{display:block;width:100%;height:auto;filter:saturate(.85)}
-.author figure::after{content:"";position:absolute;inset:.9rem -.9rem -.9rem .9rem;border:1px solid var(--gold);z-index:-1}
-.author h2{font-size:clamp(2rem,4vw,3rem);margin-block:.8rem 1.2rem}
-.author p{max-width:36rem}
-.author p+p{margin-top:1rem}
-.author i{font-style:italic}
-
-/* ficha */
-.buy{background:linear-gradient(rgba(15,23,25,.92),rgba(15,23,25,.92)),url(images/padrao.jpg) center/cover;border-block:1px solid var(--line)}
-.buy .wrap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(2rem,6vw,5rem);align-items:start}
-.buy figure{margin:0;max-width:22rem;justify-self:center}
-.buy img{display:block;width:100%;height:auto;box-shadow:0 24px 50px rgba(0,0,0,.5)}
-.buy h2{font-size:clamp(2rem,4vw,3rem);margin-block:.8rem 1.6rem}
-dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:.7rem 1.6rem;margin:0 0 2rem}
-dt{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.16em;font-size:.88rem;color:var(--gold);font-weight:600;padding-top:.22rem}
-dd{margin:0}
-.perks{display:grid;gap:1rem;margin-bottom:.4rem}
-.perk{padding:1.1rem 1.2rem;background:rgba(232,225,207,.06);border-left:3px solid var(--crimson)}
-.perk h3{font-size:1.35rem;margin-bottom:.25rem}
-.perk p{font-size:1rem;color:var(--bone-dim);line-height:1.5}
-
-/* faq */
-.faq .wrap{max-width:52rem}
-.faq h2{font-size:clamp(2rem,4vw,3rem);margin-block:.8rem 2rem}
-details{border-top:1px solid var(--line)}
-details:last-of-type{border-bottom:1px solid var(--line)}
-summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding-block:1.2rem;font-family:var(--f-display);font-size:1.5rem;font-weight:600;line-height:1.2}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";color:var(--gold);font-size:1.7rem;flex:none;line-height:1}
-details[open] summary::after{content:"\2212"}
-details p{padding-bottom:1.4rem;color:var(--bone-dim);max-width:42rem}
-
-footer{background:var(--brown);padding-block:2rem}
-footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.6rem 2rem;align-items:center}
-footer b{font-family:var(--f-display);letter-spacing:.16em;text-transform:uppercase;font-weight:600}
-footer span{font-size:.92rem;color:var(--bone-dim)}
-
-@media (max-width:52rem){
-  .hero .wrap,.problem .wrap,.author .wrap,.buy .wrap{grid-template-columns:minmax(0,1fr)}
-  .hero{background:linear-gradient(rgba(15,23,25,.88),rgba(15,23,25,.82)),url(images/padrao.jpg) center/cover}
-  .hero figure{order:-1;max-width:15rem}
-  .author figure{max-width:18rem}
-  .author figure::after{inset:.6rem -.6rem -.6rem .6rem}
-  .themes{grid-template-columns:minmax(0,1fr)}
-  .themes li:nth-child(odd){border-right:0}
-  .themes li:nth-child(even){padding-left:0}
-  .traps{grid-template-columns:minmax(0,1fr)}
-  .bar span{display:none}
-}
-@media (max-width:30rem){
-  dl{grid-template-columns:minmax(0,1fr);gap:.1rem}
-  dd{margin-bottom:.8rem}
-  .cta{display:block;text-align:center}
-}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cta{transition:none}}
-
-.cta{cursor:pointer;line-height:1.3;max-width:100%}
-.cta:disabled{opacity:.65;cursor:wait;transform:none}
-.price{font-family:var(--f-display);font-size:1.8rem;margin-top:1.4rem}
-.price del{font-size:1.1rem;color:var(--bone-dim);margin-right:.6rem}
-.purchase-note{font-size:1rem;color:var(--bone-dim);margin-top:.8rem}
-.hero .question{font-family:var(--f-display);font-size:1.5rem;line-height:1.3;margin-bottom:1rem}
-.skip-link{position:absolute;left:1rem;top:-6rem;z-index:10;background:var(--ink);padding:.6rem}
-.skip-link:focus{top:1rem}
-.bar a{text-decoration:none}
-@media(max-width:30rem){button.cta{width:100%}}
-</style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="/src/scripts/firebase-init.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>

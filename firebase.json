@@ -24,6 +24,41 @@
     "predeploy": "node scripts/generate-image-manifest.js",
     "redirects": [
       {
+        "source": "/loja/p/maria-a-flauta-de-deus",
+        "destination": "/loja/p/Maria-a-flauta-de-Deus/",
+        "type": 301
+      },
+      {
+        "source": "/loja/p/maria-a-flauta-de-deus/",
+        "destination": "/loja/p/Maria-a-flauta-de-Deus/",
+        "type": 301
+      },
+      {
+        "source": "/loja/p/hedonismo-na-camara-de-tortura",
+        "destination": "/loja/p/Hedonismo-na-camara-de-tortura/",
+        "type": 301
+      },
+      {
+        "source": "/loja/p/hedonismo-na-camara-de-tortura/",
+        "destination": "/loja/p/Hedonismo-na-camara-de-tortura/",
+        "type": 301
+      },
+      {
+        "source": "/loja/p/hedonismo",
+        "destination": "/loja/p/Hedonismo-na-camara-de-tortura/",
+        "type": 301
+      },
+      {
+        "source": "/loja/p/hedonismo-na-camara-de-tortura/images/livro.jpg",
+        "destination": "/loja/p/Hedonismo-na-camara-de-tortura/images/livro.jpg",
+        "type": 301
+      },
+      {
+        "source": "/loja/p/hedonismo/",
+        "destination": "/loja/p/Hedonismo-na-camara-de-tortura/",
+        "type": 301
+      },
+      {
         "source": "/loja/p/hedonismo-na-camara-de-tortura/images/HCT Mockup.jpeg",
         "destination": "/loja/p/Hedonismo-na-camara-de-tortura/images/livro.jpg",
         "type": 302

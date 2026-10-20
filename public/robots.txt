@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /minha-conta
+Disallow: /loja/carrinho
+Disallow: /loja/checkout
+
+# Crawlers de IA: permitidos (altere para "Disallow: /" se quiser bloquear)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://corindivisum.com.br/sitemap.xml

@@ -1,25 +1,43 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loja · Cor Indivisum</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <!-- Meta Tags Principais de SEO -->
+    <title>Loja · Cor Indivisum Editora</title>
+    <meta name="description" content="Adquira os livros e publicações oficiais da Cor Indivisum Editora. Obras com conselho editorial capacitado e acerto teológico, filosófico e literário.">
+    <meta name="keywords" content="loja católica, livros de teologia, pré-venda de livros católicos, Cor Indivisum loja">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://corindivisum.com.br/loja/">
 
-  <!-- styles.css entra primeiro: traz as variáveis de cor, fontes e reset da identidade visual -->
-  <link rel="stylesheet" href="/styles.css">
-  <!-- loja.css entra depois e cuida só do que é específico da loja (grid, cards, modal do carrinho) -->
-  <link rel="stylesheet" href="loja.css">
+    <!-- Open Graph / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://corindivisum.com.br/loja/">
+    <meta property="og:title" content="Loja Oficial · Cor Indivisum Editora">
+    <meta property="og:description" content="Confira o catálogo de lançamentos e pré-vendas de livros da Cor Indivisum Editora.">
+    <meta property="og:image" content="https://corindivisum.com.br/src/images/Fundo.webp">
+    <meta property="og:site_name" content="Cor Indivisum">
+    <meta property="og:locale" content="pt_BR">
 
+    <!-- Preconnect & Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="/src/scripts/firebase-init.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/loja/loja.css">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="/src/scripts/firebase-init.js" defer></script>
 </head>
 <body>
 
@@ -95,6 +113,22 @@
     </section>
 
   </main>
+
+  <div class="descricao-produto-modal" id="descricao-produto-modal" hidden>
+    <section class="descricao-produto-painel" role="dialog" aria-modal="true" aria-labelledby="descricao-produto-titulo">
+      <header class="descricao-produto-cabecalho">
+        <button type="button" class="descricao-produto-voltar" id="descricao-produto-voltar">← Voltar à loja</button>
+        <span>Descrição completa</span>
+      </header>
+      <article class="descricao-produto-leitura">
+        <h2 id="descricao-produto-titulo"></h2>
+        <div class="descricao-produto-conteudo" id="descricao-produto-conteudo"></div>
+      </article>
+      <footer class="descricao-produto-rodape">
+        <a class="descricao-produto-link" id="descricao-produto-link" href="#">Ver página do produto</a>
+      </footer>
+    </section>
+  </div>
 
   <footer>
     <div class="cross">✝</div>
