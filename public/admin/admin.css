@@ -162,6 +162,284 @@ body {
     color: var(--ember);
 }
 
+/* ---------- cupons ---------- */
+.cupom-ajuda,
+.cupom-feedback,
+#cupom-form-feedback {
+    color: var(--ink-soft);
+}
+
+.cupom-feedback.success,
+#cupom-form-feedback.success {
+    color: #2e6c43;
+}
+
+.cupom-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.cupom-form,
+.cupom-lista-painel {
+    background: var(--parchment);
+    border: 1px solid var(--hair);
+    padding: 1.2rem;
+    border-radius: 0.7rem;
+}
+
+.cupom-form h3,
+.cupom-lista-painel h3 {
+    margin: 0 0 1rem;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.cupom-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.8rem;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+.cupom-form label[hidden] {
+    display: none;
+}
+
+.cupom-form input,
+.cupom-form select,
+.cupom-lista-cabecalho input,
+.cupom-emissao-linha select,
+.cupom-cliente-busca {
+    width: 100%;
+    min-width: 0;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--hair);
+    border-radius: 0.45rem;
+    background: #fffdf7;
+    color: var(--ink);
+    font: inherit;
+}
+
+.cupom-form-linha {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.cupom-form-acoes,
+.cupom-emissao-linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.cupom-form-acoes > button {
+    flex: 1 1 auto;
+}
+
+.cupom-lista-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.cupom-lista-cabecalho h3 {
+    margin: 0;
+}
+
+.cupom-lista-cabecalho input {
+    max-width: 20rem;
+}
+
+.cupom-lista {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.cupom-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.85rem;
+    border: 1px solid var(--hair);
+    border-radius: 0.55rem;
+    background: rgba(255, 255, 255, 0.52);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cupom-item.selecionado {
+    border-color: var(--ember);
+    box-shadow: 0 0 0 2px rgba(132, 55, 47, 0.1);
+}
+
+.cupom-item > div {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.cupom-item small,
+.cupom-contadores,
+.cupom-item span {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+}
+
+.cupom-status {
+    white-space: nowrap;
+}
+
+.cupom-status.ativo {
+    color: #2e6c43;
+}
+
+.cupom-status.inativo {
+    color: var(--ember);
+}
+
+.cupom-vazio {
+    padding: 0.9rem;
+    border: 1px dashed var(--hair);
+    color: var(--ink-soft);
+}
+
+.cupom-clientes-painel {
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--hair);
+}
+
+.cupom-busca-clientes-label {
+    display: block;
+    margin: 0.85rem 0 0.4rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+.cupom-cliente-busca {
+    display: block;
+    margin-bottom: 0.65rem;
+}
+
+.cupom-cliente-resultados,
+#cupom-clientes-lista {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.cupom-cliente-resultado {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.75rem;
+    border: 1px solid var(--hair);
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.52);
+}
+
+.cupom-cliente-identidade {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.cupom-cliente-identidade strong,
+.cupom-cliente-identidade span,
+.cupom-cliente-identidade small {
+    overflow-wrap: anywhere;
+}
+
+.cupom-cliente-identidade strong {
+    color: var(--ink);
+}
+
+.cupom-cliente-identidade span,
+.cupom-cliente-identidade small {
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+}
+
+.cupom-cliente-tipo {
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.12rem 0.4rem;
+    border-radius: 99px;
+    background: rgba(132, 55, 47, 0.08);
+    color: var(--ink-soft);
+    font-size: 0.68rem;
+}
+
+.cupom-emitir-conta {
+    white-space: nowrap;
+}
+
+.cupom-cliente-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--hair);
+}
+
+.cupom-cliente-item-identidade {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.cupom-cliente-item-identidade small {
+    color: var(--ink-soft);
+    overflow-wrap: anywhere;
+}
+
+.cupom-cliente-item span {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 800px) {
+    .cupom-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cupom-item {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .cupom-contadores {
+        grid-column: 1;
+    }
+
+    .cupom-status {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .cupom-item > button {
+        grid-column: 2;
+        grid-row: 1 / span 3;
+    }
+
+    .cupom-cliente-resultado {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .cupom-emitir-conta {
+        width: 100%;
+    }
+}
+
 @media (max-width: 560px) {
     .integracao-card {
         align-items: flex-start;

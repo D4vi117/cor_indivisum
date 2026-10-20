@@ -145,13 +145,26 @@
 
 						<div class="summary-lines">
 							<div class="summary-line">
-								<span></span>
-								<span></span>
+								<span>Subtotal</span>
+								<span class="summary-subtotal">—</span>
 							</div>
 							<div class="summary-line">
 								<span>Frete</span>
-								<span></span>
+								<span class="summary-shipping">—</span>
 							</div>
+							<div class="summary-line summary-discount" hidden>
+								<span class="summary-discount-label">Cupom</span>
+								<span class="summary-discount-value">—</span>
+							</div>
+						</div>
+
+						<div class="checkout-coupon">
+							<label for="codigo-cupom">Cupom de desconto</label>
+							<div class="checkout-coupon-controls">
+								<input id="codigo-cupom" type="text" maxlength="40" autocomplete="off" placeholder="Digite seu código">
+								<button id="btn-aplicar-cupom" type="button">Aplicar</button>
+							</div>
+							<p id="cupom-checkout-feedback" role="status" aria-live="polite"></p>
 						</div>
 
 						<div class="summary-divider"></div>

@@ -9,7 +9,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
-	<link rel="stylesheet" href="admin.css">
+	<link rel="stylesheet" href="admin.css?v=cupons-20261020-2">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -41,6 +41,7 @@
 			<button class="admin-tab is-active" data-tab="produtos" type="button">Produtos</button>
 			<button class="admin-tab" data-tab="pedidos" type="button">Pedidos</button>
 			<button class="admin-tab" data-tab="contas" type="button">Contas</button>
+			<button class="admin-tab" data-tab="cupons" type="button">Cupons</button>
 			<button class="admin-tab" data-tab="integracoes" type="button">Integrações</button>
 			<button class="admin-tab" data-tab="newsletter" type="button">Newsletter</button>
 		</nav>
@@ -69,6 +70,63 @@
 					<tbody></tbody>
 				</table>
 				<p class="tabela-vazia" hidden>Nenhum produto cadastrado ainda.</p>
+			</div>
+		</section>
+
+		<!-- ============ CUPONS ============ -->
+		<section class="admin-panel" id="painel-cupons" data-panel="cupons">
+			<div class="panel-head">
+				<div>
+					<span class="eyebrow">Relacionamento</span>
+					<h2>Cupons</h2>
+				</div>
+				<button class="btn-primary" id="btn-novo-cupom" type="button">+ Novo cupom</button>
+			</div>
+			<p class="cupom-ajuda">Crie códigos universais ou exclusivos para clientes selecionados. A validação e aplicação no checkout será conectada em uma etapa seguinte.</p>
+			<p id="cupons-feedback" class="cupom-feedback" role="status" aria-live="polite"></p>
+			<div class="cupom-layout">
+				<form id="form-cupom" class="cupom-form">
+					<h3 id="cupom-form-titulo">Novo cupom</h3>
+					<label>Código<input name="codigo" maxlength="40" autocomplete="off" required></label>
+					<label>Descrição<input name="descricao" maxlength="240"></label>
+					<label>Disponibilidade
+						<select name="escopo" required>
+							<option value="universal">Universal — pode ser usado por qualquer cliente</option>
+							<option value="exclusivo">Exclusivo — emitir para clientes selecionados</option>
+						</select>
+					</label>
+					<div class="cupom-form-linha">
+						<label>Tipo de desconto<select name="tipo"><option value="percentual">Percentual</option><option value="valor_fixo">Valor fixo (R$)</option></select></label>
+						<label>Valor<input name="valor" type="number" min="0.01" step="0.01" required></label>
+					</div>
+					<label id="cupom-limite-desconto-wrap">Limite máximo do desconto (R$)<input name="limiteDesconto" type="number" min="0.01" step="0.01" placeholder="Sem limite"></label>
+					<div class="cupom-form-linha">
+						<label>Válido a partir de<input name="inicio" type="date"></label>
+						<label>Válido até<input name="fim" type="date"></label>
+					</div>
+					<div class="cupom-form-linha">
+						<label>Pedido mínimo (R$)<input name="pedidoMinimo" type="number" min="0" step="0.01" value="0"></label>
+						<label id="cupom-limite-emissoes-wrap"><span id="cupom-limite-label">Limite de emissões</span><input name="limite" type="number" min="1" step="1" placeholder="Sem limite"></label>
+					</div>
+					<label>Status<select name="status"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
+					<div class="cupom-form-acoes">
+						<button class="btn-primary" type="submit">Salvar cupom</button>
+						<button class="btn-secundario" id="btn-cancelar-cupom" type="button" hidden>Cancelar edição</button>
+						<button class="btn-secundario btn-danger" id="btn-excluir-cupom" type="button" hidden>Excluir</button>
+					</div>
+					<p id="cupom-form-feedback" role="status" aria-live="polite"></p>
+				</form>
+				<section class="cupom-lista-painel" aria-labelledby="cupom-lista-titulo">
+					<div class="cupom-lista-cabecalho"><h3 id="cupom-lista-titulo">Cupons cadastrados</h3><input id="cupom-busca" type="search" placeholder="Buscar código ou descrição" aria-label="Buscar cupons"></div>
+					<div id="cupom-lista" class="cupom-lista"><p>Carregando cupons…</p></div>
+					<section id="cupom-clientes-painel" class="cupom-clientes-painel" hidden>
+						<h3>Contas com este cupom</h3>
+						<label class="cupom-busca-clientes-label" for="cupom-cliente-busca">Buscar conta para emitir</label>
+						<input id="cupom-cliente-busca" class="cupom-cliente-busca" type="search" placeholder="CPF/CNPJ (preferencial), nome, e-mail ou telefone" autocomplete="off">
+						<div id="cupom-cliente-resultados" class="cupom-cliente-resultados" role="list" aria-live="polite"><p class="cupom-vazio">Busque por documento, nome, e-mail ou telefone.</p></div>
+						<div id="cupom-clientes-lista"></div>
+					</section>
+				</section>
 			</div>
 		</section>
 
@@ -263,6 +321,7 @@
 
 	<script src="/src/scripts/firebase-init.js"></script>
 	<script src="newsletter.js"></script>
+	<script src="cupons.js?v=cupons-20261020-2"></script>
 
 	<script src="admin.js"></script>
 

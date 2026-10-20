@@ -374,6 +374,65 @@ section {
     color: var(--gold-bright);
 }
 
+.checkout-coupon {
+    margin-top: 1.1rem;
+}
+
+.checkout-coupon > label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: rgba(244, 238, 223, 0.85);
+    font-size: 0.9rem;
+}
+
+.checkout-coupon-controls {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.checkout-coupon-controls input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--hair);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--parchment);
+    font: inherit;
+    text-transform: uppercase;
+}
+
+.checkout-coupon-controls button {
+    flex: 0 0 auto;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold-bright);
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.checkout-coupon-controls button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+#cupom-checkout-feedback {
+    min-height: 1.3em;
+    margin: 0.4rem 0 0;
+    color: rgba(244, 238, 223, 0.7);
+    font-size: 0.82rem;
+}
+
+#cupom-checkout-feedback.success {
+    color: var(--gold-bright);
+}
+
+.summary-discount[hidden] {
+    display: none;
+}
+
 .summary-total {
     display: flex;
     justify-content: space-between;

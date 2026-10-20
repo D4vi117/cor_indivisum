@@ -4,6 +4,7 @@
 
 let carrinhoAtual = [];
 let freteSelecionado = null; // { id, nome, transportadora, valor, prazo }
+let cupomAplicado = null;
 let consultaCepAtual = 0;
 let consultaFreteAtual = 0;
 let controladorCep = null;
@@ -35,9 +36,12 @@ function renderizarResumoPedido() {
   carrinhoAtual = obterCarrinho();
 
   const containerItens = document.querySelector(".cart-items");
-  const subtotalEl = document.querySelectorAll(".summary-line span")[1];
-  const freteEl = document.querySelectorAll(".summary-line span")[3];
+  const subtotalEl = document.querySelector(".summary-subtotal");
+  const freteEl = document.querySelector(".summary-shipping");
   const totalEl = document.querySelector(".summary-total strong");
+  const descontoLinha = document.querySelector(".summary-discount");
+  const descontoLabel = document.querySelector(".summary-discount-label");
+  const descontoValor = document.querySelector(".summary-discount-value");
 
   if (!containerItens) return;
 
@@ -68,7 +72,8 @@ function renderizarResumoPedido() {
   });
 
   const valorFrete = freteSelecionado ? freteSelecionado.valor : 0;
-  const totalFinal = subtotal + valorFrete;
+  const desconto = Math.min(subtotal, Number(cupomAplicado?.desconto) || 0);
+  const totalFinal = subtotal + valorFrete - desconto;
 
   if (subtotalEl) subtotalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
 
@@ -78,7 +83,66 @@ function renderizarResumoPedido() {
       : "Selecione abaixo";
   }
 
+  if (descontoLinha && descontoLabel && descontoValor) {
+    descontoLinha.hidden = desconto <= 0;
+    if (desconto > 0) {
+      descontoLinha.classList.add("discount");
+      descontoLabel.textContent = `Cupom ${cupomAplicado.codigo}`;
+      descontoValor.textContent = `−R$ ${desconto.toFixed(2).replace('.', ',')}`;
+    }
+  }
+
   if (totalEl) totalEl.textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+}
+
+async function aplicarCupomCheckout() {
+  const input = document.getElementById("codigo-cupom");
+  const button = document.getElementById("btn-aplicar-cupom");
+  const feedback = document.getElementById("cupom-checkout-feedback");
+  if (!input || !button || !feedback) return;
+
+  if (cupomAplicado && input.value.trim().toLocaleUpperCase("pt-BR") === cupomAplicado.codigo) {
+    cupomAplicado = null;
+    button.textContent = "Aplicar";
+    feedback.textContent = "Cupom removido.";
+    feedback.classList.remove("success");
+    renderizarResumoPedido();
+    return;
+  }
+
+  const codigo = input.value.trim().toLocaleUpperCase("pt-BR");
+  if (!codigo) {
+    feedback.textContent = "Digite um código de cupom.";
+    feedback.classList.remove("success");
+    return;
+  }
+  if (!carrinhoAtual.length) carrinhoAtual = obterCarrinho();
+
+  button.disabled = true;
+  button.textContent = "Verificando…";
+  feedback.textContent = "";
+  feedback.classList.remove("success");
+  try {
+    const validarCupom = functions.httpsCallable("validarCupom");
+    const { data } = await validarCupom({
+      codigo,
+      itens: carrinhoAtual.map((item) => ({ id: item.id, qtd: item.qtd })),
+    });
+    cupomAplicado = { codigo: data.codigo, desconto: Number(data.desconto) || 0 };
+    input.value = data.codigo;
+    button.textContent = "Remover";
+    feedback.textContent = `Cupom aplicado: desconto de R$ ${cupomAplicado.desconto.toFixed(2).replace('.', ',')}.`;
+    feedback.classList.add("success");
+    renderizarResumoPedido();
+  } catch (error) {
+    cupomAplicado = null;
+    button.textContent = "Aplicar";
+    feedback.textContent = error?.message || "Não foi possível validar este cupom.";
+    feedback.classList.remove("success");
+    renderizarResumoPedido();
+  } finally {
+    button.disabled = false;
+  }
 }
 
 // 3. Autopreenchimento de Endereço via CEP (ViaCEP API)
@@ -374,6 +438,7 @@ async function processarPedido(e) {
       itens: carrinhoAtual.map((item) => ({ id: item.id, qtd: item.qtd })),
       freteId: freteSelecionado.id,
       salvarEndereco: Boolean(salvarEndereco),
+      cupomCodigo: cupomAplicado?.codigo || "",
     });
 
     // Limpa o carrinho
@@ -512,6 +577,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("checkout-form");
   if (form) {
     form.addEventListener("submit", processarPedido);
+  }
+
+  const couponInput = document.getElementById("codigo-cupom");
+  const couponButton = document.getElementById("btn-aplicar-cupom");
+  if (couponButton) couponButton.addEventListener("click", aplicarCupomCheckout);
+  if (couponInput) {
+    couponInput.addEventListener("input", () => {
+      if (!cupomAplicado || couponInput.value.trim().toLocaleUpperCase("pt-BR") === cupomAplicado.codigo) return;
+      cupomAplicado = null;
+      couponButton.textContent = "Aplicar";
+      document.getElementById("cupom-checkout-feedback").textContent = "";
+      document.getElementById("cupom-checkout-feedback").classList.remove("success");
+      renderizarResumoPedido();
+    });
+    couponInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        aplicarCupomCheckout();
+      }
+    });
   }
 
   firebase.auth().onAuthStateChanged((user) => {

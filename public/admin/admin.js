@@ -8,6 +8,9 @@ document.querySelectorAll(".admin-tab").forEach((tab) => {
     if (tab.dataset.tab === "newsletter" && typeof window.iniciarNewsletterAdmin === "function") {
       window.iniciarNewsletterAdmin();
     }
+    if (tab.dataset.tab === "cupons" && typeof window.iniciarCuponsAdmin === "function") {
+      window.iniciarCuponsAdmin();
+    }
   });
 });
 

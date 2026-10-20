@@ -5,6 +5,7 @@ const { getMessaging } = require("firebase-admin/messaging");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const crypto = require("crypto");
 const { createNewsletterFunctions } = require("./newsletter/functions");
+const { createCouponFunctions } = require("./coupons");
 
 // Define a região global para TODAS as funções v2 deste arquivo
 setGlobalOptions({ region: "southamerica-east1" });
@@ -450,6 +451,7 @@ exports.webhookInfinitePay = onRequest(async (req, res) => {
     const pedido = pedidoSnap.data();
 
     if (pedido.status === "pago" || pedido.status === "paid") {
+      await confirmarUsoCupom({ ...pedido, id: order_nsu }).catch((err) => console.error("webhookInfinitePay: não foi possível confirmar uso do cupom", err));
       return res.status(200).send("already paid");
     }
 
@@ -518,8 +520,11 @@ exports.webhookInfinitePay = onRequest(async (req, res) => {
     });
 
     if (!pagamentoConfirmadoAgora) {
+      await confirmarUsoCupom({ ...pedido, id: order_nsu });
       return res.status(200).send("already paid");
     }
+
+    await confirmarUsoCupom({ ...pedido, id: order_nsu });
 
     await db.collection("webhook_logs").add({
       recebidoEm: FieldValue.serverTimestamp(),
@@ -1138,6 +1143,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     freteId,
     salvarEndereco,
     requestId,
+    cupomCodigo,
   } = request.data;
   if (typeof requestId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
     throw new HttpsError("invalid-argument", "Identificador de checkout inválido");
@@ -1161,6 +1167,10 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
   }
 
   const itens = await carregarItensDoCatalogo(itensSolicitados);
+  if (cupomCodigo !== undefined && cupomCodigo !== null && typeof cupomCodigo !== "string") {
+    throw new HttpsError("invalid-argument", "Código de cupom inválido.");
+  }
+  const codigoCupomNormalizado = typeof cupomCodigo === "string" ? cupomCodigo.trim().toLocaleUpperCase("pt-BR") : "";
   const accessToken = await getMelhorEnvioAccessToken();
   const freteRes = await fetch(`${MELHOR_ENVIO_BASE_URL}/api/v2/me/shipment/calculate`, {
     method: "POST",
@@ -1201,7 +1211,6 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     0
   );
   const freteCentavos = Math.round(Number(freteEscolhido.price) * 100);
-  const total = (subtotalCentavos + freteCentavos) / 100;
   const pedidoRefDoc = pedidoRef(requestId);
   const cliente = {
     uid: request.auth.uid,
@@ -1230,6 +1239,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
       itens: itensDoPedido,
       freteId: String(freteEscolhido.id),
       salvarEndereco: Boolean(salvarEndereco),
+      cupomCodigo: codigoCupomNormalizado,
     }))
     .digest("hex");
   const perfilRef = db.collection("usuarios").doc(request.auth.uid);
@@ -1244,10 +1254,29 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
           "Este checkout já foi usado com outros dados. Atualize a página para iniciar um novo pedido."
         );
       }
-      return { pedidoId: pedidoRefDoc.id, total: dadosExistentes.total };
+      return {
+        pedidoId: pedidoRefDoc.id,
+        total: dadosExistentes.total,
+        subtotal: dadosExistentes.subtotal,
+        desconto: dadosExistentes.cupom?.desconto || 0,
+        frete: dadosExistentes.frete?.valor || 0,
+      };
     }
 
     const perfilAtual = await transaction.get(perfilRef);
+    const cupom = codigoCupomNormalizado
+      ? await reservarCupomNoPedido(transaction, {
+          uid: request.auth.uid,
+          codigo: codigoCupomNormalizado,
+          subtotalCentavos,
+          pedidoId: pedidoRefDoc.id,
+        })
+      : null;
+    const descontoCupomCentavos = Math.round(Number(cupom?.desconto || 0) * 100);
+    const total = (subtotalCentavos - descontoCupomCentavos + freteCentavos) / 100;
+    if (total <= 0) {
+      throw new HttpsError("failed-precondition", "O total do pedido precisa ser maior que zero para iniciar o pagamento.");
+    }
     const perfil = { documento };
     if (salvarEndereco) {
       const enderecosAnteriores = Array.isArray(perfilAtual.data()?.enderecos)
@@ -1266,6 +1295,8 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
       entrega,
       itens: itensDoPedido,
       subtotal: subtotalCentavos / 100,
+      descontoCupom: descontoCupomCentavos / 100,
+      cupom,
       frete: {
         id: freteEscolhido.id,
         nome: freteEscolhido.name || null,
@@ -1281,7 +1312,13 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     });
     transaction.set(perfilRef, perfil, { merge: true });
 
-    return { pedidoId: pedidoRefDoc.id, total };
+    return {
+      pedidoId: pedidoRefDoc.id,
+      subtotal: subtotalCentavos / 100,
+      desconto: descontoCupomCentavos / 100,
+      frete: freteCentavos / 100,
+      total,
+    };
   });
 });
 
@@ -1335,6 +1372,10 @@ exports.process_payment = onCall(
         },
         atualizadoEm: FieldValue.serverTimestamp(),
       });
+
+      if (pagamento.status === "approved") {
+        await confirmarUsoCupom({ ...pedido, id: pedidoId }).catch((err) => console.error("process_payment: não foi possível confirmar uso do cupom", err));
+      }
 
       return {
         success: true,
@@ -1470,6 +1511,12 @@ exports.webhookMP = onRequest(
         pagamento,
         cancelamento
       });
+
+      if (pag.status === "approved") {
+        await confirmarUsoCupom({ ...pedido, id: pedidoId });
+      } else if (pag.status === "cancelled") {
+        await liberarReservaCupom({ ...pedido, id: pedidoId }, "pagamento_cancelado");
+      }
 
       if (pedido.cliente?.uid) {
         await db.collection("usuarios")
@@ -1618,6 +1665,25 @@ Object.assign(exports, createNewsletterFunctions({
   FieldValue,
   verificarAdmin,
 }));
+
+const couponFunctions = createCouponFunctions({
+  onCall,
+  HttpsError,
+  db,
+  FieldValue,
+  verificarAdmin,
+  carregarItensDoCatalogo,
+});
+const { reservarCupomNoPedido, confirmarUsoCupom, liberarReservaCupom } = couponFunctions;
+Object.assign(exports, {
+  validarCupom: couponFunctions.validarCupom,
+  listarCuponsAdmin: couponFunctions.listarCuponsAdmin,
+  salvarCupomAdmin: couponFunctions.salvarCupomAdmin,
+  excluirCupomAdmin: couponFunctions.excluirCupomAdmin,
+  listarClientesCupomAdmin: couponFunctions.listarClientesCupomAdmin,
+  emitirCupomAdmin: couponFunctions.emitirCupomAdmin,
+  removerCupomClienteAdmin: couponFunctions.removerCupomClienteAdmin,
+});
 const newsletterSubscriberService = exports.newsletterSubscriberService;
 
 function validarPedidoParaGerarEtiqueta(pedido) {
