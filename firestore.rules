@@ -72,16 +72,29 @@ service cloud.firestore {
     }
 
     function validProduct(data) {
-      return data.keys().hasAll(["nome", "precos", "status"]) &&
+      return data.keys().hasAll(["nome", "tipo", "precos", "status"]) &&
         data.keys().hasOnly([
-          "nome", "slug", "categoria", "meta", "precos", "estoque",
+          "nome", "tipo", "slug", "categoria", "meta", "precos", "estoque",
           "dimensoesEmbalagem", "status", "midias", "conteudo", "seo",
+          "fichaTecnica", "opcoesVariacao", "variacoes",
           "preco", "precoPromocional", "ativo", "publicado"
         ]) &&
         validString(data.nome, 1, 200) &&
+        data.tipo in ["livro", "artigo_catolico", "vestuario", "outro"] &&
         validPrices(data.precos) && validStatus(data.status) &&
         validOptionalString(data, "slug", 160) &&
-        validOptionalString(data, "categoria", 100);
+        validOptionalString(data, "categoria", 100) &&
+        (!("fichaTecnica" in data) || (
+          data.fichaTecnica is map &&
+          data.fichaTecnica.keys().hasOnly(["isbn", "autor", "editora", "numeroPaginas"]) &&
+          validOptionalString(data.fichaTecnica, "isbn", 20) &&
+          validOptionalString(data.fichaTecnica, "autor", 160) &&
+          validOptionalString(data.fichaTecnica, "editora", 120) &&
+          (!("numeroPaginas" in data.fichaTecnica) || data.fichaTecnica.numeroPaginas == null ||
+            (data.fichaTecnica.numeroPaginas is int && data.fichaTecnica.numeroPaginas >= 0 && data.fichaTecnica.numeroPaginas <= 100000))
+        )) &&
+        (!("opcoesVariacao" in data) || (data.opcoesVariacao is list && data.opcoesVariacao.size() <= 5)) &&
+        (!("variacoes" in data) || (data.variacoes is list && data.variacoes.size() <= 100));
     }
 
     function isPublishedProduct() {

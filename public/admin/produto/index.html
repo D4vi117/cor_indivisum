@@ -10,7 +10,7 @@
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
 	<link rel="stylesheet" href="/styles.css">
-	<link rel="stylesheet" href="produto.css">
+	<link rel="stylesheet" href="produto.css?v=variacoes-v2">
 	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -48,6 +48,16 @@
 						<input type="text" id="field-nome">
 					</div>
 					<div class="form-group col-6">
+						<label for="field-tipo">Tipo de Produto</label>
+						<select id="field-tipo" required>
+							<option value="">Selecione o tipo antes de salvar</option>
+							<option value="livro">Livro</option>
+							<option value="artigo_catolico">Artigo católico</option>
+							<option value="vestuario">Vestuário</option>
+							<option value="outro">Outro</option>
+						</select>
+					</div>
+					<div class="form-group col-6">
 						<label for="field-slug">Slug (URL)</label>
 						<input type="text" id="field-slug">
 					</div>
@@ -68,6 +78,28 @@
 						<input type="number" id="field-estoque" min="0" step="1">
 					</div>
 				</div>
+			</section>
+
+			<section class="editor-card" id="secao-dados-livro" hidden>
+				<h3>Dados editoriais</h3>
+				<div class="form-grid">
+					<div class="form-group col-6"><label for="field-isbn">ISBN</label><input type="text" id="field-isbn" maxlength="20" placeholder="978-…"></div>
+					<div class="form-group col-6"><label for="field-autor">Autor</label><input type="text" id="field-autor" maxlength="160"></div>
+					<div class="form-group col-6"><label for="field-editora">Editora</label><input type="text" id="field-editora" maxlength="120"></div>
+					<div class="form-group col-6"><label for="field-numero-paginas">Número de páginas</label><input type="number" id="field-numero-paginas" min="0" max="100000" step="1"></div>
+				</div>
+			</section>
+
+			<section class="editor-card" id="secao-variacoes">
+				<h3>Opções e variações</h3>
+				<p class="editor-help">Combine opções como cor e tamanho, ou encadernação e formato de box. Cada combinação pode ter SKU, preço e estoque próprios. Sem variações, valem o preço e estoque principais.</p>
+				<div id="atributos-variacao" class="atributos-variacao"></div>
+				<div class="variacoes-acoes">
+					<button type="button" class="btn-secundario" id="btn-adicionar-atributo">+ Adicionar atributo</button>
+					<button type="button" class="btn-primary" id="btn-gerar-variacoes">Gerar combinações</button>
+					<span id="variacoes-resumo" class="editor-help" aria-live="polite">Exemplo: Tamanho (3) × Cor (2) = 6 combinações.</span>
+				</div>
+				<div class="variacoes-tabela-wrap" id="variacoes-tabela-wrap"><table class="variacoes-tabela"><thead><tr><th>Combinação</th><th>SKU</th><th>Preço (R$)</th><th>Estoque</th></tr></thead><tbody id="variacoes-tabela-corpo"><tr><td colspan="4" class="editor-help">Adicione atributos para montar as combinações.</td></tr></tbody></table></div>
 			</section>
 
 			<!-- LOGÍSTICA / MEDIDAS -->
@@ -243,7 +275,7 @@
 	</main>
 
 	<script src="/src/scripts/firebase-init.js"></script>
-	<script src="produto.js"></script>
+	<script src="produto.js?v=variacoes-v2"></script>
 </body>
 
 </html>

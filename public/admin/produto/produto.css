@@ -164,6 +164,10 @@ body {
   padding: 1.8rem;
 }
 
+.editor-card[hidden] {
+  display: none;
+}
+
 .editor-card h3 {
   margin-top: 0;
   margin-bottom: 1.3rem;
@@ -208,6 +212,7 @@ body {
 
 .form-group input[type="text"],
 .form-group input[type="number"],
+.form-group select,
 .form-group textarea {
   width: 100%;
   box-sizing: border-box;
@@ -221,10 +226,109 @@ body {
 }
 
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(184, 146, 61, 0.15);
+}
+
+.editor-help {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.atributos-variacao {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.atributo-variacao-linha {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.75fr) minmax(200px, 1.5fr) auto;
+  align-items: end;
+  gap: 0.75rem;
+  padding: 0.8rem;
+  border: 1px solid var(--hair);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.atributo-variacao-titulo {
+  grid-column: 1 / -1;
+  color: var(--ember);
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.atributo-variacao-linha label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.atributo-variacao-linha input,
+.variacoes-tabela input {
+  width: 100%;
+  min-width: 5rem;
+  box-sizing: border-box;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--hair);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.variacoes-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.8rem 0;
+}
+
+.btn-remover-atributo {
+  min-height: 2.35rem;
+  color: var(--ember);
+  border-color: var(--hair);
+}
+
+.variacoes-tabela-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--hair);
+}
+
+.variacoes-tabela {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+}
+
+.variacoes-tabela th,
+.variacoes-tabela td {
+  padding: 0.65rem;
+  border-bottom: 1px solid var(--hair);
+  text-align: left;
+}
+
+.variacoes-tabela thead th {
+  background: var(--parchment-dim);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.variacoes-tabela tbody th {
+  min-width: 180px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .media-hint {
@@ -500,5 +604,11 @@ body {
   }
   .sidebar-card {
     position: static;
+  }
+  .atributo-variacao-linha {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .btn-remover-atributo {
+    width: 100%;
   }
 }
