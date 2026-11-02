@@ -288,6 +288,15 @@
 					Nome
 					<input type="text" name="nome" required>
 				</label>
+				<label>Tipo do produto
+					<select name="tipo" required>
+						<option value="">Selecione o tipo</option>
+						<option value="livro">Livro</option>
+						<option value="artigo_catolico">Artigo católico</option>
+						<option value="vestuario">Vestuário</option>
+						<option value="outro">Outro</option>
+					</select>
+				</label>
 				<label>
 					Descrição curta
 					<textarea name="descricaoCurta" rows="3" style="width: 100%; box-sizing: border-box; resize: vertical; margin-top: 6px; border: 1px solid var(--border, #ccc); background: transparent; color: inherit; font-family: inherit; padding: 8px;"></textarea>
@@ -379,7 +388,7 @@
 	<script src="newsletter.js"></script>
 	<script src="cupons.js?v=cupons-20261020-2"></script>
 
-	<script src="admin.js?v=clientes-pedidos-20261020-2"></script>
+	<script src="admin.js?v=tipo-produto-v1"></script>
 
 </body>
 

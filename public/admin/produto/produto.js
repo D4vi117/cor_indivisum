@@ -1,5 +1,176 @@
 let produtoId = null;
 let galeriaImagens = [];
+let opcoesVariacaoEditor = [];
+let variacoesEditor = [];
+
+function serializarAtributos(atributos) {
+  return JSON.stringify(Object.entries(atributos || {}).sort(([nomeA], [nomeB]) => nomeA.localeCompare(nomeB, "pt-BR")));
+}
+
+function idVariacao(assinatura) {
+  let hash = 2166136261;
+  for (let i = 0; i < assinatura.length; i++) {
+    hash ^= assinatura.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `var_${(hash >>> 0).toString(36)}`;
+}
+
+function combinacoesVariacao(opcoes) {
+  return opcoes.reduce((combinacoes, opcao) => {
+    const novas = [];
+    for (const combinacao of combinacoes) {
+      for (const valor of opcao.valores) {
+        novas.push({ ...combinacao, [opcao.nome]: valor });
+        if (novas.length > 100) return novas;
+      }
+    }
+    return novas;
+  }, [{}]);
+}
+
+function coletarOpcoesVariacaoDaTela() {
+  return Array.from(document.querySelectorAll(".atributo-variacao-linha")).map((row) => ({
+    nome: row.querySelector("[data-atributo-nome]").value.trim(),
+    valores: [...new Set(row.querySelector("[data-atributo-valores]").value.split(",").map((v) => v.trim()).filter(Boolean))],
+  }));
+}
+
+function renderizarTabelaVariacoes() {
+  const tbody = document.getElementById("variacoes-tabela-corpo");
+  const resumo = document.getElementById("variacoes-resumo");
+  if (!tbody) return;
+
+  if (!opcoesVariacaoEditor.length) {
+    variacoesEditor = [];
+    tbody.innerHTML = '<tr><td colspan="4" class="editor-help">Adicione atributos para montar as combinações.</td></tr>';
+    if (resumo) resumo.textContent = "Sem atributos, será usado o preço e estoque principais.";
+    return;
+  }
+
+  const opcoesValidas = opcoesVariacaoEditor.filter((opcao) => opcao.nome && opcao.valores.length);
+  if (opcoesValidas.length !== opcoesVariacaoEditor.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="editor-help">Preencha o nome e a lista de valores de cada atributo para gerar as combinações.</td></tr>';
+    if (resumo) resumo.textContent = "Complete todos os atributos.";
+    return;
+  }
+  const nomesNormalizados = opcoesValidas.map((opcao) => opcao.nome.toLocaleLowerCase("pt-BR"));
+  if (new Set(nomesNormalizados).size !== nomesNormalizados.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="editor-help">Cada atributo precisa ter um nome diferente.</td></tr>';
+    if (resumo) resumo.textContent = "Há nomes de atributos repetidos.";
+    return;
+  }
+
+  const combinacoes = combinacoesVariacao(opcoesValidas);
+  const existentes = new Map(variacoesEditor.map((variacao) => [serializarAtributos(variacao.atributos), variacao]));
+  variacoesEditor = combinacoes.map((atributos) => {
+    const assinatura = serializarAtributos(atributos);
+    return existentes.get(assinatura) || { id: idVariacao(assinatura), atributos, sku: "", preco: null, estoque: 0 };
+  });
+
+  if (resumo) {
+    const formula = opcoesValidas.map((opcao) => `${opcao.nome} (${opcao.valores.length})`).join(" × ");
+    resumo.textContent = combinacoes.length > 100
+      ? `${formula}: mais de 100 combinações. Reduza as opções.`
+      : `${formula} = ${combinacoes.length} combinação(ões)`;
+  }
+  tbody.replaceChildren(...variacoesEditor.slice(0, 100).map((variacao) => {
+    const row = document.createElement("tr");
+    const descricao = document.createElement("th");
+    descricao.scope = "row";
+    descricao.textContent = Object.entries(variacao.atributos).map(([nome, valor]) => `${nome}: ${valor}`).join(" · ");
+
+    const skuCell = document.createElement("td");
+    const sku = document.createElement("input");
+    sku.type = "text";
+    sku.maxLength = 80;
+    sku.value = variacao.sku || "";
+    sku.setAttribute("aria-label", `SKU da variação ${descricao.textContent}`);
+    sku.addEventListener("input", () => { variacao.sku = sku.value.trim(); });
+    skuCell.appendChild(sku);
+
+    const priceCell = document.createElement("td");
+    const price = document.createElement("input");
+    price.type = "number";
+    price.min = "0.01";
+    price.step = "0.01";
+    price.placeholder = "Preço principal";
+    price.value = variacao.preco ?? "";
+    price.setAttribute("aria-label", `Preço da variação ${descricao.textContent}`);
+    price.addEventListener("input", () => { variacao.preco = price.value === "" ? null : Number(price.value); });
+    priceCell.appendChild(price);
+
+    const stockCell = document.createElement("td");
+    const stock = document.createElement("input");
+    stock.type = "number";
+    stock.min = "0";
+    stock.step = "1";
+    stock.value = variacao.estoque ?? 0;
+    stock.setAttribute("aria-label", `Estoque da variação ${descricao.textContent}`);
+    stock.addEventListener("input", () => { variacao.estoque = Math.max(0, Math.floor(Number(stock.value) || 0)); });
+    stockCell.appendChild(stock);
+    row.append(descricao, skuCell, priceCell, stockCell);
+    return row;
+  }));
+}
+
+function renderizarOpcoesVariacao() {
+  const container = document.getElementById("atributos-variacao");
+  if (!container) return;
+  container.replaceChildren(...opcoesVariacaoEditor.map((opcao, index) => {
+    const row = document.createElement("div");
+    row.className = "atributo-variacao-linha";
+    const title = document.createElement("strong");
+    title.className = "atributo-variacao-titulo";
+    title.textContent = `Atributo ${index + 1}`;
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "Nome do atributo";
+    const name = document.createElement("input");
+    name.type = "text";
+    name.maxLength = 40;
+    name.placeholder = "Ex.: Tamanho";
+    name.value = opcao.nome;
+    name.dataset.atributoNome = "";
+    name.addEventListener("input", () => {
+      opcoesVariacaoEditor = coletarOpcoesVariacaoDaTela();
+      renderizarTabelaVariacoes();
+    });
+    nameLabel.appendChild(name);
+
+    const valuesLabel = document.createElement("label");
+    valuesLabel.textContent = "Opções deste atributo (separadas por vírgula)";
+    const values = document.createElement("input");
+    values.type = "text";
+    values.maxLength = 500;
+    values.placeholder = "Ex.: P, M, G";
+    values.value = opcao.valores.join(", ");
+    values.dataset.atributoValores = "";
+    values.addEventListener("input", () => {
+      opcoesVariacaoEditor = coletarOpcoesVariacaoDaTela();
+      renderizarTabelaVariacoes();
+    });
+    valuesLabel.appendChild(values);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "btn-secundario btn-remover-atributo";
+    remove.textContent = "Remover";
+    remove.addEventListener("click", () => {
+      opcoesVariacaoEditor = coletarOpcoesVariacaoDaTela();
+      opcoesVariacaoEditor.splice(index, 1);
+      renderizarOpcoesVariacao();
+      renderizarTabelaVariacoes();
+    });
+    row.append(title, nameLabel, valuesLabel, remove);
+    return row;
+  }));
+}
+
+function atualizarCamposTipoProduto() {
+  const ehLivro = document.getElementById("field-tipo")?.value === "livro";
+  const secao = document.getElementById("secao-dados-livro");
+  if (secao) secao.hidden = !ehLivro;
+}
 
 function formatarData(ts) {
   if (!ts) return "-";
@@ -190,13 +361,33 @@ async function carregarProduto() {
     const dimensoes = data.dimensoesEmbalagem || {};
     const status = data.status || {};
     const conteudo = data.conteudo || {};
+    const fichaTecnica = data.fichaTecnica || {};
     const seo = data.seo || {};
     const midias = data.midias || {};
 
     // Preenchimento seguro dos campos
     definirValorSeExiste("field-nome", data.nome);
+    definirValorSeExiste("field-tipo", data.tipo);
     definirValorSeExiste("field-slug", data.slug);
     definirValorSeExiste("field-categoria", data.categoria);
+    definirValorSeExiste("field-isbn", fichaTecnica.isbn);
+    definirValorSeExiste("field-autor", fichaTecnica.autor);
+    definirValorSeExiste("field-editora", fichaTecnica.editora);
+    definirValorSeExiste("field-numero-paginas", fichaTecnica.numeroPaginas);
+    opcoesVariacaoEditor = Array.isArray(data.opcoesVariacao) ? data.opcoesVariacao.map((opcao) => ({
+      nome: typeof opcao?.nome === "string" ? opcao.nome : "",
+      valores: Array.isArray(opcao?.valores) ? opcao.valores.filter((valor) => typeof valor === "string") : [],
+    })) : [];
+    variacoesEditor = Array.isArray(data.variacoes) ? data.variacoes.map((variacao) => ({
+      id: typeof variacao?.id === "string" ? variacao.id : "",
+      atributos: variacao?.atributos && typeof variacao.atributos === "object" ? variacao.atributos : {},
+      sku: typeof variacao?.sku === "string" ? variacao.sku : "",
+      preco: variacao?.preco == null || variacao.preco === "" ? null : Number(variacao.preco),
+      estoque: Math.max(0, Math.floor(Number(variacao?.estoque) || 0)),
+    })) : [];
+    atualizarCamposTipoProduto();
+    renderizarOpcoesVariacao();
+    renderizarTabelaVariacoes();
 
     definirValorSeExiste("field-preco", precos.de !== undefined ? precos.de : 0);
     definirValorSeExiste("field-precoPromocional", precos.emOferta ? (precos.por || 0) : 0);
@@ -265,8 +456,18 @@ function obterObjetoProduto() {
 
   return {
     nome: (document.getElementById("field-nome")?.value || "").trim(),
+    tipo: document.getElementById("field-tipo")?.value || "",
     slug: (document.getElementById("field-slug")?.value || "").trim(),
     categoria: (document.getElementById("field-categoria")?.value || "").trim(),
+    fichaTecnica: {
+      isbn: (document.getElementById("field-isbn")?.value || "").trim(),
+      autor: (document.getElementById("field-autor")?.value || "").trim(),
+      editora: (document.getElementById("field-editora")?.value || "").trim(),
+      numeroPaginas: document.getElementById("field-numero-paginas")?.value
+        ? Number(document.getElementById("field-numero-paginas").value) : null,
+    },
+    opcoesVariacao: opcoesVariacaoEditor,
+    variacoes: variacoesEditor,
     meta: {
       editadoEm: firebase.firestore.FieldValue.serverTimestamp()
     },
@@ -312,6 +513,42 @@ function obterObjetoProduto() {
 
 async function salvarProduto(redirecionarParaVisualizar = false) {
   try {
+    const tipo = document.getElementById("field-tipo")?.value || "";
+    if (!tipo) {
+      alert("Selecione o tipo do produto antes de salvar. Produtos antigos não recebem um tipo automaticamente.");
+      document.getElementById("field-tipo")?.focus();
+      return;
+    }
+    opcoesVariacaoEditor = coletarOpcoesVariacaoDaTela();
+    const nomesOpcoes = opcoesVariacaoEditor.map((opcao) => opcao.nome.toLocaleLowerCase("pt-BR"));
+    if (opcoesVariacaoEditor.length > 5 || nomesOpcoes.some((nome) => !nome) || new Set(nomesOpcoes).size !== nomesOpcoes.length || opcoesVariacaoEditor.some((opcao) => !opcao.valores.length)) {
+      alert("Confira as opções: use nomes únicos e informe ao menos um valor para cada uma. O máximo é 5 opções.");
+      return;
+    }
+    const totalVariacoes = opcoesVariacaoEditor.length ? combinacoesVariacao(opcoesVariacaoEditor).length : 0;
+    if (totalVariacoes > 100) {
+      alert("As opções geram mais de 100 combinações. Reduza os valores antes de salvar.");
+      return;
+    }
+    const paginas = document.getElementById("field-numero-paginas")?.value;
+    if (tipo === "livro" && paginas && (!Number.isInteger(Number(paginas)) || Number(paginas) < 0 || Number(paginas) > 100000)) {
+      alert("Informe um número inteiro válido para as páginas.");
+      return;
+    }
+    if (tipo === "livro") {
+      const isbn = (document.getElementById("field-isbn")?.value || "").replace(/[\s-]/g, "");
+      if (isbn && !/^(?:\d{9}[\dXx]|\d{13})$/.test(isbn)) {
+        alert("O ISBN deve ter 10 ou 13 caracteres numéricos (o ISBN-10 também pode terminar em X).");
+        document.getElementById("field-isbn")?.focus();
+        return;
+      }
+    }
+    if (variacoesEditor.some((variacao) => !Number.isInteger(variacao.estoque) || variacao.estoque < 0 ||
+      (variacao.preco !== null && (!Number.isFinite(variacao.preco) || variacao.preco <= 0)))) {
+      alert("Confira o preço e o estoque de cada variação.");
+      return;
+    }
+    renderizarTabelaVariacoes();
     const dados = obterObjetoProduto();
     await db.collection("produtos").doc(produtoId).update(dados);
     
@@ -339,6 +576,23 @@ async function excluirProduto() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("field-tipo")?.addEventListener("change", atualizarCamposTipoProduto);
+  document.getElementById("btn-adicionar-atributo")?.addEventListener("click", () => {
+    if (opcoesVariacaoEditor.length >= 5) {
+      alert("O máximo é 5 opções por produto.");
+      return;
+    }
+    opcoesVariacaoEditor = coletarOpcoesVariacaoDaTela();
+    opcoesVariacaoEditor.push({ nome: "", valores: [] });
+    renderizarOpcoesVariacao();
+    renderizarTabelaVariacoes();
+    document.querySelector(".atributo-variacao-linha:last-child [data-atributo-nome]")?.focus();
+  });
+  document.getElementById("btn-gerar-variacoes")?.addEventListener("click", () => {
+    opcoesVariacaoEditor = coletarOpcoesVariacaoDaTela();
+    renderizarTabelaVariacoes();
+    document.getElementById("variacoes-tabela-wrap")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
   document.getElementById("field-pre-venda")?.addEventListener("change", atualizarControleIgnorarEstoque);
   initWYSIWYG();
 

@@ -63,6 +63,7 @@ form.addEventListener("submit", async (e) => {
 
   const dados = {
     nome: form.nome.value.trim(),
+    tipo: form.tipo.value,
     conteudo: {
       descricaoCurta: form.descricaoCurta ? form.descricaoCurta.value.trim() : "",
     },
