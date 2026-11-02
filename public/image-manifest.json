@@ -46,6 +46,31 @@
       "directory": "loja/p/Maria-a-flauta-de-Deus/images"
     },
     {
+      "path": "/loja/p/vinte-sonetos/assets/icon.png",
+      "name": "icon.png",
+      "directory": "loja/p/vinte-sonetos/assets"
+    },
+    {
+      "path": "/loja/p/vinte-sonetos/assets/igor.png",
+      "name": "igor.png",
+      "directory": "loja/p/vinte-sonetos/assets"
+    },
+    {
+      "path": "/loja/p/vinte-sonetos/assets/leitor.png",
+      "name": "leitor.png",
+      "directory": "loja/p/vinte-sonetos/assets"
+    },
+    {
+      "path": "/loja/p/vinte-sonetos/assets/livro.png",
+      "name": "livro.png",
+      "directory": "loja/p/vinte-sonetos/assets"
+    },
+    {
+      "path": "/loja/p/vinte-sonetos/assets/logo-full.png",
+      "name": "logo-full.png",
+      "directory": "loja/p/vinte-sonetos/assets"
+    },
+    {
       "path": "/src/images/Fundo.webp",
       "name": "Fundo.webp",
       "directory": "src/images"

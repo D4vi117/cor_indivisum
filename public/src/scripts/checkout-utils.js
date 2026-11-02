@@ -94,7 +94,10 @@ async function adicionarAoCarrinho(produtoId) {
     return;
   }
 
-  let carrinho = obterCarrinho();
+  // Páginas isoladas não carregam o leitor de carrinho do catálogo.
+  let carrinho = typeof obterCarrinho === "function"
+    ? obterCarrinho()
+    : JSON.parse(localStorage.getItem("carrinho_cor_indivisum")) || [];
   const index = carrinho.findIndex(item => item.id === produtoId);
   const estoque = Number(produto.estoque?.quantidade) || 0;
   const quantidadeAtual = index > -1 ? Number(carrinho[index].qtd) || 0 : 0;
