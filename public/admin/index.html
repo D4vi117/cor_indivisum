@@ -10,6 +10,7 @@
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
 	<link rel="stylesheet" href="admin.css?v=clientes-pedidos-20261020-2">
+	<link rel="stylesheet" href="/src/styles/resgates.css">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -39,6 +40,8 @@
 		<!-- ============ SELETOR (ABAS) ============ -->
 		<nav class="admin-tabs" aria-label="Seções do painel">
 			<button class="admin-tab is-active" data-tab="produtos" type="button">Produtos</button>
+			<button class="admin-tab" data-tab="cursos" type="button">Cursos</button>
+			<button class="admin-tab" data-tab="resgates" type="button">Resgates</button>
 			<button class="admin-tab" data-tab="pedidos" type="button">Pedidos</button>
 			<button class="admin-tab" data-tab="contas" type="button">Contas</button>
 			<button class="admin-tab" data-tab="cupons" type="button">Cupons</button>
@@ -53,7 +56,7 @@
 					<span class="eyebrow">Catálogo</span>
 					<h2>Produtos</h2>
 				</div>
-				<button class="btn-primary" data-action="novo-produto" type="button">+ Novo produto</button>
+				<div><button class="btn-primary" data-action="novo-produto" type="button">+ Novo produto</button> <a class="btn-primary" href="/admin/curso/">+ Novo curso</a></div>
 			</div>
 			<div class="table-wrap">
 				<table class="admin-table" id="tabela-produtos">
@@ -70,6 +73,24 @@
 				</table>
 				<p class="tabela-vazia" hidden>Nenhum produto cadastrado ainda.</p>
 			</div>
+		</section>
+
+		<section class="admin-panel" id="painel-cursos" data-panel="cursos">
+			<div class="panel-head"><div><span class="eyebrow">Catálogo</span><h2>Cursos</h2></div><a class="btn-primary" href="/admin/curso/">+ Novo curso</a></div>
+			<p>Cadastre cursos, organize módulos e aulas e publique para disponibilizar a compra.</p>
+			<p id="cursos-feedback" role="status">Carregando cursos...</p>
+			<div class="table-wrap"><table class="admin-table"><thead><tr><th>Curso</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead><tbody id="cursos-lista"></tbody></table></div>
+		</section>
+
+		<section class="admin-panel" id="painel-resgates" data-panel="resgates">
+			<div class="panel-head"><h2>Códigos de resgate</h2></div>
+			<p>Libere um curso ou produto digital sem cobrança. Cada código pode ser usado uma vez.</p>
+			<form id="resgate-admin-form"><label>Item<select id="resgate-item" required><option value="">Carregando itens...</option></select></label>
+			<label>Validade em dias<input id="resgate-dias" type="number" min="1" max="365" value="30" required></label>
+			<button class="btn-primary" type="submit">Gerar código de 20 dígitos</button></form>
+			<p id="resgate-admin-feedback" role="status"></p>
+			<div id="resgate-gerado" hidden><p>Copie agora. O código completo não será exibido novamente.</p><output id="resgate-codigo"></output> <button class="btn-secundario" id="resgate-copiar" type="button">Copiar</button></div>
+			<h3>Últimos códigos</h3><div id="resgate-admin-lista"></div>
 		</section>
 
 		<!-- ============ CUPONS ============ -->
@@ -385,6 +406,8 @@
 	</div>
 
 	<script src="/src/scripts/firebase-init.js"></script>
+	<script src="/admin/curso/lista.js"></script>
+	<script src="/admin/resgates.js"></script>
 	<script src="newsletter.js"></script>
 	<script src="cupons.js?v=cupons-20261020-2"></script>
 

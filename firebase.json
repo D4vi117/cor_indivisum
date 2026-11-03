@@ -21,6 +21,10 @@
   ],
   "hosting": {
     "public": "public",
+    "headers": [
+      { "source": "/src/scripts/site-footer.js", "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }] },
+      { "source": "/src/styles/site-footer.css", "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }] }
+    ],
     "predeploy": "node scripts/generate-image-manifest.js",
     "redirects": [
       {
@@ -76,6 +80,7 @@
       "APITest/**"
     ],
     "rewrites": [
+      { "source": "/cursos/**", "destination": "/cursos/index.html" },
       {
         "source": "/api/newsletter/resend/callback",
         "function": {

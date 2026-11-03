@@ -11,6 +11,8 @@ rules_version = '2';
 //          somente por Cloud Functions (Admin SDK ignora estas regras).
 // Coleções operacionais: rate_limits, webhook_logs, melhor_envio_config e
 // estados OAuth não são acessíveis pelo cliente.
+// cursos: dados comerciais; somente cursos publicados têm leitura pública.
+// cursos_conteudos: módulos/aulas privados, separados da futura vitrine.
 // ===============================================================
 
 service cloud.firestore {
@@ -111,6 +113,43 @@ service cloud.firestore {
       allow get, list: if isPublishedProduct() || isStaff();
       allow create, update: if isStaff() && validProduct(request.resource.data);
       allow delete: if isStaff();
+    }
+
+    function validCourse(data) {
+      return data.keys().hasAll(["tipo", "nome", "slug", "professor", "resumo", "descricao", "capa", "preco", "status", "criadoEm", "editadoEm"]) &&
+        data.keys().hasOnly(["tipo", "nome", "slug", "professor", "resumo", "descricao", "capa", "preco", "status", "criadoEm", "editadoEm"]) &&
+        data.tipo == "curso" && data.status in ["rascunho", "publicado"] &&
+        (data.status != "publicado" || data.preco > 0) &&
+        validString(data.nome, 1, 200) && validString(data.slug, 1, 160) &&
+        data.slug.matches("[A-Za-z0-9]+(-[A-Za-z0-9]+)*") &&
+        validString(data.professor, 0, 160) && validString(data.resumo, 0, 500) &&
+        validString(data.descricao, 0, 15000) && validString(data.capa, 0, 2000) &&
+        (data.capa == "" || data.capa.matches("https://.*")) &&
+        data.preco is number && data.preco >= 0 && data.preco <= 1000000 &&
+        data.criadoEm is timestamp && data.editadoEm == request.time;
+    }
+
+    function validCourseContent(data) {
+      return data.keys().hasAll(["modulos", "editadoEm"]) &&
+        data.keys().hasOnly(["modulos", "editadoEm"]) &&
+        data.modulos is list && data.modulos.size() <= 30 &&
+        data.editadoEm == request.time;
+    }
+
+    match /cursos/{cursoId} {
+      allow read: if resource.data.status == "publicado" || isStaff();
+      allow create: if isStaff() && validCourse(request.resource.data) &&
+        request.resource.data.criadoEm == request.time;
+      allow update: if isStaff() && validCourse(request.resource.data) &&
+        request.resource.data.criadoEm == resource.data.criadoEm;
+      allow delete: if false;
+    }
+
+    match /cursos_conteudos/{cursoId} {
+      allow read: if isStaff();
+      allow create, update: if isStaff() && validCourseContent(request.resource.data) &&
+        existsAfter(/databases/$(database)/documents/cursos/$(cursoId));
+      allow delete: if false;
     }
 
     // =============================================================

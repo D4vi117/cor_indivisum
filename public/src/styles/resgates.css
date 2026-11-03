@@ -1,0 +1,13 @@
+#resgate-admin-form, #form-resgatar { display:flex; gap:1rem; align-items:end; flex-wrap:wrap; margin:1.5rem 0; }
+#resgate-admin-form label { display:grid; gap:.4rem; flex:1 1 200px; }
+#resgate-admin-form input, #resgate-admin-form select, #codigo-resgate { font:inherit; padding:.7rem; border:1px solid var(--hair); border-radius:3px; background:var(--parchment); color:var(--ink); max-width:100%; min-width:0; box-sizing:border-box; }
+#resgate-admin-form button, #form-resgatar button { min-height:44px; }
+#form-resgatar label { flex-basis:100%; }
+#codigo-resgate { flex:1 1 230px; font-variant-numeric:tabular-nums; }
+#resgate-codigo { font:600 1.2rem monospace; overflow-wrap:anywhere; user-select:all; }
+#resgate-gerado { padding:1rem; border:1px solid var(--hair); margin:1rem 0; }
+#resgate-acessos p, #resgate-admin-lista p { padding:.8rem 0; border-bottom:1px solid var(--hair); overflow-wrap:anywhere; }
+#resgate-conteudo p { white-space:pre-wrap; }
+#resgate-conteudo details { padding:1rem 0; border-bottom:1px solid var(--hair); }
+#resgate-conteudo summary { cursor:pointer; }
+#codigo-resgate:focus-visible, #resgate-conteudo summary:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }

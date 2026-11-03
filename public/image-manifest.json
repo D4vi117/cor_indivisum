@@ -1,6 +1,16 @@
 {
   "images": [
     {
+      "path": "/cursos/Encontrar-o-belo-em-si/Capa.jpg",
+      "name": "Capa.jpg",
+      "directory": "cursos/Encontrar-o-belo-em-si"
+    },
+    {
+      "path": "/cursos/Encontrar-o-belo-em-si/Professor.png",
+      "name": "Professor.png",
+      "directory": "cursos/Encontrar-o-belo-em-si"
+    },
+    {
       "path": "/favicon.png",
       "name": "favicon.png",
       "directory": ""
@@ -46,6 +56,11 @@
       "directory": "loja/p/Maria-a-flauta-de-Deus/images"
     },
     {
+      "path": "/loja/p/poemas-de-natal/images/livro.jpeg",
+      "name": "livro.jpeg",
+      "directory": "loja/p/poemas-de-natal/images"
+    },
+    {
       "path": "/loja/p/vinte-sonetos/assets/icon.png",
       "name": "icon.png",
       "directory": "loja/p/vinte-sonetos/assets"
@@ -71,6 +86,21 @@
       "directory": "loja/p/vinte-sonetos/assets"
     },
     {
+      "path": "/src/images/badges/GoogleSafeBrowsing.svg",
+      "name": "GoogleSafeBrowsing.svg",
+      "directory": "src/images/badges"
+    },
+    {
+      "path": "/src/images/badges/Infinitepay.svg",
+      "name": "Infinitepay.svg",
+      "directory": "src/images/badges"
+    },
+    {
+      "path": "/src/images/badges/ProtectedByCloudflareBadge_web_badges_1.webp",
+      "name": "ProtectedByCloudflareBadge_web_badges_1.webp",
+      "directory": "src/images/badges"
+    },
+    {
       "path": "/src/images/Fundo.webp",
       "name": "Fundo.webp",
       "directory": "src/images"
@@ -84,6 +114,11 @@
       "path": "/src/images/icons/cart.svg",
       "name": "cart.svg",
       "directory": "src/images/icons"
+    },
+    {
+      "path": "/src/images/infinitepay.svg",
+      "name": "infinitepay.svg",
+      "directory": "src/images"
     }
   ]
 }

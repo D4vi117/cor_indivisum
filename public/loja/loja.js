@@ -73,6 +73,7 @@ function renderizarModalCarrinho(carrinho) {
 }
 
 function alterarQtdModal(index, delta) {
+  if (delta > 0 && String(obterCarrinho()[index]?.id).startsWith('curso:')) return;
   let carrinho = obterCarrinho();
   const item = carrinho[index];
   const produto = todosProdutos.find((p) => p.id === item?.id);

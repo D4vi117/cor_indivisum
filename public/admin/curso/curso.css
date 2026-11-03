@@ -1,0 +1,26 @@
+.curso-editor { max-width: 1300px; margin: 2.4rem auto; padding: 0 20px 3rem; }
+.curso-editor > h1 { font: 500 1.5rem 'Cinzel', serif; }
+.curso-editor .editor-layout { margin: 0; padding: 0; width: 100%; }
+.curso-editor .editor-main, .curso-editor .editor-sidebar { min-width: 0; }
+.curso-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+.curso-grid > label:first-child { grid-column: 1 / -1; }
+.curso-editor fieldset { border: 0; padding: 0; min-width: 0; }
+.curso-editor label { display: grid; gap: .35rem; margin: 1rem 0; color: var(--ink); }
+.curso-editor input, .curso-editor textarea, .curso-editor select { width: 100%; box-sizing: border-box; padding: .7rem; border: 1px solid var(--hair); background: var(--parchment); color: var(--ink); font: inherit; }
+.curso-editor textarea { resize: vertical; }
+.curso-editor input:focus-visible, .curso-editor textarea:focus-visible, .curso-editor select:focus-visible, .curso-editor button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.curso-modulo { border: 1px solid var(--hair); border-radius: 4px; margin: 1rem 0; }
+.curso-modulo > summary, .curso-aula > summary { cursor: pointer; padding: 1rem; overflow-wrap: anywhere; }
+.curso-modulo > summary { background: var(--parchment-dim); font-weight: 600; }
+.curso-modulo-corpo { padding: 1rem; }
+.curso-aula { border-top: 1px solid var(--hair); margin-top: .75rem; }
+.curso-aula-corpo { padding: .5rem 1rem 1rem; }
+.curso-vazio { padding: 1rem 0; color: var(--ink-soft); }
+.curso-editor input, .curso-editor textarea { background: #fff; border-radius: 3px; }
+.curso-editor select { padding: .7rem; border: 1px solid var(--hair); border-radius: 3px; background: #fff; color: var(--ink); font: inherit; width: 100%; }
+.curso-editor summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+#curso-nome-preview { font: 500 1.1rem 'Cinzel', serif; overflow-wrap: anywhere; }
+.curso-acoes { display: flex; flex-wrap: wrap; gap: .5rem; }
+.curso-editor button:disabled { opacity: .5; cursor: not-allowed; }
+#feedback { min-height: 1.5rem; }
+@media (max-width: 600px) { .curso-editor .editor-card { padding: 1rem; } .curso-acoes button { flex: 1 1 auto; } .curso-grid { grid-template-columns: minmax(0, 1fr); } .admin-top-inner { flex-direction: column; align-items: flex-start; gap: 12px; } .admin-top-inner > div:first-child { flex-wrap: wrap; gap: 10px; } }

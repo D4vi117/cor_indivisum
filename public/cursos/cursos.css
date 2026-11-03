@@ -1,0 +1,42 @@
+.cursos-topo .loja-header-inner { gap: 1.5rem; }
+.cursos-nav { display: flex; align-items: center; gap: 1.5rem; }
+.cursos-nav a { color: var(--parchment); text-decoration: none; font-size: .9rem; }
+.cursos-nav a[aria-current], .cursos-nav a:hover { color: var(--gold-bright); }
+.cursos-nav .btn-carrinho-topo { color: var(--gold-bright); }
+.cursos-main { flex: 1 0 auto; margin: 2rem auto 5rem; width: 100%; box-sizing: border-box; }
+.curso-breadcrumb { display: flex; flex-wrap: wrap; gap: .7rem; color: var(--ink-soft); font-size: .9rem; margin-bottom: 2.5rem; }
+.curso-breadcrumb a { color: inherit; text-decoration: none; }
+.curso-breadcrumb a:hover { color: var(--ember); }
+.cursos-intro { max-width: 850px; margin-bottom: 2.5rem; }
+.cursos-intro h1 { font: 500 clamp(2rem, 4vw, 3.4rem)/1.13 'Cormorant Garamond', serif; color: var(--ink); margin: .6rem 0 1rem; text-wrap: balance; overflow-wrap: anywhere; }
+.cursos-intro > p { color: var(--ink-soft); font-size: 1.15rem; }
+.cursos-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.8rem; }
+.curso-publico { min-width: 0; }
+.curso-visual { aspect-ratio: 16 / 10; background: var(--parchment-dim); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.curso-visual img { width: 100%; height: 100%; object-fit: contain; }
+.curso-sem-capa { font: .9rem 'Cinzel', serif; letter-spacing: .14em; color: var(--ink-soft); padding: 1.5rem; }
+.curso-professor { font-style: italic; color: var(--ink-soft); margin: .3rem 0 .8rem; }
+.curso-preco { font: 600 1.65rem 'Cormorant Garamond', serif; color: var(--oxblood); font-variant-numeric: tabular-nums; display: block; margin-top: 1rem; }
+.curso-entrega { color: var(--ink-soft); font-size: .9rem; margin: .2rem 0 1rem; }
+.curso-publico .btn-primary { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; min-height: 44px; box-sizing: border-box; }
+.curso-publico button:disabled { opacity: .6; cursor: wait; }
+.curso-publico p { overflow-wrap: anywhere; }
+.curso-detalhe { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr); gap: 2rem 3rem; align-items: start; }
+.curso-detalhe .curso-visual { border: 1px solid var(--hair); border-radius: 3px; }
+.curso-compra { padding: 1.6rem; border: 1px solid var(--hair); background: var(--parchment-dim); border-radius: 3px; }
+.curso-compra .card-titulo { font-size: 1.75rem; margin: .5rem 0 1rem; }
+.curso-compra .card-descricao { max-height: none; overflow: visible; }
+.curso-compra .btn-primary { width: 100%; }
+.curso-apresentacao { grid-column: 1 / -1; border-top: 1px solid var(--hair); padding: 2rem 0 0; }
+.curso-apresentacao h2 { font: 500 1.7rem 'Cormorant Garamond', serif; margin-bottom: 1rem; }
+.curso-apresentacao .descricao { max-width: 70ch; white-space: pre-wrap; line-height: 1.75; color: var(--ink-soft); font-size: 1.1rem; }
+.curso-aulas details { border-bottom: 1px solid var(--hair); padding: 1rem 0; }
+.curso-aulas summary { cursor: pointer; font-weight: 600; }
+.curso-aulas summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.curso-aulas h3 { margin-top: 1.5rem; }
+.cursos-main #cursos-status:empty { display: none; }
+.curso-pular { position: absolute; top: -100px; left: 1rem; z-index: 10; background: var(--parchment); color: var(--ink); padding: .7rem; }
+.curso-pular:focus { top: 1rem; }
+.cursos-topo a:focus-visible, .cursos-main a:focus-visible, .cursos-main button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+@media(max-width: 950px) { .cursos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cursos-nav { gap: 1rem; } }
+@media(max-width: 650px) { .cursos-topo .loja-header-inner { align-items: flex-start; flex-direction: column; } .cursos-nav { flex-wrap: wrap; gap: .8rem 1.2rem; } .cursos-grid, .curso-detalhe { grid-template-columns: minmax(0, 1fr); } .cursos-intro { margin-bottom: 1.5rem; } .curso-breadcrumb { margin-bottom: 1.5rem; } }

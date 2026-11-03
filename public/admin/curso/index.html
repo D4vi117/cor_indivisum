@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar curso · Cor Indivisum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/admin/produto/produto.css"><link rel="stylesheet" href="curso.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+</head>
+<body>
+  <header class="admin-top"><div class="admin-top-inner"><div><a class="btn-voltar" href="/admin/">← Voltar ao painel</a><span class="admin-brand">Cor Indivisum</span></div><div class="top-actions"><a class="btn-secundario" href="/admin/">Cancelar</a><button class="btn-primary" type="submit" form="curso-form" id="salvar-topo" disabled>Salvar rascunho</button></div></div></header>
+  <main class="curso-editor">
+    <h1 id="titulo-editor">Novo curso</h1>
+    <p>Prepare o curso e publique para disponibilizar a compra. A área de aulas dos alunos será conectada na próxima etapa.</p>
+    <p id="feedback" role="status" aria-live="polite">Verificando acesso...</p>
+    <form id="curso-form" hidden>
+      <fieldset id="editor-campos" class="editor-layout">
+       <div class="editor-main">
+        <section class="editor-card"><h3>Informações principais</h3><div class="curso-grid">
+          <label>Nome do curso<input name="nome" required maxlength="200"></label>
+          <label>Slug<input name="slug" required maxlength="160" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" placeholder="Nome-do-Curso"></label>
+          <label>Professor<input name="professor" maxlength="160"></label>
+        </div></section>
+        <section class="editor-card"><h3>Apresentação do curso</h3>
+          <label>Descrição curta<textarea name="resumo" maxlength="500" rows="3"></textarea></label>
+          <label>Apresentação completa<textarea name="descricao" maxlength="15000" rows="6"></textarea></label>
+          <label>URL HTTPS da capa<input name="capa" type="url" maxlength="2000" pattern="https://.*" placeholder="https://..."></label>
+        </section>
+        <section class="editor-card"><h3>Preço</h3>
+          <label>Preço (R$)<input name="preco" type="number" required min="0" max="1000000" step="0.01" value="0"></label>
+          <label>Status<select name="status"><option value="rascunho">Rascunho</option><option value="publicado">Publicado · disponível para compra</option></select></label>
+          <p class="editor-help">Cursos não exigem estoque, peso ou dimensões.</p>
+        </section>
+        <section class="editor-card"><h3>Módulos e aulas</h3>
+          <p class="editor-help">Monte a estrutura do curso e abra uma aula para editar seu conteúdo. Os vídeos poderão ser adicionados depois.</p>
+          <p id="estrutura-resumo"></p><div id="modulos"></div>
+          <button class="btn-secundario" type="button" id="adicionar-modulo">+ Adicionar módulo</button>
+        </section>
+       </div>
+       <aside class="editor-sidebar"><div class="editor-card sidebar-card">
+         <h3>Resumo do curso</h3>
+         <div class="sidebar-thumb-wrap"><img id="curso-capa-preview" alt="Capa do curso" hidden><span id="curso-sem-capa">Sem capa</span></div>
+         <h2 id="curso-nome-preview">Novo curso</h2>
+         <div class="sidebar-info-list">
+           <div class="info-item"><span>Status</span><strong id="curso-status-preview" class="status-badge" data-status="off">Rascunho</strong></div>
+           <div class="info-item"><span>Preço</span><strong id="curso-preco-preview">R$ 0,00</strong></div>
+           <div class="info-item"><span>Conteúdo</span><strong id="curso-contagem">0 aulas</strong></div>
+         </div>
+         <a id="curso-link-publico" href="/cursos/">Ver página pública</a>
+       </div></aside>
+      </fieldset>
+    </form>
+  </main>
+  <script src="/src/scripts/firebase-init.js"></script><script src="curso.js?v=publicacao-cursos-2"></script>
+</body>
+</html>

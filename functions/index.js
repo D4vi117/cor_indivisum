@@ -6,6 +6,7 @@ const { setGlobalOptions } = require("firebase-functions/v2");
 const crypto = require("crypto");
 const { createNewsletterFunctions } = require("./newsletter/functions");
 const { createCouponFunctions } = require("./coupons");
+const { createRedemptionFunctions } = require("./redemptions");
 
 // Define a região global para TODAS as funções v2 deste arquivo
 setGlobalOptions({ region: "southamerica-east1" });
@@ -141,6 +142,17 @@ async function carregarItensDoCatalogo(itensSolicitados) {
 
   return Promise.all(
     [...quantidades.keys()].map(async (id) => {
+      if (id.startsWith("curso:")) {
+        const cursoId = id.slice(6);
+        if (!cursoId || cursoId.includes("/")) throw new HttpsError("invalid-argument", "Curso inválido");
+        const cursoSnap = await db.collection("cursos").doc(cursoId).get();
+        const curso = cursoSnap.data();
+        if (!curso || curso.status !== "publicado" || !Number.isFinite(curso.preco) || curso.preco <= 0) {
+          throw new HttpsError("failed-precondition", "Curso indisponível");
+        }
+        if (quantidades.get(id) !== 1) throw new HttpsError("invalid-argument", "Cada curso permite uma inscrição por pedido");
+        return { id, cursoId, tipoItem: "curso", nome: curso.nome, preco: curso.preco, qtd: 1 };
+      }
       const snap = await db.collection("produtos").doc(id).get();
       if (!snap.exists) {
         throw new HttpsError("not-found", "Produto não encontrado");
@@ -755,7 +767,7 @@ async function comprarEtiquetaMelhorEnvio(pedidoId, pedido) {
     "User-Agent": "Cor Indivisum (contato@corindivisum.com.br)",
   };
 
-  const itens = pedido.itens || [];
+  const itens = (pedido.itens || []).filter((item) => item.tipoItem !== "curso");
   const produtosSnaps = await Promise.all(
     itens.map((item) => db.collection("produtos").doc(item.id).get())
   );
@@ -771,7 +783,7 @@ async function comprarEtiquetaMelhorEnvio(pedidoId, pedido) {
     };
   });
 
-  const valorSegurado = Math.max(Number(pedido.total) || 0, 1);
+  const valorSegurado = Math.max(itens.reduce((soma, item) => soma + Number(item.preco) * item.qtd, 0), 1);
 
   const entrega = pedido.entrega || {};
 
@@ -929,7 +941,7 @@ exports.melhorEnvioCalcularFrete = onRequest(
     const payload = {
       from: { postal_code: String(cepOrigem).replace(/\D/g, "") },
       to: { postal_code: destinoNormalizado },
-      products: itens.map((item) => ({
+      products: itens.filter((item) => item.tipoItem !== "curso").map((item) => ({
         id: item.id,
         width: item.dimensoes.largura,
         height: item.dimensoes.altura,
@@ -1138,7 +1150,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
 
   const {
     cliente: clienteRecebido,
-    endereco,
+    endereco = {},
     itens: itensSolicitados,
     freteId,
     salvarEndereco,
@@ -1155,22 +1167,26 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
   const cepDestino = String(endereco?.cep || "").replace(/\D/g, "");
   const cepOrigem = cepOrigemConfigurado();
 
-  if (!nome || !telefone || ![11, 14].includes(documento.length) || cepDestino.length !== 8) {
+  const itens = await carregarItensDoCatalogo(itensSolicitados);
+  const itensFisicos = itens.filter((item) => item.tipoItem !== "curso");
+  const precisaEntrega = itensFisicos.length > 0;
+  if (!nome || !telefone || ![11, 14].includes(documento.length) || (precisaEntrega && cepDestino.length !== 8)) {
     throw new HttpsError("invalid-argument", "Dados de cliente ou entrega inválidos");
   }
-  if (typeof freteId !== "number" && typeof freteId !== "string") {
+  if (precisaEntrega && typeof freteId !== "number" && typeof freteId !== "string") {
     throw new HttpsError("invalid-argument", "Opção de frete inválida");
   }
-  if (!cepOrigem) {
+  if (precisaEntrega && !cepOrigem) {
     console.error("criarPedido: REMETENTE_POSTAL_CODE não configurado ou inválido");
     throw new HttpsError("failed-precondition", "A configuração de frete está indisponível");
   }
 
-  const itens = await carregarItensDoCatalogo(itensSolicitados);
   if (cupomCodigo !== undefined && cupomCodigo !== null && typeof cupomCodigo !== "string") {
     throw new HttpsError("invalid-argument", "Código de cupom inválido.");
   }
   const codigoCupomNormalizado = typeof cupomCodigo === "string" ? cupomCodigo.trim().toLocaleUpperCase("pt-BR") : "";
+  let freteEscolhido = { id: "sem-envio", name: "Curso online · sem frete", price: 0 };
+  if (precisaEntrega) {
   const accessToken = await getMelhorEnvioAccessToken();
   const freteRes = await fetch(`${MELHOR_ENVIO_BASE_URL}/api/v2/me/shipment/calculate`, {
     method: "POST",
@@ -1183,7 +1199,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     body: JSON.stringify({
       from: { postal_code: cepOrigem },
       to: { postal_code: cepDestino },
-      products: itens.map((item) => ({
+      products: itensFisicos.map((item) => ({
         id: item.id,
         width: item.dimensoes.largura,
         height: item.dimensoes.altura,
@@ -1199,11 +1215,12 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     throw new HttpsError("unavailable", "Não foi possível validar o frete");
   }
 
-  const freteEscolhido = opcoesFrete.find(
+  freteEscolhido = opcoesFrete.find(
     (opcao) => String(opcao.id) === String(freteId) && !opcao.error && Number(opcao.price) >= 0
   );
   if (!freteEscolhido) {
     throw new HttpsError("failed-precondition", "A opção de frete expirou; calcule novamente");
+  }
   }
 
   const subtotalCentavos = itens.reduce(
@@ -1220,7 +1237,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
     documento,
   };
   const entrega = {
-    cep: cepDestino,
+    cep: precisaEntrega ? cepDestino : "",
     estado: String(endereco.estado || "").trim(),
     rua: String(endereco.rua || "").trim(),
     numero: String(endereco.numero || "").trim(),
@@ -1278,7 +1295,7 @@ exports.criarPedido = onCall({ secrets: ["MELHOR_ENVIO_CLIENT_SECRET"] }, async 
       throw new HttpsError("failed-precondition", "O total do pedido precisa ser maior que zero para iniciar o pagamento.");
     }
     const perfil = { documento };
-    if (salvarEndereco) {
+    if (salvarEndereco && precisaEntrega) {
       const enderecosAnteriores = Array.isArray(perfilAtual.data()?.enderecos)
         ? perfilAtual.data().enderecos
         : [];
@@ -1666,6 +1683,8 @@ Object.assign(exports, createNewsletterFunctions({
   verificarAdmin,
 }));
 
+Object.assign(exports, createRedemptionFunctions({ onCall, HttpsError, db, FieldValue, verificarAdmin }));
+
 const couponFunctions = createCouponFunctions({
   onCall,
   HttpsError,
@@ -1743,6 +1762,9 @@ exports.adminAtualizarPedido = onCall(async (request) => {
 const newsletterSubscriberService = exports.newsletterSubscriberService;
 
 function validarPedidoParaGerarEtiqueta(pedido) {
+  if (pedido.itens?.length && pedido.itens.every((item) => item.tipoItem === "curso")) {
+    throw new HttpsError("failed-precondition", "Cursos não precisam de etiqueta de envio.");
+  }
   if (pedido.status !== "pago") {
     throw new HttpsError(
       "failed-precondition",

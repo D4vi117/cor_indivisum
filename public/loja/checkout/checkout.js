@@ -31,6 +31,17 @@ function obterCarrinho() {
   return JSON.parse(localStorage.getItem("carrinho_cor_indivisum")) || [];
 }
 
+function precisaEntrega() {
+  return obterCarrinho().some((item) => !String(item.id).startsWith('curso:'));
+}
+
+function configurarEntrega() {
+  const fisico = precisaEntrega();
+  const bloco = document.getElementById('entrega-checkout');
+  bloco.hidden = !fisico;
+  bloco.querySelectorAll('input, select').forEach((input) => { input.disabled = !fisico; });
+}
+
 // 2. Renderizar Resumo do Pedido na Lateral
 function renderizarResumoPedido() {
   carrinhoAtual = obterCarrinho();
@@ -78,7 +89,7 @@ function renderizarResumoPedido() {
   if (subtotalEl) subtotalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
 
   if (freteEl) {
-    freteEl.textContent = freteSelecionado
+    freteEl.textContent = !precisaEntrega() ? 'Sem frete · curso online' : freteSelecionado
       ? `R$ ${valorFrete.toFixed(2).replace('.', ',')}`
       : "Selecione abaixo";
   }
@@ -147,6 +158,7 @@ async function aplicarCupomCheckout() {
 
 // 3. Autopreenchimento de Endereço via CEP (ViaCEP API)
 async function buscarCEP(cep) {
+  if (!precisaEntrega()) return;
   const cepLimpo = cep.replace(/\D/g, "");
   const consultaAtual = ++consultaCepAtual;
   controladorCep?.abort();
@@ -206,7 +218,7 @@ async function buscarCEP(cep) {
 
 // 3.1 Monta a lista de produtos no formato esperado pela function de frete
 function montarProdutosParaFrete(carrinho) {
-  return carrinho.map((item) => ({
+  return carrinho.filter((item) => !String(item.id).startsWith('curso:')).map((item) => ({
     id: item.id,
     quantidade: item.qtd,
   }));
@@ -380,14 +392,14 @@ function selecionarFrete(opcoes, idx) {
 function atualizarEstadoBotaoCheckout() {
   const btn = document.querySelector(".btn-checkout");
   if (!btn) return;
-  btn.disabled = !freteSelecionado;
+  btn.disabled = precisaEntrega() && !freteSelecionado;
 }
 
 // 4. Submissão do Form e Criação do Pedido
 async function processarPedido(e) {
   e.preventDefault();
 
-  if (!freteSelecionado) {
+  if (precisaEntrega() && !freteSelecionado) {
     alert("Selecione uma opção de frete antes de continuar.");
     return;
   }
@@ -436,7 +448,7 @@ async function processarPedido(e) {
       cliente: { nome, email, telefone, documento },
       endereco,
       itens: carrinhoAtual.map((item) => ({ id: item.id, qtd: item.qtd })),
-      freteId: freteSelecionado.id,
+      freteId: precisaEntrega() ? freteSelecionado?.id : null,
       salvarEndereco: Boolean(salvarEndereco),
       cupomCodigo: cupomAplicado?.codigo || "",
     });
@@ -570,6 +582,7 @@ function aplicarMascaras() {
 
 // Inicialização
 document.addEventListener("DOMContentLoaded", () => {
+  configurarEntrega();
   renderizarResumoPedido();
   aplicarMascaras();
   atualizarEstadoBotaoCheckout();

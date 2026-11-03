@@ -20,6 +20,11 @@ async function renderizarPaginaCarrinho() {
 
   try {
     await Promise.all(carrinho.map(async (item) => {
+      if (String(item.id).startsWith('curso:')) {
+        const curso = await db.collection('cursos').doc(item.id.slice(6)).get();
+        estoquePorId.set(item.id, curso.data()?.status === 'publicado' ? 1 : 0);
+        return;
+      }
       const doc = await db.collection("produtos").doc(item.id).get();
       const produto = doc.exists ? doc.data() : {};
       const ignoraEstoque = produto.status?.preVenda === true &&
@@ -94,6 +99,7 @@ async function renderizarPaginaCarrinho() {
 
 function alterarQtd(index, delta) {
   let carrinho = obterCarrinho();
+  if (delta > 0 && String(carrinho[index].id).startsWith('curso:')) return;
   if (delta > 0) {
     db.collection("produtos").doc(carrinho[index].id).get().then((doc) => {
       const produto = doc.exists ? doc.data() : {};

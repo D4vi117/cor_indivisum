@@ -10,6 +10,7 @@
 		href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
 		rel="stylesheet">
 	<link rel="stylesheet" href="minha-conta.css">
+	<link rel="stylesheet" href="/src/styles/resgates.css">
 	<link rel="icon" href="/favicon.png" type="image/png">
 </head>
 
@@ -31,7 +32,9 @@
 		<!-- ============ ABAS ============ -->
 		<nav class="conta-tabs" id="contaTabs">
 			<button class="conta-tab active" data-tab="pedidos" type="button">Pedidos</button>
+			<button class="conta-tab" data-tab="digitais" type="button">Meus produtos digitais</button>
 			<button class="conta-tab" data-tab="dados" type="button">Meus dados</button>
+			<button class="conta-tab" data-tab="resgatar" type="button">Resgatar código</button>
 			<button class="conta-tab" data-tab="seguranca" type="button">Segurança</button>
 		</nav>
 
@@ -43,6 +46,22 @@
 					<div class="pedidos-vazio">Carregando pedidos…</div>
 				</div>
 			</section>
+		</section>
+
+		<section class="conta-painel" id="painel-resgatar" hidden>
+			<section class="conta-card"><h2>Resgatar acesso</h2><p>Recebeu um código? Digite os 20 dígitos para vincular o curso ou produto digital à sua conta.</p>
+			<form id="form-resgatar"><label for="codigo-resgate">Código de resgate</label><input id="codigo-resgate" type="text" inputmode="numeric" autocomplete="off" maxlength="30" required placeholder="00000 00000 00000 00000"><button class="btn-secundario" type="submit">Resgatar</button></form>
+			<p id="resgate-feedback" role="status" aria-live="polite"></p></section>
+			<button class="btn-secundario" id="resgate-ver-produtos" type="button">Ver meus produtos digitais</button>
+		</section>
+
+		<section class="conta-painel" id="painel-digitais" hidden>
+			<p id="digitais-feedback" role="status" aria-live="polite"></p>
+			<div id="resgate-acessos">
+				<section class="conta-card"><h2>Meus cursos</h2><div id="digitais-cursos">Carregando cursos...</div></section>
+				<section class="conta-card"><h2>Outros produtos digitais</h2><div id="digitais-produtos">Carregando produtos...</div></section>
+			</div>
+			<section class="conta-card" id="resgate-conteudo" hidden></section>
 		</section>
 
 		<!-- ============ ABA: MEUS DADOS ============ -->
@@ -128,7 +147,9 @@
 
 	<!-- minha-conta.js na mesma página -->
 	<script src="minha-conta.js"></script>
+	<script src="resgates.js"></script>
 
+<script src="/src/scripts/site-footer.js?v=3" defer></script>
 </body>
 
 </html>

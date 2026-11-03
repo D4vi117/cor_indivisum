@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cursos · Cor Indivisum</title>
+  <meta name="description" content="Conheça os cursos da Cor Indivisum e encontre sua próxima formação.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/loja/loja.css"><link rel="stylesheet" href="/cursos/cursos.css?v=identidade-1">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+</head>
+<body>
+  <a class="curso-pular" href="#conteudo">Pular para o conteúdo</a>
+  <header class="loja-header cursos-topo"><div class="loja-header-inner">
+    <a class="brand-logo" href="/">Cor Indivisum</a>
+    <nav class="cursos-nav" aria-label="Navegação"><a href="/loja/">Loja</a><a href="/cursos/" aria-current="page">Cursos</a><a href="/minha-conta/">Minha Conta</a><a class="btn-carrinho-topo" href="/loja/carrinho/">Carrinho (<span id="cursos-cart-count">0</span>)</a></nav>
+  </div></header>
+  <main class="loja-container cursos-main" id="conteudo">
+    <nav class="curso-breadcrumb" aria-label="Caminho da página"><a href="/loja/">Loja</a><span aria-hidden="true">/</span><a href="/cursos/">Cursos</a></nav>
+    <div class="cursos-intro"><span class="eyebrow">Cor Indivisum · Formação</span><h1 id="cursos-titulo">Cursos</h1><p id="cursos-intro-texto">Conheça nossos cursos e escolha sua próxima formação.</p></div>
+    <p id="cursos-status" class="loading-state" role="status">Carregando cursos...</p><div id="cursos-conteudo" aria-busy="true"></div>
+  </main>
+  <footer><div class="cross">✝</div><p class="fine">COR INDIVISUM &middot; Iniciativa católica leiga &middot; Produção audiovisual &amp; editora</p></footer>
+  <script src="/src/scripts/firebase-init.js"></script><script src="/cursos/cursos.js?v=identidade-1"></script>
+<script src="/src/scripts/site-footer.js?v=3" defer></script>
+</body>
+</html>
