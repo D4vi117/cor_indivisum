@@ -56,9 +56,24 @@
       "directory": "loja/p/Maria-a-flauta-de-Deus/images"
     },
     {
-      "path": "/loja/p/poemas-de-natal/images/livro.jpeg",
+      "path": "/loja/p/Poemas-de-Natal/assets/igor-barbosa.png",
+      "name": "igor-barbosa.png",
+      "directory": "loja/p/Poemas-de-Natal/assets"
+    },
+    {
+      "path": "/loja/p/Poemas-de-Natal/assets/logo-full.png",
+      "name": "logo-full.png",
+      "directory": "loja/p/Poemas-de-Natal/assets"
+    },
+    {
+      "path": "/loja/p/Poemas-de-Natal/assets/mockup-frontal.png",
+      "name": "mockup-frontal.png",
+      "directory": "loja/p/Poemas-de-Natal/assets"
+    },
+    {
+      "path": "/loja/p/Poemas-de-Natal/images/livro.jpeg",
       "name": "livro.jpeg",
-      "directory": "loja/p/poemas-de-natal/images"
+      "directory": "loja/p/Poemas-de-Natal/images"
     },
     {
       "path": "/loja/p/vinte-sonetos/assets/icon.png",
